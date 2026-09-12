@@ -1,7 +1,7 @@
 {
-  "name": "黄金建仓助手 V2.5.1",
+  "name": "黄金建仓助手 V2.6",
   "short_name": "黄金建仓",
-  "description": "积存金下跌分批建仓、反弹分批止盈的盯盘助手，支持本地数据保存与 Excel 导出",
+  "description": "积存金下跌分批建仓、反弹分批止盈的盯盘助手，支持账号云同步与 Excel 导出",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

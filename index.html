@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.1</title>
+<title>黄金建仓助手 V3.1.1</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -433,6 +433,8 @@
     .sb-logo{width:32px; height:32px; border-radius:10px;}
     .sb-icons{display:none;}
     .sb-panel{display:flex;}
+    .sb-panel-head{justify-content:flex-end; padding:10px 12px 6px;}
+    .sb-panel-head b{display:none;}
     .sb-close{display:inline-flex;}
     .sb-mask{display:block; position:fixed; inset:0; background:rgba(6,8,12,.55); z-index:390;
       opacity:0; visibility:hidden; transition:opacity .25s; backdrop-filter:blur(2px);}
@@ -830,7 +832,7 @@
     </section>
     </div>
 
-    <footer class="foot">黄金建仓助手 V3.1 —— 图标侧边栏 · 三栏布局 · 黑金视觉 · 多方案 · 双建仓逻辑 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.1.1 —— 图标侧边栏 · 三栏布局 · 黑金视觉 · 多方案 · 双建仓逻辑 · 账号云同步</footer>
   </div>
 
 
@@ -1745,10 +1747,11 @@ function initSidebar(){
   function showSec(key){
     activeKey=key;
     var title=document.getElementById('sbPanelTitle');
-    if(title) title.textContent = SECTIONS[key] || '';
+    var mob=isMobile();
+    if(title) title.textContent = mob ? '' : (SECTIONS[key] || '');
     var list=document.querySelectorAll('#sbPanel .sb-sec');
     for(var i=0;i<list.length;i++){
-      list[i].style.display = (list[i].id.toLowerCase()==='sb'+key) ? '' : 'none';
+      list[i].style.display = (mob || list[i].id.toLowerCase()==='sb'+key) ? '' : 'none';
     }
     document.querySelectorAll('.sb-icon').forEach(function(b){
       b.classList.toggle('on', b.getAttribute('data-sb')===key);
@@ -2079,7 +2082,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.1.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

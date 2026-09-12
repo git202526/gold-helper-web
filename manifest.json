@@ -1,7 +1,7 @@
 {
-  "name": "黄金建仓助手 V3.0",
+  "name": "黄金建仓助手 V3.1",
   "short_name": "黄金建仓",
-  "description": "黑金科技视觉 · 积存金下跌分批建仓、反弹分批止盈，多端账号云同步",
+  "description": "图标侧边栏·三栏布局·黑金视觉·积存金下跌分批建仓反弹分批止盈，多端账号云同步",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

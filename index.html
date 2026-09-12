@@ -1320,7 +1320,7 @@ var SECRETS = {   /* 内置账号密文（离线兜底） */
 var KEY_SESSION='jcj_session_v1';
 var KEY_REMEMBER='jcj_remember_v1';
 var SECRETS_FILE='_secrets.json';
-var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'', sha:null, updatedAt:'', timer:null, busy:false, masterToken:'' };
+var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'', sha:null, updatedAt:'', timer:null, busy:false, ready:false, masterToken:'' };
 
 function toBuf(s){ return Uint8Array.from(atob(s), function(c){ return c.charCodeAt(0); }); }
 function toB64(b){ var arr=new Uint8Array(b), str=''; for(var i=0;i<arr.length;i++) str+=String.fromCharCode(arr[i]); return btoa(str); }
@@ -1455,10 +1455,10 @@ function cloudPull(silent){
     setSyncUI('离线（联网后自动同步）', false);
     if(!silent) toast('云端同步失败：'+(e&&e.message?e.message:'网络错误'));
     return false;
-  }).then(function(v){ _cloud.busy=false; return v; });
+  }).then(function(v){ _cloud.busy=false; _cloud.ready=true; return v; });
 }
 function cloudPush(silent){
-  if(!_cloud.token) return Promise.resolve(false);
+  if(!_cloud.token || !_cloud.ready) return Promise.resolve(false);
   if(_cloud.busy){
     clearTimeout(_cloud.timer);
     _cloud.timer = setTimeout(function(){ cloudPush(silent); }, 3000);
@@ -1520,7 +1520,7 @@ window.__syncPushDelayed = function(){
   _cloud.timer=setTimeout(function(){ cloudPush(true); }, 2000);
 };
 function loginOk(u, tk, remember, offline){
-  _cloud.token=tk; _cloud.user=u;
+  _cloud.token=tk; _cloud.user=u; _cloud.ready=false;
   try{ sessionStorage.setItem(KEY_SESSION, JSON.stringify({user:u, token:tk})); }catch(e){}
   var rb=document.getElementById('loginRemember');
   try{
@@ -1568,7 +1568,7 @@ function doAuth(){
   });
 }
 function doLogout(){
-  _cloud.token=''; _cloud.user=''; _cloud.sha=null; _cloud.updatedAt='';
+  _cloud.token=''; _cloud.user=''; _cloud.sha=null; _cloud.updatedAt=''; _cloud.ready=false;
   try{ sessionStorage.removeItem(KEY_SESSION); }catch(e){}
   document.getElementById('loginUserTag').textContent='退出';
   document.getElementById('loginMsg').textContent='';
@@ -1699,7 +1699,7 @@ function initAuth(){
   var sess=null;
   try{ var raw=sessionStorage.getItem(KEY_SESSION); if(raw) sess=JSON.parse(raw); }catch(e){}
   if(sess && sess.user && sess.token){
-    _cloud.token=sess.token; _cloud.user=sess.user;
+    _cloud.token=sess.token; _cloud.user=sess.user; _cloud.ready=false;
     document.getElementById('loginMask').classList.add('hide');
     document.getElementById('loginUserTag').textContent=sess.user;
     setSyncUI('同步中…', true);

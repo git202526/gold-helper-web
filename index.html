@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#241d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V2.5.1</title>
+<title>黄金建仓助手 V2.6</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V2.5 主题系统（亮/暗） ================= */
@@ -55,24 +55,52 @@
     background-image:var(--bg-grad); background-attachment:fixed;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1280px; margin:0 auto; padding:22px 20px 60px;}
+  .wrap{max-width:1400px; margin:0 auto; padding:22px 20px 60px; display:flex; gap:18px; align-items:flex-start;}
   button{font-family:inherit; cursor:pointer; border:none; border-radius:12px; font-size:.92rem; padding:9px 18px;
     transition:filter .15s, transform .12s, box-shadow .15s;}
   button:hover{filter:brightness(1.07);}
   button:active{transform:translateY(1px);}
   input{font-family:inherit;}
 
-  /* ===== 登录门禁 ===== */
-  .login-mask{position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center; padding:20px;
-    background-image:radial-gradient(900px 480px at 50% -20%, rgba(224,184,77,.16) 0%, transparent 65%), linear-gradient(135deg,#2e2a21 0%,#191611 100%);}
-  .login-mask.hide{display:none;}
-  .login-card{width:min(92vw,380px); background:var(--card); border:1px solid var(--line); border-radius:22px; padding:34px 28px 26px;
-    box-shadow:var(--shadow-2); text-align:center;}
-  .login-badge{width:64px; height:64px; margin:0 auto 14px; border-radius:20px; background:var(--gold-grad);
-    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 24px -8px rgba(184,134,11,.55);}
-  .login-card h1{font-size:1.45rem; font-weight:800; letter-spacing:.5px; color:var(--ink);}
-  .login-card .ver{display:inline-block; margin:6px 0 20px; font-size:.72rem; color:var(--gold-deep); background:var(--gold-bg);
-    border:1px solid var(--gold); padding:2px 10px; border-radius:99px; font-weight:600;}
+  /* ===== V2.6 左侧边栏（账号 / 建仓逻辑 / 行情参数） ===== */
+  .sidebar{width:300px; flex:none; position:sticky; top:18px; max-height:calc(100vh - 36px);
+    display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:20px;
+    box-shadow:var(--shadow-1); overflow:hidden;}
+  .sb-head{background:var(--head-bg); color:#f5e9d0; padding:18px 18px 14px; position:relative;}
+  .sb-head h1{font-size:1.18rem; font-weight:800; letter-spacing:.5px; padding-right:34px;}
+  .sb-head .ver{display:inline-block; font-size:.6rem; font-weight:600; color:#f0cf6b;
+    background:rgba(255,255,255,.12); border:1px solid rgba(212,175,55,.5); padding:1px 8px; border-radius:99px; margin-left:8px; vertical-align:middle;}
+  .sb-head .sub{font-size:.78rem; color:#d5c9ab; margin-top:3px;}
+  .sb-close{position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:9px; border:none;
+    background:rgba(255,255,255,.1); color:#e8dcc0; font-size:1.1rem; line-height:1; cursor:pointer; display:none;}
+  .sb-scroll{flex:1; overflow-y:auto; padding:14px;}
+  .sb-sec{border:1px solid var(--line); border-radius:14px; background:var(--card-2); padding:12px; margin-bottom:14px;}
+  .sb-sec.collapsed .sb-body{display:none;}
+  .sb-sec.collapsed .fold-btn .ar{transform:rotate(-90deg);}
+  .sb-title{font-size:.88rem; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:7px; margin-bottom:10px;}
+  .sb-title::before{content:''; width:4px; height:14px; border-radius:3px; background:var(--gold-grad); flex:none;}
+  .sb-title .tag{font-size:.68rem; font-weight:400; color:var(--ink-2); background:var(--card); border:1px solid var(--line); padding:1px 8px; border-radius:99px;}
+  .sb-title .fold-btn{margin-left:auto; display:inline-flex; align-items:center; gap:4px;
+    border:1px solid var(--line); background:var(--card); border-radius:9px; font-size:.68rem; color:var(--ink-2); cursor:pointer; padding:3px 8px; font-family:inherit;}
+  .sb-title .fold-btn .ar{display:inline-block; transition:transform .2s; color:var(--gold);}
+  .sb-user{font-size:.88rem; color:var(--ink); margin-bottom:8px;}
+  .sb-user b{color:var(--gold-deep);}
+  .sb-syncrow{margin-bottom:8px;}
+  .sync-dot.sb{display:inline-block; max-width:100%; overflow:hidden; text-overflow:ellipsis;}
+  .btn-logout.sb{width:100%; display:flex; align-items:center; justify-content:center; gap:5px;
+    background:transparent; color:var(--ink-2); border:1px solid var(--line); border-radius:10px;
+    padding:8px 12px; font-size:.82rem; cursor:pointer; font-family:inherit;}
+  .btn-logout.sb:hover{color:var(--danger); border-color:var(--danger);}
+  .sb-planbtn{width:100%; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px;
+    border:1.5px dashed var(--gold); color:var(--gold-deep); background:var(--gold-bg); border-radius:11px;
+    padding:9px 12px; font-size:.82rem; font-weight:600; cursor:pointer; font-family:inherit;}
+  .sb-mask{display:none;}
+  .main{flex:1; min-width:0;}
+  .btn-sb-open{display:none; align-items:center; justify-content:center; flex:none;
+    border:1px solid rgba(255,255,255,.2); color:#e8dcc0; background:rgba(255,255,255,.08);
+    border-radius:12px; min-width:38px; height:38px; font-size:1.05rem; cursor:pointer; font-family:inherit; line-height:1; padding:0 10px;}
+
+  /* ===== 登录表单（边栏内） ===== */
   .login-field{position:relative; margin-bottom:12px;}
   .login-field input{width:100%; background:var(--input-bg); border:1px solid var(--line); border-radius:12px;
     padding:13px 14px 13px 42px; font-size:1rem; color:var(--ink); outline:none; transition:border-color .18s, box-shadow .18s;}
@@ -137,12 +165,10 @@
     border:1px solid var(--line); background:var(--card-2); border-radius:10px; font-size:.72rem; color:var(--ink-2); cursor:pointer; padding:4px 10px; font-family:inherit;}
   .card h2 .fold-btn:hover{border-color:var(--gold); color:var(--ink);}
   .card h2 .fold-btn .ar{display:inline-block; transition:transform .2s; color:var(--gold);}
-  #paramCard.collapsed .fold-btn .ar{transform:rotate(-90deg);}
-  #paramCard.collapsed .params{display:none;}
-  #paramCard.collapsed h2{margin-bottom:0;}
-  #planCard.collapsed .logicBox{display:none;}
-  #planCard.collapsed .fold-btn .ar{transform:rotate(-90deg);}
-  #planCard.collapsed h2{margin-bottom:0;}
+  #sbParams.collapsed .sb-body{display:none;}
+  #sbParams.collapsed .fold-btn .ar{transform:rotate(-90deg);}
+  #sbLogic.collapsed .sb-body{display:none;}
+  #sbLogic.collapsed .fold-btn .ar{transform:rotate(-90deg);}
 
   /* ===== 方案管理 ===== */
   .plan-row{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;}
@@ -161,7 +187,7 @@
   .plan-note{margin-top:12px; font-size:.8rem; color:var(--ink-2); line-height:1.6;}
 
   /* ===== 参数区 ===== */
-  .params{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .params{display:grid; grid-template-columns:1fr; gap:12px;}
   .field label{display:block; font-size:.85rem; color:var(--ink-2); margin-bottom:6px;}
   .field .ipt{width:100%; border:1px solid var(--line); border-radius:10px; padding:9px 11px; font-size:1rem; color:var(--ink); background:var(--input-bg); font-family:inherit; transition:border-color .18s, box-shadow .18s;}
   .field .ipt:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,134,11,.15);}
@@ -292,7 +318,15 @@
   .drawer-new:active{transform:scale(.98);}
 
   @media (max-width:760px){
-    .params{grid-template-columns:1fr;}
+    .wrap{display:block; padding:14px 12px 50px;}
+    .sidebar{position:fixed; top:0; left:0; bottom:0; width:min(86vw,340px); max-height:none; border-radius:0;
+      border-right:1px solid var(--line); z-index:400; transform:translateX(-102%); transition:transform .26s ease;}
+    .sidebar.open{transform:translateX(0); box-shadow:var(--shadow-2);}
+    .sb-close{display:block;}
+    .sb-mask{display:block; position:fixed; inset:0; background:rgba(20,16,10,.45); z-index:390;
+      opacity:0; visibility:hidden; transition:opacity .25s;}
+    .sb-mask.show{opacity:1; visibility:visible;}
+    .btn-sb-open{display:inline-flex;}
     .status{grid-template-columns:repeat(2,1fr);}
     header.top{padding:14px; border-radius:16px;}
     .price-bar{width:100%;}
@@ -321,10 +355,9 @@
       --danger:#b3372f; --danger-bg:#fbeae8; --info:#2b5f8a; --info-bg:#e8f0f7;
       --table-head:#3a3327; --table-head-ink:#f4ead2; --stripe:#faf7ef; --check-row:#fbf5e3; --tier-cur-row:#edf3e8; --input-bg:#fff; --sel-bg:#fff; --adv-bg:#fde3e8; }
     *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .btn-ghost, #btnRefresh, #btnPrint, #toast, .btn-print, .field .hint, .tier-zone, .legend, .card h2 .fold-btn, .btn-ic, .btn-plan-top, .btn-logout, .login-mask, .sync-dot{ display:none !important; }
-    #paramCard.collapsed .params{ display:grid !important; }
-    #paramCard.collapsed h2{ margin-bottom:5px; }
-    .wrap{ max-width:100%; padding:0; }
+    .btn-ghost, #btnRefresh, #btnPrint, #toast, .btn-print, .field .hint, .tier-zone, .legend, .card h2 .fold-btn, .btn-ic, .btn-plan-top, .btn-logout, .login-mask, .sync-dot, .sidebar, .sb-mask, .btn-sb-open{ display:none !important; }
+    .wrap{ max-width:100%; padding:0; display:block; }
+    .main{ width:100%; }
     header.top{ border-radius:10px; padding:6px 12px; }
     header.top h1{ font-size:16px; }
     header.top .ver{ font-size:8.5px; padding:0 6px; }
@@ -384,197 +417,213 @@
 
 </head>
 <body>
-<!-- ===== 登录门禁（双账号） ===== -->
-<div class="login-mask" id="loginMask">
-  <div class="login-card">
-    <div class="login-badge">
-      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 4v6c0 4.4-3 7.4-7 9-4-1.6-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-    </div>
-    <h1>黄金建仓助手</h1>
-    <span class="ver">V2.5.1 · 账号云同步</span>
-    <div class="login-field">
-      <span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-      <input id="loginUser" type="text" autocomplete="username" placeholder="账号">
-    </div>
-    <div class="login-field">
-      <span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-      <input id="loginPass" type="password" autocomplete="current-password" placeholder="密码">
-    </div>
-    <button class="btn-login" id="btnLogin" type="button">登 录</button>
-    <div class="login-msg" id="loginMsg"></div>
-    <div class="login-tip">默认账号：admin / admin123 或 uesr / uesr123<br>登录后数据自动云端同步，多端同一账号数据一致<br>（重开浏览器需重新登录）</div>
-  </div>
-</div>
 <div class="wrap">
 
-  <header class="top">
-    <div class="topbar">
-      <div>
-        <h1>黄金建仓助手<span class="ver">V2.5.1</span></h1>
-        <div class="sub">倒金字塔建仓 · 分批止盈 · 双账号云同步</div>
-      </div>
-      <div class="topbtns">
-        <button class="btn-font btn-ic" id="btnFontMinus" type="button" title="减小字号">A−</button>
-        <button class="btn-font btn-ic" id="btnFontPlus" type="button" title="增大字号">A+</button>
-        <button class="btn-ic" id="btnTheme" type="button" title="切换日夜模式">
-          <svg id="icMoon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-          <svg id="icSun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-        </button>
-        <button class="btn-plan-top" id="btnPlanOpen" type="button" title="方案管理">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>方案
-        </button>
-        <span class="sync-dot" id="syncDot" title="云同步状态"></span>
-        <button class="btn-logout" id="btnLogout" type="button" title="退出登录">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span id="loginUserTag">退出</span>
-        </button>
-      </div>
+  <!-- ===== 左侧边栏：账号同步 / 建仓逻辑 / 行情参数 ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <h1>黄金建仓助手<span class="ver">V2.6</span></h1>
+      <div class="sub">倒金字塔建仓 · 分批止盈 · 账号云同步</div>
+      <button class="sb-close" id="btnSbClose" type="button" title="关闭菜单">×</button>
     </div>
-    <div class="price-bar">
-      <span class="label">Au99.99 实时金价</span>
-      <span class="val" id="goldVal">--</span>
-      <span class="unit">元/克</span>
-      <button class="btn-gold btn-sm" id="btnRefresh">刷新</button>
-      <button class="btn-print btn-sm" id="btnPrint"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>打印</button>
-      <button class="btn-print btn-sm" id="btnExport" title="导出当前数据为 Excel 可打开的表格"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出</button>
-      <div class="meta" id="goldMeta">自动获取中…</div>
-    </div>
-  </header>
+    <div class="sb-scroll">
 
-  <!-- ===== 方案：两套建仓逻辑（方案新建/切换在侧边栏） ===== -->
-  <section class="card" id="planCard">
-    <h2>建仓逻辑 <span class="tag" id="planLogicTxt">逻辑1 · 原版</span>
-      <button class="fold-btn" id="foldLogic" type="button" title="收起/展开建仓逻辑"><span class="ar">▾</span><span class="ftxt">收起</span></button>
-    </h2>
-    <div class="logicBox" id="logicBox">
-    <div class="logic-row">
-      <span class="logic-label">当前方案 <b id="curPlanName" style="color:var(--gold-deep);">默认方案</b></span>
-      <div class="seg seg-logic" id="segLogic">
-        <button type="button" data-logic="1">逻辑1 · 原版<br><small>5档起 · 6:10:17:27:44:72:124</small></button>
-        <button type="button" data-logic="2">逻辑2 · 深跌版<br><small>-40前不建 · -60/-80/-100/-120</small></button>
+      <!-- 账号与同步 -->
+      <div class="sb-sec">
+        <div class="sb-title">账号与同步</div>
+        <div id="sbLoginForm">
+          <div class="login-field">
+            <span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <input id="loginUser" type="text" autocomplete="username" placeholder="账号">
+          </div>
+          <div class="login-field">
+            <span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <input id="loginPass" type="password" autocomplete="current-password" placeholder="密码">
+          </div>
+          <button class="btn-login" id="btnLogin" type="button">登 录</button>
+          <div class="login-msg" id="loginMsg"></div>
+          <div class="login-tip">登录后数据自动云端同步，多端同一账号数据一致<br>（重开浏览器需重新登录）</div>
+        </div>
+        <div id="sbUserInfo" style="display:none">
+          <div class="sb-user">已登录：<b id="loginUserTag">--</b></div>
+          <div class="sb-syncrow"><span class="sync-dot sb" id="syncDot"></span></div>
+          <button class="btn-logout sb" id="btnLogout" type="button">退出登录</button>
+        </div>
       </div>
-    </div>
-    <div class="plan-note" id="planNote">每套方案独立保存数据；逻辑1/逻辑2 持仓各自独立。点顶部「☰ 方案」新建、切换或重命名方案。</div>
-    </div>
-  </section>
 
-  <!-- ===== 参数区（可折叠） ===== -->
-  <section class="card" id="paramCard">
-    <h2>行情参数 <span class="tag">输入后全表联动</span>
-      <button class="fold-btn" id="foldParams" type="button" title="收起/展开参数"><span class="ar">▾</span><span class="ftxt">收起</span></button>
-    </h2>
-    <div class="params" id="paramsBox">
-      <div class="field">
-        <label for="inHigh">阶段高点（本轮行情高点，元/克）</label>
-        <input class="ipt" id="inHigh" type="number" min="0" step="0.01" placeholder="如 560">
+      <!-- 建仓逻辑 -->
+      <div class="sb-sec" id="sbLogic">
+        <div class="sb-title">建仓逻辑 <span class="tag" id="planLogicTxt">逻辑1 · 原版</span>
+          <button class="fold-btn" id="foldLogic" type="button" title="收起/展开建仓逻辑"><span class="ar">▾</span><span class="ftxt">收起</span></button>
+        </div>
+        <div class="sb-body" id="logicBox">
+          <div class="logic-row">
+            <span class="logic-label">当前方案 <b id="curPlanName" style="color:var(--gold-deep);">默认方案</b></span>
+            <div class="seg seg-logic" id="segLogic">
+              <button type="button" data-logic="1">逻辑1 · 原版<br><small>5档起 · 6:10:17:27:44:72:124</small></button>
+              <button type="button" data-logic="2">逻辑2 · 深跌版<br><small>-40前不建 · -60/-80/-100/-120</small></button>
+            </div>
+          </div>
+          <div class="plan-note" id="planNote">每套方案独立保存数据；逻辑1/逻辑2 持仓各自独立。</div>
+          <button class="sb-planbtn" id="btnPlanOpen" type="button">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>方案管理（新建 / 切换 / 重命名）
+          </button>
+        </div>
       </div>
-      <div class="field">
-        <label for="inPrice">当前金价（元/克）</label>
-        <input class="ipt" id="inPrice" type="number" min="0" step="0.01" placeholder="自动获取后可手动改">
-        <div class="hint">自动获取失败时可手动填写</div>
-      </div>
-      <div class="field">
-        <label for="inCap">持仓上限（克）</label>
-        <input class="ipt" id="inCap" type="number" min="1" step="1" placeholder="默认 300">
-        <div class="hint">各档购买重量按 6:10:17:27:44:72:124 比例自动换算</div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ===== 当前状态 ===== -->
-  <section class="card">
-    <h2>当前状态 <span class="tag" id="tierTag">--</span></h2>
-    <div class="status">
-      <div class="stat" id="stTier"><div class="k">当前档位</div><div class="v">--</div><div class="s">相对高点回撤</div></div>
-      <div class="stat" id="stPos"><div class="k">总持仓</div><div class="v">--</div><div class="s">占持仓上限 --</div></div>
-      <div class="stat" id="stAvg"><div class="k">持仓均价</div><div class="v">--</div><div class="s">保本价 --（均价×1.004）</div></div>
-      <div class="stat" id="stPnL"><div class="k">浮动盈亏</div><div class="v">--</div><div class="s">按当前金价估算</div></div>
-    </div>
-    <div class="advice" id="advice">
-      <span class="dot"></span>
-      <div><b>--</b><div class="extra">填写阶段高点与当前金价后，这里会给出对应操作建议。</div></div>
-    </div>
-  </section>
-
-  <!-- ===== 档位表 ===== -->
-  <section class="card">
-    <h2>档位 · 建仓计划 <span class="tag">勾选=已买入</span></h2>
-    <div class="tier-zone" id="tierZone">
-      <span><b>0档</b>（高点上方）：搏高参考区，不买入</span>
-      <span id="zoneWait"><b>1-4 档</b>（回撤 0 ~ -30）：空仓区，一分不买</span>
-      <span id="zoneBuy"><b>5-11 档</b>（回撤 -40 ~ -100）：倒金字塔建仓区</span>
-    </div>
-    <div class="tbl-scroll">
-      <table>
-        <colgroup>
-          <col style="width:5%"><col style="width:10%"><col style="width:11%"><col style="width:12%">
-          <col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:13%"><col style="width:13%">
-        </colgroup>
-        <thead>
-          <tr>
-            <th class="c">已买</th>
-            <th class="l">档位（回撤）</th>
-            <th>参考价</th>
-            <th>实际成交价</th>
-            <th>参考克重</th>
-            <th>实际加仓重量</th>
-            <th>该档投入</th>
-            <th>累计投入</th>
-            <th>当前均价</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-    <div class="legend">
-      <span class="lg"><span class="sw s-chk"></span>已勾选（已买入）</span>
-      <span class="lg"><span class="sw s-cur"></span>当前价所在档位</span>
-      <span class="lg"><span class="sw s-act"></span>该档投入按实际值计算</span>
-      <span class="lg">累计投入 / 当前均价 = 按已勾选档位实时计算（实际成交价/重量优先）</span>
-    </div>
-  </section>
-
-  <!-- ===== 止盈计划 ===== -->
-  <section class="card">
-    <h2>止盈计划 <span class="tag">反弹到价分批卖出</span></h2>
-    <div class="tp-grid" id="tpGrid"></div>
-  </section>
-
-  <!-- ===== 规则说明 ===== -->
-  <section class="card">
-    <h2>规则说明</h2>
-    <details class="rule" open>
-      <summary>建仓规则（下跌过程执行）<span class="ar">▶</span></summary>
-      <div class="body">
-        <p>1-4 档（回撤 0 ~ -30）：全部空仓，浅度回调不进场。5-11 档倒金字塔加仓（小跌小买、大跌大买），克重按持仓上限等比例换算：</p>
-        <ul>
-          <li>5档(-40) 6g · 6档(-50) 10g · 7档(-60) 17g · 8档(-70) 27g · 9档(-80) 44g · 10档(-90) 72g · 11档(-100) 124g（上限300g时，等比放大非等差）</li>
-        </ul>
-        <p>7 档买满后持仓均价贴近 10 档（倒数第二档）价位附近（示例高点560：约473 vs 10档470）。-100 以下停止加仓，到价才买不预埋。</p>
+      <!-- 行情参数 -->
+      <div class="sb-sec" id="sbParams">
+        <div class="sb-title">行情参数 <span class="tag">输入后全表联动</span>
+          <button class="fold-btn" id="foldParams" type="button" title="收起/展开参数"><span class="ar">▾</span><span class="ftxt">收起</span></button>
+        </div>
+        <div class="sb-body" id="paramsBox">
+          <div class="field">
+            <label for="inHigh">阶段高点（本轮行情高点，元/克）</label>
+            <input class="ipt" id="inHigh" type="number" min="0" step="0.01" placeholder="如 560">
+          </div>
+          <div class="field">
+            <label for="inPrice">当前金价（元/克）</label>
+            <input class="ipt" id="inPrice" type="number" min="0" step="0.01" placeholder="自动获取后可手动改">
+            <div class="hint">自动获取失败时可手动填写</div>
+          </div>
+          <div class="field">
+            <label for="inCap">持仓上限（克）</label>
+            <input class="ipt" id="inCap" type="number" min="1" step="1" placeholder="默认 300">
+            <div class="hint">各档购买重量按 6:10:17:27:44:72:124 比例自动换算</div>
+          </div>
+        </div>
       </div>
-    </details>
-    <details class="rule">
-      <summary>止盈减仓规则（反弹上涨过程执行）<span class="ar">▶</span></summary>
-      <div class="body">
-        <p>分批止盈（10%/20%/20%/20%），克重按总持仓自动计算，优先卖低位筹码，反弹到价依次执行：</p>
-        <ul>
-          <li>第1批：反弹到 4 档（高点-30）卖 1 成 · 第2批：3 档（高点-20）卖 2 成 · 第3批：2 档（高点-10）卖 2 成 · 第4批：1 档（高点0）卖 2 成</li>
-          <li>保留 30% 搏高：涨到 高点+20 卖出；若到过高点后跌回 0 档（高点附近），保留仓全部清仓落袋</li>
-        </ul>
-        <p>反弹只到 4 档即掉头 → 仅完成第1批；一路回高点 → 前4批完成，30% 搏更高；清仓后必须回 5 档（-40）以下才重新建仓，4 档以上绝不追高。</p>
-      </div>
-    </details>
-    <details class="rule">
-      <summary>极端行情处理 <span class="ar">▶</span></summary>
-      <div class="body">
-        <p>下跌一次性跌超 -100：11 档打完（满仓）后，无论后续跌多少不再加仓，被动持仓等待反弹。</p>
-        <p>建仓途中价格直接反弹向上：未到止盈档位不卖出，持有现有仓位等待反弹目标位。</p>
-        <p>反弹未触发止盈再度创新低：继续按档位执行剩余计划加仓。</p>
-      </div>
-    </details>
-    <p class="disclaim">本工具仅作交易策略推演与盯盘对照，不构成投资建议。</p>
-  </section>
 
-  <footer class="foot">黄金建仓助手 V2.5.1 —— 多方案 · 双建仓逻辑 · 双账号访问 · 支持导出 Excel</footer>
+    </div>
+  </aside>
+  <div class="sb-mask" id="sbMask"></div>
+
+  <!-- ===== 主区：首页 ===== -->
+  <div class="main">
+
+    <header class="top">
+      <div class="topbar">
+        <div>
+          <h1>黄金建仓助手<span class="ver">V2.6</span></h1>
+          <div class="sub">倒金字塔建仓 · 分批止盈</div>
+        </div>
+        <div class="topbtns">
+          <button class="btn-sb-open" id="btnSbOpen" type="button" title="打开菜单">☰</button>
+          <button class="btn-font btn-ic" id="btnFontMinus" type="button" title="减小字号">A−</button>
+          <button class="btn-font btn-ic" id="btnFontPlus" type="button" title="增大字号">A+</button>
+          <button class="btn-ic" id="btnTheme" type="button" title="切换日夜模式">
+            <svg id="icMoon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+            <svg id="icSun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="price-bar">
+        <span class="label">Au99.99 实时金价</span>
+        <span class="val" id="goldVal">--</span>
+        <span class="unit">元/克</span>
+        <button class="btn-gold btn-sm" id="btnRefresh">刷新</button>
+        <button class="btn-print btn-sm" id="btnPrint"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>打印</button>
+        <button class="btn-print btn-sm" id="btnExport" title="导出当前数据为 Excel 可打开的表格"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出</button>
+        <div class="meta" id="goldMeta">自动获取中…</div>
+      </div>
+    </header>
+
+    <!-- ===== 当前状态 ===== -->
+    <section class="card">
+      <h2>当前状态 <span class="tag" id="tierTag">--</span></h2>
+      <div class="status">
+        <div class="stat" id="stTier"><div class="k">当前档位</div><div class="v">--</div><div class="s">相对高点回撤</div></div>
+        <div class="stat" id="stPos"><div class="k">总持仓</div><div class="v">--</div><div class="s">占持仓上限 --</div></div>
+        <div class="stat" id="stAvg"><div class="k">持仓均价</div><div class="v">--</div><div class="s">保本价 --（均价×1.004）</div></div>
+        <div class="stat" id="stPnL"><div class="k">浮动盈亏</div><div class="v">--</div><div class="s">按当前金价估算</div></div>
+      </div>
+      <div class="advice" id="advice">
+        <span class="dot"></span>
+        <div><b>--</b><div class="extra">填写阶段高点与当前金价后，这里会给出对应操作建议。</div></div>
+      </div>
+    </section>
+
+    <!-- ===== 档位表 ===== -->
+    <section class="card">
+      <h2>档位 · 建仓计划 <span class="tag">勾选=已买入</span></h2>
+      <div class="tier-zone" id="tierZone">
+        <span><b>0档</b>（高点上方）：搏高参考区，不买入</span>
+        <span id="zoneWait"><b>1-4 档</b>（回撤 0 ~ -30）：空仓区，一分不买</span>
+        <span id="zoneBuy"><b>5-11 档</b>（回撤 -40 ~ -100）：倒金字塔建仓区</span>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <colgroup>
+            <col style="width:5%"><col style="width:10%"><col style="width:11%"><col style="width:12%">
+            <col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:13%"><col style="width:13%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="c">已买</th>
+              <th class="l">档位（回撤）</th>
+              <th>参考价</th>
+              <th>实际成交价</th>
+              <th>参考克重</th>
+              <th>实际加仓重量</th>
+              <th>该档投入</th>
+              <th>累计投入</th>
+              <th>当前均价</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <span class="lg"><span class="sw s-chk"></span>已勾选（已买入）</span>
+        <span class="lg"><span class="sw s-cur"></span>当前价所在档位</span>
+        <span class="lg"><span class="sw s-act"></span>该档投入按实际值计算</span>
+        <span class="lg">累计投入 / 当前均价 = 按已勾选档位实时计算（实际成交价/重量优先）</span>
+      </div>
+    </section>
+
+    <!-- ===== 止盈计划 ===== -->
+    <section class="card">
+      <h2>止盈计划 <span class="tag">反弹到价分批卖出</span></h2>
+      <div class="tp-grid" id="tpGrid"></div>
+    </section>
+
+    <!-- ===== 规则说明 ===== -->
+    <section class="card">
+      <h2>规则说明</h2>
+      <details class="rule" open>
+        <summary>建仓规则（下跌过程执行）<span class="ar">▶</span></summary>
+        <div class="body">
+          <p>1-4 档（回撤 0 ~ -30）：全部空仓，浅度回调不进场。5-11 档倒金字塔加仓（小跌小买、大跌大买），克重按持仓上限等比例换算：</p>
+          <ul>
+            <li>5档(-40) 6g · 6档(-50) 10g · 7档(-60) 17g · 8档(-70) 27g · 9档(-80) 44g · 10档(-90) 72g · 11档(-100) 124g（上限300g时，等比放大非等差）</li>
+          </ul>
+          <p>7 档买满后持仓均价贴近 10 档（倒数第二档）价位附近（示例高点560：约473 vs 10档470）。-100 以下停止加仓，到价才买不预埋。</p>
+        </div>
+      </details>
+      <details class="rule">
+        <summary>止盈减仓规则（反弹上涨过程执行）<span class="ar">▶</span></summary>
+        <div class="body">
+          <p>分批止盈（10%/20%/20%/20%），克重按总持仓自动计算，优先卖低位筹码，反弹到价依次执行：</p>
+          <ul>
+            <li>第1批：反弹到 4 档（高点-30）卖 1 成 · 第2批：3 档（高点-20）卖 2 成 · 第3批：2 档（高点-10）卖 2 成 · 第4批：1 档（高点0）卖 2 成</li>
+            <li>保留 30% 搏高：涨到 高点+20 卖出；若到过高点后跌回 0 档（高点附近），保留仓全部清仓落袋</li>
+          </ul>
+          <p>反弹只到 4 档即掉头 → 仅完成第1批；一路回高点 → 前4批完成，30% 搏更高；清仓后必须回 5 档（-40）以下才重新建仓，4 档以上绝不追高。</p>
+        </div>
+      </details>
+      <details class="rule">
+        <summary>极端行情处理 <span class="ar">▶</span></summary>
+        <div class="body">
+          <p>下跌一次性跌超 -100：11 档打完（满仓）后，无论后续跌多少不再加仓，被动持仓等待反弹。</p>
+          <p>建仓途中价格直接反弹向上：未到止盈档位不卖出，持有现有仓位等待反弹目标位。</p>
+          <p>反弹未触发止盈再度创新低：继续按档位执行剩余计划加仓。</p>
+        </div>
+      </details>
+      <p class="disclaim">本工具仅作交易策略推演与盯盘对照，不构成投资建议。</p>
+    </section>
+
+    <footer class="foot">黄金建仓助手 V2.6 —— 多方案 · 双建仓逻辑 · 账号云同步 · 支持导出 Excel</footer>
+  </div>
 
 <!-- ===== 方案管理侧边栏 ===== -->
 <div class="mask" id="planMask"></div>
@@ -1086,11 +1135,11 @@ function setStat(id, v, s, cls){
 /* ===== 事件 ===== */
 function bind(){
   document.getElementById('foldParams').addEventListener('click', function(){
-    document.getElementById('paramCard').classList.toggle('collapsed');
+    document.getElementById('sbParams').classList.toggle('collapsed');
   });
   var fl = document.getElementById('foldLogic');
   if(fl) fl.addEventListener('click', function(){
-    document.getElementById('planCard').classList.toggle('collapsed');
+    document.getElementById('sbLogic').classList.toggle('collapsed');
   });
   document.getElementById('inHigh').addEventListener('input', function(){
     var P = cur(); P.high = toNum(this.value); P.hitHigh = false;   // 新高点 = 新行情，重置反弹记录
@@ -1213,7 +1262,7 @@ function toast(msg){
   toast._t=setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
-/* ===== V2.5.1 账号云同步：账号密码即钥匙，多端同一账号数据自动一致 ===== */
+/* ===== V2.6 账号云同步：账号密码即钥匙，多端同一账号数据自动一致 ===== */
 var AUTH_ACCOUNTS = { 'admin':'admin123', 'uesr':'uesr123' };
 var SECRET_SALT = 'jcj-v25-salt';
 var SECRETS = {
@@ -1295,7 +1344,7 @@ function cloudPush(silent){
   }
   _cloud.busy=true;
   setSyncUI('同步中…', true);
-  var payload={app:'gold-helper', ver:'2.5.1', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
+  var payload={app:'gold-helper', ver:'2.6', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
   var content=b64enc(JSON.stringify(payload));
   var body={message:'同步 '+new Date().toLocaleTimeString('zh-CN',{hour12:false}), content:content};
   if(_cloud.sha) body.sha=_cloud.sha;
@@ -1357,7 +1406,7 @@ function doAuth(){
   decryptToken(u,p).then(function(tk){
     _cloud.token=tk; _cloud.user=u;
     try{ sessionStorage.setItem(KEY_SESSION, JSON.stringify({user:u, token:tk})); }catch(e){}
-    document.getElementById('loginMask').classList.add('hide');
+    setAuthUI(true);
     document.getElementById('loginUserTag').textContent=u;
     msg.textContent='';
     toast('欢迎回来，'+u);
@@ -1370,19 +1419,41 @@ function doAuth(){
 function doLogout(){
   _cloud.token=''; _cloud.user=''; _cloud.sha=null; _cloud.updatedAt='';
   try{ sessionStorage.removeItem(KEY_SESSION); }catch(e){}
-  document.getElementById('loginUserTag').textContent='退出';
+  document.getElementById('loginUserTag').textContent='--';
   document.getElementById('loginMsg').textContent='';
   document.getElementById('loginPass').value='';
-  document.getElementById('loginMask').classList.remove('hide');
+  setAuthUI(false);
   setSyncUI('', false);
   toast('已退出登录，数据保留在云端');
+}
+function setAuthUI(logged){
+  var f=document.getElementById('sbLoginForm'), u=document.getElementById('sbUserInfo');
+  if(f) f.style.display = logged ? 'none' : '';
+  if(u) u.style.display = logged ? '' : 'none';
+}
+function initSidebar(){
+  var open=document.getElementById('btnSbOpen'), close=document.getElementById('btnSbClose'), mask=document.getElementById('sbMask');
+  var sb=document.getElementById('sidebar');
+  function openSb(){
+    if(!sb) return;
+    sb.classList.add('open');
+    if(mask) mask.classList.add('show');
+  }
+  function closeSb(){
+    if(!sb) return;
+    sb.classList.remove('open');
+    if(mask) mask.classList.remove('show');
+  }
+  if(open) open.addEventListener('click', openSb);
+  if(close) close.addEventListener('click', closeSb);
+  if(mask) mask.addEventListener('click', closeSb);
 }
 function initAuth(){
   var sess=null;
   try{ var raw=sessionStorage.getItem(KEY_SESSION); if(raw) sess=JSON.parse(raw); }catch(e){}
   if(sess && sess.user && sess.token && AUTH_ACCOUNTS[sess.user]){
     _cloud.token=sess.token; _cloud.user=sess.user;
-    document.getElementById('loginMask').classList.add('hide');
+    setAuthUI(true);
     document.getElementById('loginUserTag').textContent=sess.user;
     setSyncUI('同步中…', true);
     cloudPull(true);
@@ -1392,6 +1463,7 @@ function initAuth(){
   document.getElementById('loginUser').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('loginPass').focus(); });
   var lo=document.getElementById('btnLogout');
   if(lo) lo.addEventListener('click', doLogout);
+  initSidebar();
 }
 
 /* ===== V2.5 日夜主题切换（记忆偏好，默认跟随系统） ===== */
@@ -1652,7 +1724,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.5.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.6 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

@@ -1426,6 +1426,27 @@ function putUserFile(fname, payload){
     return r;
   });
 }
+function hasUserData(){
+  try{
+    var ps=core.state.profiles;
+    if(!ps || ps.length===0) return false;
+    if(ps.length>1) return true;
+    var p=ps[0];
+    if(p.high!=null) return true;
+    if(p.price!=null && p.priceManual) return true;
+    if(p.cap!==300) return true;
+    for(var lg=1;lg<=2;lg++){
+      var pos=p.pos[lg]||{};
+      var ck=pos.checked||[], ap=pos.actPrice||[], ag=pos.actGrams||[];
+      for(var i=0;i<13;i++){
+        if(ck[i]) return true;
+        if(ap[i]!=null) return true;
+        if(ag[i]!=null) return true;
+      }
+    }
+    return false;
+  }catch(e){ return false; }
+}
 function cloudPull(silent){
   if(!_cloud.token || _cloud.busy) return Promise.resolve(false);
   _cloud.busy=true;
@@ -1438,7 +1459,7 @@ function cloudPull(silent){
       var pl; try{ pl=JSON.parse(b64dec(d.content)); }catch(e){ throw new Error('云端数据损坏'); }
       _cloud.updatedAt=pl.updatedAt||'';
       var localT=''; try{ localT=localStorage.getItem('jcj_local_ts_v3')||''; }catch(e){}
-      if((pl.updatedAt||'')>localT){
+      if(!hasUserData() || (pl.updatedAt||'')>localT){
         var dd=pl.data;
         if(dd && Array.isArray(dd.profiles) && dd.profiles.length>0){
           core.state.profiles=dd.profiles.map(core.normalizeProfile);

@@ -16,7 +16,7 @@
     --head-bg:#32291c; --head-ink:#f5e9d0;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{font-size:16px;}
+  html{font-size:18px;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif;
     background:var(--bg); color:var(--ink); line-height:1.55;
@@ -115,6 +115,13 @@
   }
   .btn-sync-top:active{transform:scale(.96);}
   .btn-sync-top.linked{border-color:var(--gold); color:var(--gold-deep); background:var(--gold-bg);}
+  .btn-font{
+    display:inline-flex; align-items:center; justify-content:center; flex:none;
+    border:1px solid var(--line); color:var(--ink-1); background:rgba(255,255,255,.08);
+    border-radius:10px; width:34px; height:34px; font-size:1rem; font-weight:700; cursor:pointer; font-family:inherit;
+    line-height:1; padding:0;
+  }
+  .btn-font:active{transform:scale(.94);}
   .sync-status{font-size:.66rem; color:var(--ink-2); max-width:112px; line-height:1.35; flex:none;}
   .sync-status.ok{color:#2e9e5b;}
   .sync-status.err{color:#e05555;}
@@ -334,14 +341,14 @@
   #btnRefresh{min-height:36px;min-width:60px;}
 
   /* ===== 大屏适配：1K(1920) / 2K(2560) / 4K(3840) 等比放大 ===== */
-  @media (min-width:1600px) and (max-width:2399px){ html{ zoom:1.15; } }
-  @media (min-width:2400px) and (max-width:3199px){ html{ zoom:1.35; } }
-  @media (min-width:3200px){ html{ zoom:1.7; } }
+  @media (min-width:1600px) and (max-width:2399px){ html{ zoom:1.2; } }
+  @media (min-width:2400px) and (max-width:3199px){ html{ zoom:1.45; } }
+  @media (min-width:3200px){ html{ zoom:1.85; } }
 
   /* ===== 打印 / 输出 PDF（保留网页卡片布局，横版竖版均 2 页） ===== */
   @media print{
     @page{ margin:8mm; }
-    html{ font-size:12px; zoom:1 !important; }
+    html{ font-size:12px !important; zoom:1 !important; }
     body{ background:#fff; font-size:12px; }
     *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     .btn-ghost, #btnRefresh, #btnPrint, #toast, .btn-print, .field .hint, .tier-zone, .legend, .card h2 .fold-btn, .btn-sync-top, .sync-status, #syncModal, #syncMask{ display:none !important; }
@@ -414,6 +421,8 @@
         <div class="sub">倒金字塔建仓 · 分批止盈 · 多端云同步</div>
       </div>
       <div class="topbtns">
+        <button class="btn-font" id="btnFontMinus" type="button" title="减小字号">A−</button>
+        <button class="btn-font" id="btnFontPlus" type="button" title="增大字号">A+</button>
         <button class="btn-sync-top" id="btnSync" type="button" title="云端同步（GitHub 私有仓库）">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 1 0-.9-8.9A5 5 0 0 0 6.6 13.5 3.5 3.5 0 0 0 7 21h10.5z"/></svg>同步
         </button>
@@ -1299,6 +1308,24 @@ function fetchGoldPrice(manual){
     });
 }
 
+/* ===== 字号调节（A-/A+，保存偏好） ===== */
+var KEY_FSIZE='jcj_fsize_v1', FS_MIN=14, FS_MAX=26, FS_STEP=2, FS_DEF=18, curFS=FS_DEF;
+function applyFS(n){
+  curFS=n;
+  document.documentElement.style.fontSize=n+'px';
+  try{ localStorage.setItem(KEY_FSIZE,String(n)); }catch(e){}
+  var el=document.getElementById('syncStatus');
+  if(el && el.textContent===''){ /* no-op */ }
+}
+function initFS(){
+  var n=parseInt(localStorage.getItem(KEY_FSIZE)||'0',10);
+  if(!(n>=FS_MIN&&n<=FS_MAX)) n=FS_DEF;
+  applyFS(n);
+  var bm=document.getElementById('btnFontMinus'), bp=document.getElementById('btnFontPlus');
+  if(bm) bm.addEventListener('click', function(){ applyFS(Math.max(FS_MIN,curFS-FS_STEP)); toast('字号 '+curFS+'px'); });
+  if(bp) bp.addEventListener('click', function(){ applyFS(Math.min(FS_MAX,curFS+FS_STEP)); toast('字号 '+curFS+'px'); });
+}
+
 /* ===== V2.3 云端同步（GitHub WebAPI → 私有仓库 data.json） ===== */
 var SYNC_KEY = 'jcj_sync_cfg_v3';
 var SYNC_FILE = 'data.json';
@@ -1507,6 +1534,7 @@ document.getElementById('btnSyncLogout').addEventListener('click', function(){
 core.load();
 core.bind();
 core.render();
+initFS();
 _sync.syncInit();
 document.getElementById('btnRefresh').addEventListener('click', function(){ fetchGoldPrice(true); });
 document.getElementById('btnPrint').addEventListener('click', function(){

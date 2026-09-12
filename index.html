@@ -1270,7 +1270,7 @@ var SECRETS = {
   'uesr':  {v:1,i:'zHH7bujs4WIvUrND',c:'Iekl6IiVDFVMNfqkFM6K8vQi0ff3Ml/nSd9WBMbBDiwyf1Hy7Mza0frczHvBYh5ELRVQVmCSpqk='}
 };
 var KEY_SESSION='jcj_session_v1';
-var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'', sha:null, updatedAt:'', timer:null, busy:false };
+var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'', sha:null, updatedAt:'', timer:null, busy:false, ready:false };
 
 function toBuf(s){ return Uint8Array.from(atob(s), function(c){ return c.charCodeAt(0); }); }
 function deriveKey(pass){
@@ -1304,6 +1304,27 @@ function cloudApi(path, method, body){
 }
 function b64enc(s){ try{ return btoa(unescape(encodeURIComponent(s))); }catch(e){ return btoa(s); } }
 function b64dec(s){ try{ return decodeURIComponent(escape(atob(s))); }catch(e){ return atob(s); } }
+function hasUserData(){
+  try{
+    var ps=core.state.profiles;
+    if(!ps || ps.length===0) return false;
+    if(ps.length>1) return true;
+    var p=ps[0];
+    if(p.high!=null) return true;
+    if(p.price!=null && p.priceManual) return true;
+    if(p.cap!==300) return true;
+    for(var lg=1;lg<=2;lg++){
+      var pos=p.pos[lg]||{};
+      var ck=pos.checked||[], ap=pos.actPrice||[], ag=pos.actGrams||[];
+      for(var i=0;i<13;i++){
+        if(ck[i]) return true;
+        if(ap[i]!=null) return true;
+        if(ag[i]!=null) return true;
+      }
+    }
+    return false;
+  }catch(e){ return false; }
+}
 function cloudPull(silent){
   if(!_cloud.token || _cloud.busy) return Promise.resolve(false);
   _cloud.busy=true;
@@ -1316,7 +1337,7 @@ function cloudPull(silent){
       var pl; try{ pl=JSON.parse(b64dec(d.content)); }catch(e){ throw new Error('云端数据损坏'); }
       _cloud.updatedAt=pl.updatedAt||'';
       var localT=''; try{ localT=localStorage.getItem('jcj_local_ts_v3')||''; }catch(e){}
-      if((pl.updatedAt||'')>localT){
+      if(!hasUserData() || (pl.updatedAt||'')>localT){
         var dd=pl.data;
         if(dd && Array.isArray(dd.profiles) && dd.profiles.length>0){
           core.state.profiles=dd.profiles.map(core.normalizeProfile);
@@ -1333,10 +1354,10 @@ function cloudPull(silent){
     setSyncUI('离线（联网后自动同步）', false);
     if(!silent) toast('云端同步失败：'+(e&&e.message?e.message:'网络错误'));
     return false;
-  }).then(function(v){ _cloud.busy=false; return v; });
+  }).then(function(v){ _cloud.busy=false; _cloud.ready=true; return v; });
 }
 function cloudPush(silent){
-  if(!_cloud.token) return Promise.resolve(false);
+  if(!_cloud.token || !_cloud.ready) return Promise.resolve(false);
   if(_cloud.busy){
     clearTimeout(_cloud.timer);
     _cloud.timer = setTimeout(function(){ cloudPush(silent); }, 3000);
@@ -1390,7 +1411,7 @@ function cloudPush(silent){
     setSyncUI('离线（联网后自动同步）', false);
     if(!silent) toast('云端同步失败：'+(e&&e.message?e.message:'网络错误'));
     return false;
-  }).then(function(v){ _cloud.busy=false; return v; });
+  }).then(function(v){ _cloud.busy=false; _cloud.ready=true; return v; });
 }
 window.__syncPushDelayed = function(){
   if(!_cloud.token) return;
@@ -1404,7 +1425,7 @@ function doAuth(){
   if(!u || !p){ msg.textContent='请输入账号和密码'; return; }
   if(!AUTH_ACCOUNTS[u]){ msg.textContent='账号不存在'; return; }
   decryptToken(u,p).then(function(tk){
-    _cloud.token=tk; _cloud.user=u;
+    _cloud.token=tk; _cloud.user=u; _cloud.ready=false;
     try{ sessionStorage.setItem(KEY_SESSION, JSON.stringify({user:u, token:tk})); }catch(e){}
     setAuthUI(true);
     document.getElementById('loginUserTag').textContent=u;
@@ -1417,7 +1438,7 @@ function doAuth(){
   });
 }
 function doLogout(){
-  _cloud.token=''; _cloud.user=''; _cloud.sha=null; _cloud.updatedAt='';
+  _cloud.token=''; _cloud.user=''; _cloud.sha=null; _cloud.updatedAt=''; _cloud.ready=false;
   try{ sessionStorage.removeItem(KEY_SESSION); }catch(e){}
   document.getElementById('loginUserTag').textContent='--';
   document.getElementById('loginMsg').textContent='';
@@ -1452,7 +1473,7 @@ function initAuth(){
   var sess=null;
   try{ var raw=sessionStorage.getItem(KEY_SESSION); if(raw) sess=JSON.parse(raw); }catch(e){}
   if(sess && sess.user && sess.token && AUTH_ACCOUNTS[sess.user]){
-    _cloud.token=sess.token; _cloud.user=sess.user;
+    _cloud.token=sess.token; _cloud.user=sess.user; _cloud.ready=false;
     setAuthUI(true);
     document.getElementById('loginUserTag').textContent=sess.user;
     setSyncUI('同步中…', true);

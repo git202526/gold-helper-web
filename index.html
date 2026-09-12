@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#241d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V2.5</title>
+<title>黄金建仓助手 V2.5.1</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V2.5 主题系统（亮/暗） ================= */
@@ -111,6 +111,10 @@
     background:transparent; color:#c9bda2; border:1px solid rgba(255,255,255,.16);
     border-radius:12px; padding:8px 12px; font-size:.8rem; cursor:pointer; font-family:inherit;}
   .btn-logout:hover{color:#f2e5c4; border-color:rgba(255,255,255,.3);}
+  .sync-dot{font-size:.62rem; color:#c9bda2; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
+    border-radius:99px; padding:3px 10px; white-space:nowrap; max-width:132px; overflow:hidden; text-overflow:ellipsis; flex:none;}
+  .sync-dot.ok{color:#9fe3b6; border-color:rgba(120,220,160,.45);}
+  .sync-dot.err{color:#f0a89f; border-color:rgba(240,130,120,.45);}
   .price-bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; width:100%;
     background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); border-radius:14px; padding:11px 16px;}
   .price-bar .label{font-size:.85rem; color:#d8cbaa;}
@@ -317,7 +321,7 @@
       --danger:#b3372f; --danger-bg:#fbeae8; --info:#2b5f8a; --info-bg:#e8f0f7;
       --table-head:#3a3327; --table-head-ink:#f4ead2; --stripe:#faf7ef; --check-row:#fbf5e3; --tier-cur-row:#edf3e8; --input-bg:#fff; --sel-bg:#fff; --adv-bg:#fde3e8; }
     *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .btn-ghost, #btnRefresh, #btnPrint, #toast, .btn-print, .field .hint, .tier-zone, .legend, .card h2 .fold-btn, .btn-ic, .btn-plan-top, .btn-logout, .login-mask{ display:none !important; }
+    .btn-ghost, #btnRefresh, #btnPrint, #toast, .btn-print, .field .hint, .tier-zone, .legend, .card h2 .fold-btn, .btn-ic, .btn-plan-top, .btn-logout, .login-mask, .sync-dot{ display:none !important; }
     #paramCard.collapsed .params{ display:grid !important; }
     #paramCard.collapsed h2{ margin-bottom:5px; }
     .wrap{ max-width:100%; padding:0; }
@@ -387,7 +391,7 @@
       <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 4v6c0 4.4-3 7.4-7 9-4-1.6-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
     </div>
     <h1>黄金建仓助手</h1>
-    <span class="ver">V2.5 · 账号访问</span>
+    <span class="ver">V2.5.1 · 账号云同步</span>
     <div class="login-field">
       <span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
       <input id="loginUser" type="text" autocomplete="username" placeholder="账号">
@@ -398,7 +402,7 @@
     </div>
     <button class="btn-login" id="btnLogin" type="button">登 录</button>
     <div class="login-msg" id="loginMsg"></div>
-    <div class="login-tip">默认账号：admin / admin123 或 uesr / uesr123<br>登录状态保存在本机</div>
+    <div class="login-tip">默认账号：admin / admin123 或 uesr / uesr123<br>登录后数据自动云端同步，多端同一账号数据一致<br>（重开浏览器需重新登录）</div>
   </div>
 </div>
 <div class="wrap">
@@ -406,8 +410,8 @@
   <header class="top">
     <div class="topbar">
       <div>
-        <h1>黄金建仓助手<span class="ver">V2.5</span></h1>
-        <div class="sub">倒金字塔建仓 · 分批止盈 · 双账号访问</div>
+        <h1>黄金建仓助手<span class="ver">V2.5.1</span></h1>
+        <div class="sub">倒金字塔建仓 · 分批止盈 · 双账号云同步</div>
       </div>
       <div class="topbtns">
         <button class="btn-font btn-ic" id="btnFontMinus" type="button" title="减小字号">A−</button>
@@ -419,6 +423,7 @@
         <button class="btn-plan-top" id="btnPlanOpen" type="button" title="方案管理">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>方案
         </button>
+        <span class="sync-dot" id="syncDot" title="云同步状态"></span>
         <button class="btn-logout" id="btnLogout" type="button" title="退出登录">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span id="loginUserTag">退出</span>
         </button>
@@ -569,7 +574,7 @@
     <p class="disclaim">本工具仅作交易策略推演与盯盘对照，不构成投资建议。</p>
   </section>
 
-  <footer class="foot">黄金建仓助手 V2.5 —— 多方案 · 双建仓逻辑 · 双账号访问 · 支持导出 Excel</footer>
+  <footer class="foot">黄金建仓助手 V2.5.1 —— 多方案 · 双建仓逻辑 · 双账号访问 · 支持导出 Excel</footer>
 
 <!-- ===== 方案管理侧边栏 ===== -->
 <div class="mask" id="planMask"></div>
@@ -669,6 +674,7 @@ function normalizeProfile(p){
 function save(noSync){
   try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
   try{ localStorage.setItem(KEY_LOCAL_TS, new Date().toISOString()); }catch(e){}
+  if(!noSync && window.__syncPushDelayed) window.__syncPushDelayed();
 }
 function load(){
   try{
@@ -1207,45 +1213,184 @@ function toast(msg){
   toast._t=setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
-/* ===== V2.5 双账号密码访问（本地校验，登录状态存本机） ===== */
+/* ===== V2.5.1 账号云同步：账号密码即钥匙，多端同一账号数据自动一致 ===== */
 var AUTH_ACCOUNTS = { 'admin':'admin123', 'uesr':'uesr123' };
-var KEY_AUTH = 'jcj_auth_v1';
-function getAuthUser(){
-  try{ return localStorage.getItem(KEY_AUTH) || ''; }catch(e){ return ''; }
+var SECRET_SALT = 'jcj-v25-salt';
+var SECRETS = {
+  'admin': {v:1,i:'8TOBtWniVifTAocg',c:'iUtgnZ5H92n2iCate40mPKgKuaWz6eBRBPiQ0Ff0FpDsnK6Yooz/rwN4aWsISP/F5tsByYCAyGw='},
+  'uesr':  {v:1,i:'zHH7bujs4WIvUrND',c:'Iekl6IiVDFVMNfqkFM6K8vQi0ff3Ml/nSd9WBMbBDiwyf1Hy7Mza0frczHvBYh5ELRVQVmCSpqk='}
+};
+var KEY_SESSION='jcj_session_v1';
+var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'', sha:null, updatedAt:'', timer:null, busy:false };
+
+function toBuf(s){ return Uint8Array.from(atob(s), function(c){ return c.charCodeAt(0); }); }
+function deriveKey(pass){
+  return crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey'])
+    .then(function(k){
+      return crypto.subtle.deriveKey(
+        {name:'PBKDF2', salt:new TextEncoder().encode(SECRET_SALT), iterations:120000, hash:'SHA-256'},
+        k, {name:'AES-GCM', length:256}, false, ['decrypt']);
+    });
 }
-function doAuth(){
-  var u = document.getElementById('loginUser').value.trim();
-  var p = document.getElementById('loginPass').value;
-  var msg = document.getElementById('loginMsg');
-  if(!u || !p){ msg.textContent = '请输入账号和密码'; return; }
-  if(AUTH_ACCOUNTS[u] === p){
-    try{ localStorage.setItem(KEY_AUTH, u); }catch(e){}
-    document.getElementById('loginMask').classList.add('hide');
-    document.getElementById('loginUserTag').textContent = u;
-    msg.textContent = '';
-    toast('欢迎回来，'+u);
-  } else {
-    msg.textContent = '账号或密码错误';
+function decryptToken(user, pass){
+  var sec = SECRETS[user];
+  if(!sec) return Promise.reject(new Error('未知账号'));
+  return deriveKey(user+'|'+pass).then(function(key){
+    return crypto.subtle.decrypt({name:'AES-GCM', iv:toBuf(sec.i)}, key, toBuf(sec.c)).then(function(pt){
+      return new TextDecoder().decode(pt);
+    }).catch(function(){ throw new Error('密码错误'); });
+  });
+}
+function setSyncUI(t, ok){
+  var el=document.getElementById('syncDot');
+  if(!el) return;
+  el.textContent = t;
+  el.className = 'sync-dot'+(ok===true?' ok':(ok===false?' err':''));
+}
+function cloudFile(){ return _cloud.user + '.json'; }
+function cloudApi(path, method, body){
+  var opt={method:method||'GET', headers:{'Authorization':'Bearer '+_cloud.token,'Accept':'application/vnd.github+json'}};
+  if(body){ opt.headers['Content-Type']='application/json'; opt.body=JSON.stringify(body); }
+  return fetch('https://api.github.com'+path, opt);
+}
+function b64enc(s){ try{ return btoa(unescape(encodeURIComponent(s))); }catch(e){ return btoa(s); } }
+function b64dec(s){ try{ return decodeURIComponent(escape(atob(s))); }catch(e){ return atob(s); } }
+function cloudPull(silent){
+  if(!_cloud.token || _cloud.busy) return Promise.resolve(false);
+  _cloud.busy=true;
+  setSyncUI('同步中…', true);
+  return cloudApi('/repos/'+_cloud.owner+'/'+_cloud.repo+'/contents/'+cloudFile()).then(function(r){
+    if(r.status===404){ setSyncUI('首次使用，数据将自动上传', true); return false; }
+    if(r.status!==200) throw new Error('HTTP '+r.status);
+    return r.json().then(function(d){
+      _cloud.sha=d.sha;
+      var pl; try{ pl=JSON.parse(b64dec(d.content)); }catch(e){ throw new Error('云端数据损坏'); }
+      _cloud.updatedAt=pl.updatedAt||'';
+      var localT=''; try{ localT=localStorage.getItem('jcj_local_ts_v3')||''; }catch(e){}
+      if((pl.updatedAt||'')>localT){
+        var dd=pl.data;
+        if(dd && Array.isArray(dd.profiles) && dd.profiles.length>0){
+          core.state.profiles=dd.profiles.map(core.normalizeProfile);
+          var has=false; for(var a=0;a<core.state.profiles.length;a++) if(core.state.profiles[a].id===dd.activeId) has=true;
+          core.state.activeId=has?dd.activeId:core.state.profiles[0].id;
+          core.save(true); core.render();
+          setSyncUI('已同步账号数据', true);
+          if(!silent) toast('已同步账号数据');
+        }
+      } else { setSyncUI('已连接', true); }
+      return true;
+    });
+  }).catch(function(e){
+    setSyncUI('离线（联网后自动同步）', false);
+    if(!silent) toast('云端同步失败：'+(e&&e.message?e.message:'网络错误'));
+    return false;
+  }).then(function(v){ _cloud.busy=false; return v; });
+}
+function cloudPush(silent){
+  if(!_cloud.token) return Promise.resolve(false);
+  if(_cloud.busy){
+    clearTimeout(_cloud.timer);
+    _cloud.timer = setTimeout(function(){ cloudPush(silent); }, 3000);
+    return Promise.resolve(false);
   }
+  _cloud.busy=true;
+  setSyncUI('同步中…', true);
+  var payload={app:'gold-helper', ver:'2.5.1', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
+  var content=b64enc(JSON.stringify(payload));
+  var body={message:'同步 '+new Date().toLocaleTimeString('zh-CN',{hour12:false}), content:content};
+  if(_cloud.sha) body.sha=_cloud.sha;
+  var put=function(){
+    return cloudApi('/repos/'+_cloud.owner+'/'+_cloud.repo+'/contents/'+cloudFile(),'PUT',body).then(function(r){
+      if(r.status===409){
+        return cloudApi('/repos/'+_cloud.owner+'/'+_cloud.repo+'/contents/'+cloudFile()).then(function(r2){
+          if(r2.status===200) return r2.json().then(function(d2){
+            _cloud.sha=d2.sha;
+            var pl; try{ pl=JSON.parse(b64dec(d2.content)); }catch(e){ pl=null; }
+            if(pl && (pl.updatedAt||'')>(payload.updatedAt||'')){
+              _cloud.updatedAt=pl.updatedAt;
+              var dd=pl.data;
+              if(dd && Array.isArray(dd.profiles) && dd.profiles.length>0){
+                core.state.profiles=dd.profiles.map(core.normalizeProfile);
+                var has=false; for(var a=0;a<core.state.profiles.length;a++) if(core.state.profiles[a].id===dd.activeId) has=true;
+                core.state.activeId=has?dd.activeId:core.state.profiles[0].id;
+                core.save(true); core.render();
+                setSyncUI('已采用其他设备数据', true);
+                toast('检测到其他设备更新，已同步');
+              }
+              return true;
+            }
+            body.sha=_cloud.sha;
+            return cloudApi('/repos/'+_cloud.owner+'/'+_cloud.repo+'/contents/'+cloudFile(),'PUT',body);
+          });
+        });
+      }
+      return r;
+    }).then(function(r){
+      if(!r || !r.ok){
+        if(r && r.status===401) throw new Error('同步凭据失效');
+        throw new Error('上传失败('+(r?r.status:'?')+')');
+      }
+      return r.json().then(function(d){
+        _cloud.sha=d.content.sha; _cloud.updatedAt=payload.updatedAt;
+        setSyncUI('已同步', true);
+        return true;
+      });
+    });
+  };
+  return put().catch(function(e){
+    setSyncUI('离线（联网后自动同步）', false);
+    if(!silent) toast('云端同步失败：'+(e&&e.message?e.message:'网络错误'));
+    return false;
+  }).then(function(v){ _cloud.busy=false; return v; });
+}
+window.__syncPushDelayed = function(){
+  if(!_cloud.token) return;
+  clearTimeout(_cloud.timer);
+  _cloud.timer=setTimeout(function(){ cloudPush(true); }, 2000);
+};
+function doAuth(){
+  var u=document.getElementById('loginUser').value.trim();
+  var p=document.getElementById('loginPass').value;
+  var msg=document.getElementById('loginMsg');
+  if(!u || !p){ msg.textContent='请输入账号和密码'; return; }
+  if(!AUTH_ACCOUNTS[u]){ msg.textContent='账号不存在'; return; }
+  decryptToken(u,p).then(function(tk){
+    _cloud.token=tk; _cloud.user=u;
+    try{ sessionStorage.setItem(KEY_SESSION, JSON.stringify({user:u, token:tk})); }catch(e){}
+    document.getElementById('loginMask').classList.add('hide');
+    document.getElementById('loginUserTag').textContent=u;
+    msg.textContent='';
+    toast('欢迎回来，'+u);
+    setSyncUI('同步中…', true);
+    cloudPull(false);
+  }).catch(function(e){
+    msg.textContent=e&&e.message?e.message:'登录失败';
+  });
 }
 function doLogout(){
-  try{ localStorage.removeItem(KEY_AUTH); }catch(e){}
-  document.getElementById('loginUserTag').textContent = '退出';
-  document.getElementById('loginMsg').textContent = '';
-  document.getElementById('loginPass').value = '';
+  _cloud.token=''; _cloud.user=''; _cloud.sha=null; _cloud.updatedAt='';
+  try{ sessionStorage.removeItem(KEY_SESSION); }catch(e){}
+  document.getElementById('loginUserTag').textContent='退出';
+  document.getElementById('loginMsg').textContent='';
+  document.getElementById('loginPass').value='';
   document.getElementById('loginMask').classList.remove('hide');
-  toast('已退出登录');
+  setSyncUI('', false);
+  toast('已退出登录，数据保留在云端');
 }
 function initAuth(){
-  var authed = getAuthUser();
-  if(authed && AUTH_ACCOUNTS[authed]){
+  var sess=null;
+  try{ var raw=sessionStorage.getItem(KEY_SESSION); if(raw) sess=JSON.parse(raw); }catch(e){}
+  if(sess && sess.user && sess.token && AUTH_ACCOUNTS[sess.user]){
+    _cloud.token=sess.token; _cloud.user=sess.user;
     document.getElementById('loginMask').classList.add('hide');
-    document.getElementById('loginUserTag').textContent = authed;
+    document.getElementById('loginUserTag').textContent=sess.user;
+    setSyncUI('同步中…', true);
+    cloudPull(true);
   }
   document.getElementById('btnLogin').addEventListener('click', doAuth);
   document.getElementById('loginPass').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
   document.getElementById('loginUser').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('loginPass').focus(); });
-  var lo = document.getElementById('btnLogout');
+  var lo=document.getElementById('btnLogout');
   if(lo) lo.addEventListener('click', doLogout);
 }
 
@@ -1507,7 +1652,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.5 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.5.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

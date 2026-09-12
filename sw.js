@@ -1,8 +1,8 @@
-/* 黄金建仓助手 V2.5.2 —— Service Worker：离线缓存 */
-var CACHE = 'gold-assistant-v2.5.2';
+/* 黄金建仓助手 V2.5.1 —— Service Worker：离线缓存 */
+var CACHE = 'gold-assistant-v2.5.1';
 var ASSETS = [
   './',
-  './黄金建仓助手-V2.0.html',
+  './index.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'
@@ -43,7 +43,7 @@ self.addEventListener('fetch', function(e){
         return res;
       }).catch(function(){
         // 离线时兜底回主页
-        return caches.match('./黄金建仓助手-V2.0.html');
+        return caches.match('./index.html');
       });
     })
   );

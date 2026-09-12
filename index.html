@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#241d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V2.8</title>
+<title>黄金建仓助手 V2.9</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V2.5 主题系统（亮/暗） ================= */
@@ -62,7 +62,7 @@
   button:active{transform:translateY(1px);}
   input{font-family:inherit;}
 
-  /* ===== V2.8 左侧边栏（账号 / 建仓逻辑 / 行情参数 / 设置） ===== */
+  /* ===== V2.9 左侧边栏（账号 / 建仓逻辑 / 行情参数 / 设置） ===== */
   .sidebar{width:300px; flex:none; position:sticky; top:18px; max-height:calc(100vh - 36px);
     display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:24px;
     box-shadow:var(--shadow-2); overflow:hidden;}
@@ -175,9 +175,9 @@
     text-shadow:0 2px 12px rgba(240,207,107,.25);}
   .price-bar .unit{font-size:.75rem; color:#cbbd9d;}
   .price-bar .meta{font-size:.76rem; color:#a99e88; max-width:300px;}
+  .price-cols{display:flex; flex-direction:column; gap:1px; flex:1 1 auto; min-width:0;}
   .price-group{display:flex; align-items:baseline; gap:8px; flex:none;}
   .price-group .label{font-size:.8rem; color:#d8cbaa;}
-  .price-group + .price-group{padding-left:14px; border-left:1px solid rgba(255,255,255,.14);}
   .btn-gold{background:var(--gold-grad); color:#fff; box-shadow:0 6px 16px -8px rgba(184,134,11,.6);}
   .btn-print{display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,.12); color:#f5e9d0; border:1px solid rgba(255,255,255,.28);}
   .btn-ghost{background:transparent; color:var(--ink-2); border:1px solid var(--line);}
@@ -369,7 +369,7 @@
     .price-bar .label,.price-bar .meta,.field label,.field .hint,.stat .k,.stat .s,
     .price-group .label{font-size:13px;}
     .price-group .val{font-size:1.3rem;}
-    .price-group + .price-group{padding-left:10px;}
+    .price-cols{width:100%;}
     .price-bar .label,.price-bar .meta,.field label,.field .hint,.stat .k,.stat .s,
     .tier-zone,.legend,.tp .t,.tp .st,.disclaim,.rule .body{font-size:14px;}
     .stat .v{font-size:1.2rem;}
@@ -464,7 +464,7 @@
   <!-- ===== 左侧边栏：账号同步 / 建仓逻辑 / 行情参数 ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="sb-head">
-      <h1>黄金建仓助手<span class="ver">V2.8</span></h1>
+      <h1>黄金建仓助手<span class="ver">V2.9</span></h1>
       <div class="sub">倒金字塔建仓 · 分批止盈 · 账号云同步</div>
       <button class="sb-close" id="btnSbClose" type="button" title="关闭菜单">×</button>
     </div>
@@ -579,15 +579,17 @@
     <header class="top">
       <div class="price-bar">
         <button class="btn-sb-open" id="btnSbOpen" type="button" title="打开菜单">☰</button>
-        <div class="price-group">
-          <span class="label">Au99.99 人民币金价</span>
-          <span class="val" id="goldVal">--</span>
-          <span class="unit">元/克</span>
-        </div>
-        <div class="price-group">
-          <span class="label">伦敦金 现货</span>
-          <span class="val" id="goldUsdVal">--</span>
-          <span class="unit">美元/盎司</span>
+        <div class="price-cols">
+          <div class="price-group">
+            <span class="label">人民币金价</span>
+            <span class="val" id="goldVal">--</span>
+            <span class="unit">元/克</span>
+          </div>
+          <div class="price-group">
+            <span class="label">伦敦金 现货</span>
+            <span class="val" id="goldUsdVal">--</span>
+            <span class="unit">美元/盎司</span>
+          </div>
         </div>
         <button class="btn-gold btn-sm" id="btnRefresh">刷新</button>
         <div class="meta" id="goldMeta">自动获取中…</div>
@@ -692,7 +694,7 @@
       <p class="disclaim">本工具仅作交易策略推演与盯盘对照，不构成投资建议。</p>
     </section>
 
-    <footer class="foot">黄金建仓助手 V2.8 —— 多方案 · 双建仓逻辑 · 账号云同步 · 双金价展示</footer>
+    <footer class="foot">黄金建仓助手 V2.9 —— 多方案 · 双建仓逻辑 · 账号云同步 · 双金价展示</footer>
   </div>
 
 <!-- ===== 方案管理侧边栏 ===== -->
@@ -1168,16 +1170,16 @@ function render(){
     : '保留 30% 搏高：高点+20 卖出，跌回 0 档清仓';
   var sell5hit = R.sell5Done && R.checkedAny;
   var tpCards = [
-    {n:'1', t:'第1批止盈（1成）', p: R.valid?money(R.high-30):'--', g: hasPos?(R.sell1+' g'):'—', st:'启动：反弹到 4 档（高点-30）', hit: R.valid&&R.price!=null&&R.price>=R.high-30},
-    {n:'2', t:'第2批止盈（2成）', p: R.valid?money(R.high-20):'--', g: hasPos?(R.sell2+' g'):'—', st:'中级减仓：反弹到 3 档（高点-20）', hit: R.valid&&R.price!=null&&R.price>=R.high-20},
-    {n:'3', t:'第3批止盈（2成）', p: R.valid?money(R.high-10):'--', g: hasPos?(R.sell3+' g'):'—', st:'减仓：反弹到 2 档（高点-10）', hit: R.valid&&R.price!=null&&R.price>=R.high-10},
-    {n:'4', t:'第4批止盈（2成）', p: R.valid?money(R.high):'--', g: hasPos?(R.sell4+' g'):'—', st:'回到 1 档（高点0），卖出 2 成', hit: R.valid&&R.price!=null&&R.price>=R.high},
+    {n:'', t:'第1批 1成仓', p: R.valid?money(R.high-30):'--', g: hasPos?(R.sell1+' g'):'—', st:'启动：反弹到 4 档（高点-30）', hit: R.valid&&R.price!=null&&R.price>=R.high-30},
+    {n:'', t:'第2批 2成仓', p: R.valid?money(R.high-20):'--', g: hasPos?(R.sell2+' g'):'—', st:'中级减仓：反弹到 3 档（高点-20）', hit: R.valid&&R.price!=null&&R.price>=R.high-20},
+    {n:'', t:'第3批 2成仓', p: R.valid?money(R.high-10):'--', g: hasPos?(R.sell3+' g'):'—', st:'减仓：反弹到 2 档（高点-10）', hit: R.valid&&R.price!=null&&R.price>=R.high-10},
+    {n:'', t:'第4批 2成仓', p: R.valid?money(R.high):'--', g: hasPos?(R.sell4+' g'):'—', st:'回到 1 档（高点0），卖出 2 成', hit: R.valid&&R.price!=null&&R.price>=R.high},
     {n:'30%', t:'保留30%搏高', p: R.valid?money(R.high+20):'--', g: hasPos?(R.sell5+' g'):'—', st: sell5st, hit: sell5hit}
   ];
   var tpHtml='';
   for(var t=0;t<5;t++){
     tpHtml += '<div class="tp'+(t===4?' wide':'')+(tpCards[t].hit&&R.checkedAny?' cur':'')+'">'
-      +'<span class="badge">'+tpCards[t].n+'</span>'
+      +((t===4)?'<span class="badge">'+tpCards[t].n+'</span>':'')
       +'<div class="t">'+tpCards[t].t+'</div><div class="p">'+tpCards[t].p+' 元/克</div>'
       +'<div class="g">'+(tpCards[t].g==='—'?'—':'卖出 '+tpCards[t].g)+'</div><div class="st">'+(tpCards[t].hit?(tpCards[t].hit&&R.checkedAny?'当前价已到达，可执行':'当前价已到达（空仓无需卖出）'):tpCards[t].st)+'</div></div>';
   }
@@ -1344,7 +1346,7 @@ function toast(msg){
   toast._t=setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
-/* ===== V2.8 账号云同步：账号密码即钥匙，多端同一账号数据自动一致 ===== */
+/* ===== V2.9 账号云同步：账号密码即钥匙，多端同一账号数据自动一致 ===== */
 var AUTH_ACCOUNTS = { 'admin':'admin123', 'uesr':'uesr123' };
 var SECRET_SALT = 'jcj-v25-salt';
 var SECRETS = {
@@ -1447,7 +1449,7 @@ function cloudPush(silent){
   }
   _cloud.busy=true;
   setSyncUI('同步中…', true);
-  var payload={app:'gold-helper', ver:'2.8', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
+  var payload={app:'gold-helper', ver:'2.9', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
   var content=b64enc(JSON.stringify(payload));
   var body={message:'同步 '+new Date().toLocaleTimeString('zh-CN',{hour12:false}), content:content};
   if(_cloud.sha) body.sha=_cloud.sha;
@@ -1835,7 +1837,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.8 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.9 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#241d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V2.9</title>
+<title>黄金建仓助手 V2.9.1</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V2.5 主题系统（亮/暗） ================= */
@@ -62,7 +62,7 @@
   button:active{transform:translateY(1px);}
   input{font-family:inherit;}
 
-  /* ===== V2.9 左侧边栏（账号 / 建仓逻辑 / 行情参数 / 设置） ===== */
+  /* ===== V2.9.1 左侧边栏（账号 / 建仓逻辑 / 行情参数 / 设置） ===== */
   .sidebar{width:300px; flex:none; position:sticky; top:18px; max-height:calc(100vh - 36px);
     display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:24px;
     box-shadow:var(--shadow-2); overflow:hidden;}
@@ -326,18 +326,11 @@
     opacity:0; pointer-events:none; transition:all .25s; z-index:99; max-width:86vw; box-shadow:var(--shadow-2);}
   #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
-  /* ===== 方案侧边栏 ===== */
-  .mask{position:fixed; inset:0; background:rgba(20,16,8,.5); opacity:0; visibility:hidden; transition:opacity .25s; z-index:90; backdrop-filter:blur(2px);}
-  .mask.show{opacity:1; visibility:visible;}
-  .drawer{position:fixed; top:0; left:0; bottom:0; width:78%; max-width:330px; z-index:99;
-    background:var(--card); box-shadow:var(--shadow-2); transform:translateX(-105%); transition:transform .28s ease;
-    display:flex; flex-direction:column; padding:18px 16px; box-sizing:border-box; border-right:1px solid var(--line);}
-  .drawer.open{transform:translateX(0);}
-  .drawer-head{display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--line);}
-  .drawer-head b{font-size:1.05rem; color:var(--ink);}
-  .drawer-close{border:none; background:var(--gold-bg); color:var(--gold-deep); width:30px; height:30px; border-radius:9px; font-size:1.2rem; line-height:1; cursor:pointer;}
-  .drawer-sub{margin:12px 0; font-size:.74rem; color:var(--ink-2); line-height:1.55;}
-  .plan-list{list-style:none; margin:0; padding:0; flex:1; overflow-y:auto;}
+  /* ===== 方案管理二级菜单（并入主侧边栏） ===== */
+  .plan-sub{margin-top:10px; padding:10px; border:1px dashed rgba(212,175,55,.45); background:var(--card-2); border-radius:12px;}
+  .plan-sub-note{margin-bottom:9px; font-size:.72rem; color:var(--ink-2); line-height:1.55;}
+  .plan-sub .plan-list{max-height:210px; overflow-y:auto;}
+  .plan-list{list-style:none; margin:0; padding:0;}
   .plan-list li{display:flex; align-items:center; gap:8px; padding:11px 10px; border:1px solid var(--line); border-radius:12px; margin-bottom:9px; cursor:pointer; background:var(--card-2); transition:border-color .15s, background .15s;}
   .plan-list li.on{border-color:var(--gold); background:var(--gold-bg); box-shadow:0 0 0 1px var(--gold) inset;}
   .plan-list .pname{flex:1; min-width:0; font-size:.9rem; color:var(--ink); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -379,6 +372,7 @@
     .card h2 .fold-btn{padding:4px 9px;}
     .sb-title .fold-btn .ftxt{display:none;}
     .sb-title .fold-btn{padding:3px 7px;}
+    .plan-sub{max-height:46vh; overflow-y:auto;}
   }
   #btnRefresh{min-height:36px;min-width:60px;}
 
@@ -464,7 +458,7 @@
   <!-- ===== 左侧边栏：账号同步 / 建仓逻辑 / 行情参数 ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="sb-head">
-      <h1>黄金建仓助手<span class="ver">V2.9</span></h1>
+      <h1>黄金建仓助手<span class="ver">V2.9.1</span></h1>
       <div class="sub">倒金字塔建仓 · 分批止盈 · 账号云同步</div>
       <button class="sb-close" id="btnSbClose" type="button" title="关闭菜单">×</button>
     </div>
@@ -514,6 +508,11 @@
           <button class="sb-planbtn" id="btnPlanOpen" type="button">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>方案管理（新建 / 切换 / 重命名）
           </button>
+          <div class="plan-sub" id="planSub" style="display:none">
+            <div class="plan-sub-note">每套方案独立保存阶段高点、金价、持仓上限与两套逻辑的各自持仓。点击方案即切换。</div>
+            <ul class="plan-list" id="planList"></ul>
+            <button class="drawer-new" id="btnDrawerNew" type="button">＋ 新建方案</button>
+          </div>
         </div>
       </div>
 
@@ -694,20 +693,9 @@
       <p class="disclaim">本工具仅作交易策略推演与盯盘对照，不构成投资建议。</p>
     </section>
 
-    <footer class="foot">黄金建仓助手 V2.9 —— 多方案 · 双建仓逻辑 · 账号云同步 · 双金价展示</footer>
+    <footer class="foot">黄金建仓助手 V2.9.1 —— 多方案 · 双建仓逻辑 · 账号云同步 · 双金价展示</footer>
   </div>
 
-<!-- ===== 方案管理侧边栏 ===== -->
-<div class="mask" id="planMask"></div>
-<aside class="drawer" id="planDrawer" aria-label="方案管理">
-  <div class="drawer-head">
-    <b>方案管理</b>
-    <button class="drawer-close" id="btnDrawerClose" type="button" title="关闭">×</button>
-  </div>
-  <div class="drawer-sub">每套方案独立保存阶段高点、金价、持仓上限与两套逻辑的各自持仓。点击方案即切换。</div>
-  <ul class="plan-list" id="planList"></ul>
-  <button class="drawer-new" id="btnDrawerNew" type="button">＋ 新建方案</button>
-</aside>
 
 </div>
 
@@ -1025,14 +1013,38 @@ function renderPlanList(){
   }
   ul.innerHTML = html;
 }
-function openDrawer(){ 
-  var d = document.getElementById('planDrawer'), m = document.getElementById('planMask');
-  if(d) d.classList.add('open'); if(m) m.classList.add('show');
+function openDrawer(){
+  var sub = document.getElementById('planSub');
+  var pb = document.getElementById('btnPlanOpen');
+  if(sub) sub.style.display = 'block';
+  if(pb) pb.classList.add('on');
   renderPlanList();
 }
 function closeDrawer(){
-  var d = document.getElementById('planDrawer'), m = document.getElementById('planMask');
-  if(d) d.classList.remove('open'); if(m) m.classList.remove('show');
+  var sub = document.getElementById('planSub');
+  var pb = document.getElementById('btnPlanOpen');
+  if(sub) sub.style.display = 'none';
+  if(pb) pb.classList.remove('on');
+}
+function toggleDrawer(){
+  var sub = document.getElementById('planSub');
+  if(sub && sub.style.display==='block') closeDrawer(); else openDrawer();
+}
+/* ---- 折叠状态记忆（本地 UI 偏好，不跨设备同步） ---- */
+var FOLD_KEY = 'jcj_ui_folds_v1';
+var FOLD_MAP = {account:'sbAccount', logic:'sbLogic', params:'sbParams', settings:'sbSettings', tier:'tierCard'};
+function getFolds(){
+  try{ var f = JSON.parse(localStorage.getItem(FOLD_KEY)||'{}'); return (f&&typeof f==='object')?f:{}; }catch(e){ return {}; }
+}
+function setFold(k, collapsed){
+  var f = getFolds(); f[k] = !!collapsed;
+  try{ localStorage.setItem(FOLD_KEY, JSON.stringify(f)); }catch(e){}
+}
+function applyFolds(){
+  var f = getFolds();
+  for(var k in FOLD_MAP){
+    if(f[k]){ var el = document.getElementById(FOLD_MAP[k]); if(el) el.classList.add('collapsed'); }
+  }
 }
 function fmt(n, d){ return (n==null||isNaN(n)) ? '--' : (d? n.toFixed(d) : String(n)); }
 function money(n){ return fmt(n,2); }
@@ -1207,23 +1219,33 @@ function setStat(id, v, s, cls){
 /* ===== 事件 ===== */
 function bind(){
   document.getElementById('foldParams').addEventListener('click', function(){
-    document.getElementById('sbParams').classList.toggle('collapsed');
+    var c = document.getElementById('sbParams');
+    c.classList.toggle('collapsed');
+    setFold('params', c.classList.contains('collapsed'));
   });
   var fl = document.getElementById('foldLogic');
   if(fl) fl.addEventListener('click', function(){
-    document.getElementById('sbLogic').classList.toggle('collapsed');
+    var c = document.getElementById('sbLogic');
+    c.classList.toggle('collapsed');
+    setFold('logic', c.classList.contains('collapsed'));
   });
   var ft = document.getElementById('foldTier');
   if(ft) ft.addEventListener('click', function(){
-    document.getElementById('tierCard').classList.toggle('collapsed');
+    var c = document.getElementById('tierCard');
+    c.classList.toggle('collapsed');
+    setFold('tier', c.classList.contains('collapsed'));
   });
   var fa = document.getElementById('foldAccount');
   if(fa) fa.addEventListener('click', function(){
-    document.getElementById('sbAccount').classList.toggle('collapsed');
+    var c = document.getElementById('sbAccount');
+    c.classList.toggle('collapsed');
+    setFold('account', c.classList.contains('collapsed'));
   });
   var fset = document.getElementById('foldSettings');
   if(fset) fset.addEventListener('click', function(){
-    document.getElementById('sbSettings').classList.toggle('collapsed');
+    var c = document.getElementById('sbSettings');
+    c.classList.toggle('collapsed');
+    setFold('settings', c.classList.contains('collapsed'));
   });
   document.getElementById('inHigh').addEventListener('input', function(){
     var P = cur(); P.high = toNum(this.value); P.hitHigh = false;   // 新高点 = 新行情，重置反弹记录
@@ -1251,13 +1273,9 @@ function bind(){
       save(); render();
     }
   });
-  /* ---- 方案侧边栏 ---- */
+  /* ---- 方案管理（二级菜单） ---- */
   var po = document.getElementById('btnPlanOpen');
-  if(po) po.addEventListener('click', openDrawer);
-  var pc = document.getElementById('btnDrawerClose');
-  if(pc) pc.addEventListener('click', closeDrawer);
-  var pm = document.getElementById('planMask');
-  if(pm) pm.addEventListener('click', closeDrawer);
+  if(po) po.addEventListener('click', toggleDrawer);
   var pn = document.getElementById('btnDrawerNew');
   if(pn) pn.addEventListener('click', function(){
     var P = cur();
@@ -1329,7 +1347,7 @@ function bind(){
     });
   });
 }
-window.__jcjCore = { state:state, calc:calc, render:render, save:save, round2:round2, money:money, toNum:toNum, bind:bind, load:load, judge:judge, cur:cur, isBuyTier:isBuyTier, normalizeProfile:normalizeProfile };
+window.__jcjCore = { state:state, calc:calc, render:render, save:save, round2:round2, money:money, toNum:toNum, bind:bind, load:load, judge:judge, cur:cur, isBuyTier:isBuyTier, normalizeProfile:normalizeProfile, applyFolds:applyFolds, setFold:setFold, getFolds:getFolds };
 })();
 </script>
 <script id="app-extra">
@@ -1346,7 +1364,7 @@ function toast(msg){
   toast._t=setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
-/* ===== V2.9 账号云同步：账号密码即钥匙，多端同一账号数据自动一致 ===== */
+/* ===== V2.9.1 账号云同步：账号密码即钥匙，多端同一账号数据自动一致 ===== */
 var AUTH_ACCOUNTS = { 'admin':'admin123', 'uesr':'uesr123' };
 var SECRET_SALT = 'jcj-v25-salt';
 var SECRETS = {
@@ -1449,7 +1467,7 @@ function cloudPush(silent){
   }
   _cloud.busy=true;
   setSyncUI('同步中…', true);
-  var payload={app:'gold-helper', ver:'2.9', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
+  var payload={app:'gold-helper', ver:'2.9.1', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
   var content=b64enc(JSON.stringify(payload));
   var body={message:'同步 '+new Date().toLocaleTimeString('zh-CN',{hour12:false}), content:content};
   if(_cloud.sha) body.sha=_cloud.sha;
@@ -1537,6 +1555,7 @@ function setAuthUI(logged){
   if(u) u.style.display = logged ? '' : 'none';
 }
 function initSidebar(){
+  core.applyFolds();
   var open=document.getElementById('btnSbOpen'), close=document.getElementById('btnSbClose'), mask=document.getElementById('sbMask');
   var sb=document.getElementById('sidebar');
   function openSb(){
@@ -1837,7 +1856,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.9 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V2.9.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

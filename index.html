@@ -1595,7 +1595,7 @@ function doReg(){
       return encryptByPass(u+'|'+p1, mtk).then(function(sec){
         return sha256Hex(a).then(function(h){
           secs.obj[u]={v:1, i:sec.i, c:sec.c, q:q, h:h};
-          return saveSecrets(secs, secs.sha).then(function(){
+          return saveSecrets(secs.obj, secs.sha).then(function(){
             _cloud.token=mtk; _cloud.user=u;
             var initPayload={app:'gold-helper', ver:'2.5.2', updatedAt:new Date().toISOString(), data:{profiles:core.state.profiles, activeId:core.state.activeId}};
             return putUserFile(u+'.json', initPayload).then(function(){

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.3</title>
+<title>黄金建仓助手 V3.4</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -34,28 +34,28 @@
     --glow:0 0 24px rgba(226,184,79,.28);
   }
   :root[data-theme="light"]{
-    --bg:#f4efe3;
-    --bg-grad:radial-gradient(1300px 700px at 82% -14%, rgba(226,184,79,.20) 0%, transparent 60%),
-               radial-gradient(900px 540px at -10% 30%, rgba(226,184,79,.14) 0%, transparent 52%),
-               radial-gradient(800px 480px at 55% 118%, rgba(226,184,79,.10) 0%, transparent 55%);
-    --card:rgba(255,253,247,.92); --card-2:rgba(250,246,235,.96);
-    --ink:#2b2620; --ink-2:#6f6656; --ink-3:#9d9484;
-    --line:rgba(184,134,11,.30); --line-2:rgba(184,134,11,.14);
-    --gold:#b8860b; --gold-deep:#8a6508; --gold-bg:rgba(250,243,221,.9);
-    --gold-grad:linear-gradient(135deg,#c9962e 0%,#a67c0a 100%);
+    --bg:#f3f5f8;
+    --bg-grad:radial-gradient(1200px 620px at 82% -14%, rgba(184,134,11,.10) 0%, transparent 58%),
+               radial-gradient(900px 520px at -10% 30%, rgba(184,134,11,.06) 0%, transparent 50%),
+               radial-gradient(800px 460px at 55% 118%, rgba(184,134,11,.05) 0%, transparent 55%);
+    --card:#ffffff; --card-2:#f6f8fb;
+    --ink:#14181f; --ink-2:#3d4754; --ink-3:#5c6674;
+    --line:rgba(100,116,139,.40); --line-2:rgba(100,116,139,.18);
+    --gold:#8a6508; --gold-deep:#6b4d05; --gold-bg:#faf3dd;
+    --gold-grad:linear-gradient(135deg,#b8860b 0%,#8a6508 100%);
     --gold-grad-soft:linear-gradient(160deg,#fdf6e2 0%,#f7ecd0 100%);
-    --ok:#2e7d4f; --ok-bg:#e7f3ec; --warn:#b26a00; --warn-bg:#fdf0dd;
-    --danger:#b3372f; --danger-bg:#fbeae8; --info:#2b5f8a; --info-bg:#e8f0f7;
-    --head-bg:linear-gradient(135deg,#2b2315 0%,#171208 100%);
-    --shadow-1:0 1px 2px rgba(70,55,20,.06), 0 12px 30px -16px rgba(70,55,20,.20);
-    --shadow-2:0 16px 38px -16px rgba(70,55,20,.28);
-    --table-head:#3a3327; --table-head-ink:#f4ead2;
-    --stripe:#faf7ef; --check-row:#fbf5e3; --tier-cur-row:#edf3e8;
-    --input-bg:#fff; --sel-bg:#fff;
+    --ok:#1d7a45; --ok-bg:#e6f4ec; --warn:#9a5b00; --warn-bg:#fdf0dd;
+    --danger:#b9322a; --danger-bg:#fbeae8; --info:#1d5b8a; --info-bg:#e8f1f7;
+    --head-bg:linear-gradient(135deg,#26201a 0%,#14110c 100%);
+    --shadow-1:0 1px 2px rgba(20,24,31,.08), 0 10px 26px -14px rgba(20,24,31,.18);
+    --shadow-2:0 14px 34px -14px rgba(20,24,31,.24);
+    --table-head:#232a33; --table-head-ink:#ffffff;
+    --stripe:#f7f9fc; --check-row:#f1f7e4; --tier-cur-row:#e6f1e4;
+    --input-bg:#ffffff; --sel-bg:#ffffff;
     --adv-bg:rgba(255,203,213,.30);
-    --toast-bg:#2b2620;
+    --toast-bg:#1c2026;
     --glass-blur:blur(8px);
-    --glow:0 0 20px rgba(184,134,11,.18);
+    --glow:0 0 18px rgba(184,134,11,.16);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{font-size:18px;}
@@ -241,7 +241,6 @@
   .price-group{display:flex; align-items:baseline; gap:8px; flex:none;}
   .price-group .label{font-size:.8rem; color:#d8cbaa;}
   .btn-gold{background:var(--gold-grad); color:#171208; font-weight:700; box-shadow:0 6px 20px -6px rgba(226,184,79,.65);}
-  .btn-print{display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,.12); color:#f5e9d0; border:1px solid rgba(255,255,255,.28);}
   .btn-ghost{background:transparent; color:var(--ink-2); border:1px solid var(--line);}
   .btn-sm{padding:6px 14px; font-size:.82rem;}
 
@@ -293,41 +292,6 @@
   .field .ipt{width:100%; border:1px solid var(--line); border-radius:10px; padding:9px 11px; font-size:1rem; color:var(--ink); background:var(--input-bg); font-family:inherit; transition:border-color .18s, box-shadow .18s;}
   .field .ipt:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(226,184,79,.16), var(--glow);}
   .field .hint{font-size:.72rem; color:var(--ink-3); margin-top:4px;}
-
-  /* ===== 状态条 ===== */
-  .status{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
-  .stat{position:relative; border:1px solid var(--line); border-radius:16px; padding:14px 16px; background:var(--card-2); overflow:hidden; transition:transform .2s, box-shadow .2s; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);}
-  .stat:hover{transform:translateY(-2px); box-shadow:var(--shadow-2), var(--glow);}
-  .stat::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--gold-grad); opacity:.8;}
-  .stat .k{font-size:.8rem; color:var(--ink-2);}
-  .stat .v{font-size:1.18rem; font-weight:800; margin-top:3px; font-variant-numeric:tabular-nums;}
-  .stat .s{font-size:.8rem; color:var(--ink-2); margin-top:2px;}
-  #stTier .v, #stTier .s{white-space:nowrap;}
-  #stTier .v{font-size:.95rem;}
-  #stTier .s{overflow:hidden; text-overflow:ellipsis;}
-  .stat .s b.up{color:var(--gold); font-weight:800; font-size:1.18em; letter-spacing:.02em; white-space:nowrap; text-shadow:0 0 10px rgba(226,184,79,.4);}
-  .stat.v-ok{background:var(--ok-bg);} .stat.v-ok::before{background:var(--ok);}
-  .stat.v-warn{background:var(--warn-bg);} .stat.v-warn::before{background:var(--warn);}
-  .stat.v-danger{background:var(--danger-bg);} .stat.v-danger::before{background:var(--danger);}
-  .stat.v-info{background:var(--info-bg);} .stat.v-info::before{background:var(--info);}
-  .stat.v-gold{background:var(--gold-bg);} .stat.v-gold::before{background:var(--gold);}
-
-  .advice{margin-top:14px; border-radius:14px; padding:13px 16px; font-size:.93rem; border:1px solid var(--line); background:var(--card-2);
-    display:flex; gap:11px; align-items:flex-start; position:relative; box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
-  .advice .dot{flex:none; width:10px; height:10px; border-radius:50%; margin-top:6px; box-shadow:0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);}
-  .advice.a-hold .dot{background:#8a8f98; color:#8a8f98;} .advice.a-hold{border-left:4px solid #8a8f98;}
-  .advice.a-buy .dot{background:var(--ok); color:var(--ok);} .advice.a-buy{border-left:4px solid var(--ok);}
-  .advice.a-sell .dot{background:var(--warn); color:var(--warn);} .advice.a-sell{border-left:4px solid var(--warn);}
-  .advice.a-clear .dot{background:var(--danger); color:var(--danger);} .advice.a-clear{border-left:4px solid var(--danger);}
-  .advice.a-wait .dot{background:var(--info); color:var(--info);} .advice.a-wait{border-left:4px solid var(--info);}
-  .advice.a-sell, .advice.a-clear{background:var(--adv-bg);}
-  .advice.pulse{animation:advPulse 2s ease-in-out infinite;}
-  @keyframes advPulse{
-    0%,100%{transform:scale(1); box-shadow:0 2px 8px rgba(0,0,0,.05);}
-    50%{transform:scale(1.02); box-shadow:0 6px 30px -6px rgba(226,184,79,.55);}
-  }
-  .advice b{font-weight:800;}
-  .advice .extra{font-size:.8rem; color:var(--ink-2); margin-top:3px;}
 
   /* ===== 档位表 ===== */
   .tbl-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:14px; background:var(--card); box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
@@ -399,10 +363,6 @@
   .op-item b.v-ok{color:var(--ok);} .op-item b.v-danger{color:var(--danger);}
   .op-item .op-s{display:block; font-size:.68rem; color:var(--ink-2); margin-top:3px; line-height:1.35;}
   .op-item .op-s.up{color:var(--ok);} .op-item .op-s.down{color:var(--warn);}
-  .op-next{border:1px solid var(--line); border-radius:12px; padding:11px 12px; background:var(--card-2); margin-bottom:12px;}
-  .op-next .op-k{font-size:.68rem; color:var(--ink-3);}
-  .op-next-line b{font-size:1.06rem; color:var(--gold-deep); font-variant-numeric:tabular-nums;}
-  .op-next-sub{font-size:.74rem; color:var(--ink-2); margin-top:3px;}
   .op-advice{display:flex; gap:10px; align-items:flex-start; border-radius:12px; padding:11px 13px; font-size:.88rem; margin-bottom:12px;
     border:1px solid var(--line); background:var(--card-2);}
   .op-advice .dot{flex:none; width:9px; height:9px; border-radius:50%; margin-top:6px; box-shadow:0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);}
@@ -468,7 +428,6 @@
       opacity:0; visibility:hidden; transition:opacity .25s; backdrop-filter:blur(2px);}
     .sb-mask.show{opacity:1; visibility:visible;}
     .btn-sb-open{display:inline-flex;}
-    .status{grid-template-columns:repeat(2,1fr);}
     header.top{padding:14px; border-radius:16px;}
     .price-bar{width:100%;}
     .card{padding:15px; border-radius:16px;}
@@ -500,94 +459,10 @@
   /* 大屏竖屏（如平板 / 竖屏显示器）：内容宽度收窄，避免拉伸过宽 */
   @media (orientation:portrait) and (min-width:1024px){
     .wrap{ max-width:1180px; }
-    .status{ grid-template-columns:repeat(2,1fr); }
     .tp-grid{ grid-template-columns:repeat(2,1fr); }
   }
 
   /* ===== 打印 / 输出 PDF（保留网页卡片布局，横版竖版均 2 页） ===== */
-  @media print{
-    @page{ margin:8mm; }
-    html{ font-size:12px !important; zoom:1 !important; }
-    body{ background:#fff !important; color:#222; font-size:12px; background-image:none !important; }
-    :root{ --card:#fff; --card-2:#fff; --ink:#222; --ink-2:#555; --ink-3:#777; --line:#ddd; --line-2:#eee;
-      --gold:#b8860b; --gold-deep:#8a6508; --gold-bg:#faf3dd; --ok:#2e7d4f; --ok-bg:#e7f3ec; --warn:#b26a00; --warn-bg:#fdf0dd;
-      --danger:#b3372f; --danger-bg:#fbeae8; --info:#2b5f8a; --info-bg:#e8f0f7;
-      --table-head:#3a3327; --table-head-ink:#f4ead2; --stripe:#faf7ef; --check-row:#fbf5e3; --tier-cur-row:#edf3e8; --input-bg:#fff; --sel-bg:#fff; --adv-bg:#fde3e8; }
-    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .btn-ghost, #btnRefresh, #btnPrint, #toast, .btn-print, .field .hint, .tier-zone, .legend, .card h2 .fold-btn, .btn-ic, .btn-plan-top, .btn-logout, .login-mask, .sync-dot, .sidebar, .sb-mask, .btn-sb-open{ display:none !important; }
-    .wrap{ max-width:100%; padding:0; display:block; }
-    .main{ width:100%; display:block; }
-    .cd-bar,.cd-resize{ display:none !important; }
-    .op-plan{ margin-bottom:5px; }
-    .op-plan-sub{ font-size:9px; }
-    .op-grid{ gap:5px; margin-bottom:6px; }
-    .op-item{ padding:5px 8px; border-radius:8px; }
-    .op-item b{ font-size:12px; }
-    .op-item .op-s{ font-size:9px; margin-top:1px; }
-    .op-advice{ padding:6px 9px; margin-bottom:6px; font-size:11px; }
-    .op-advice .extra{ font-size:9.5px; }
-    .op-btns{ gap:6px; }
-    .op-btn{ padding:7px 6px; font-size:11px; }
-    .op-risk{ margin-top:6px; padding-top:5px; font-size:9px; }
-    #ruleCard .rule summary{ font-size:11px; padding:2px 0; }
-    #ruleCard .rule .body{ padding:2px 0; }
-    #ruleCard .rule .body p, #ruleCard .rule .body li{ font-size:10px; margin:2px 0; line-height:1.3; }
-    #ruleCard .disclaim{ font-size:9px; margin-top:4px; }
-    header.top{ border-radius:10px; padding:6px 12px; }
-    header.top h1{ font-size:16px; }
-    header.top .ver{ font-size:8.5px; padding:0 6px; }
-    header.top .sub{ font-size:9.5px; }
-    .price-bar{ padding:5px 10px; gap:8px; }
-    .price-bar .val{ font-size:18px; }
-    .price-bar .meta{ max-width:none; }
-    .card{ border-radius:10px; padding:6px 10px; margin-top:6px; box-shadow:none; break-inside:avoid; }
-    .card h2{ font-size:12.5px; margin-bottom:5px; }
-    .card h2 .tag{ font-size:9px; padding:1px 5px; }
-    .card h2::before{ width:4px; height:14px; }
-    .params{ gap:10px; }
-    .field label{ font-size:10px; margin-bottom:2px; }
-    .field .ipt{ padding:4px 8px; font-size:12px; border-radius:6px; }
-    .status{ gap:8px; }
-    .stat{ padding:5px 10px; border-radius:8px; }
-    .stat .k{ font-size:10px; }
-    .stat .v{ font-size:13.5px; }
-    .stat .s{ font-size:9px; }
-    .advice{ margin-top:6px; padding:5px 10px; font-size:11px; }
-    .advice .extra{ font-size:9.5px; margin-top:1px; }
-    .tbl-scroll{ overflow:visible; border:none; }
-    table{ min-width:0; width:100%; font-size:8pt; }
-    .tbl-scroll th,.tbl-scroll td{ padding:2.5px 5px; line-height:1.3; }
-    .tbl-scroll th{ font-size:7.5pt; }
-    .tbl-scroll .edit{ border:none !important; background:transparent !important; padding:0; font-size:8pt; box-shadow:none; outline:none; -webkit-appearance:none; appearance:none; height:auto !important; min-height:0 !important; }
-    .print-val{ display:inline-block; line-height:1.3; }
-    .print-chk{ font-weight:bold; color:#666; line-height:1.3; }
-    .chk{ visibility:hidden; }
-    .num-empty{ color:#888; }
-    .tp-grid{ gap:8px; }
-    .tp{ padding:6px 9px; border-radius:8px; }
-    .tp .t{ font-size:11px; }
-    .tp .p{ font-size:13.5px; }
-    .tp .g{ font-size:11px; }
-    .tp .st{ font-size:9px; }
-    details.rule{ margin-top:6px; border-radius:8px; break-inside:avoid; }
-    details.rule summary{ padding:5px 10px; font-size:11.5px; }
-    details.rule .body{ display:block !important; padding:5px 10px 8px; font-size:10px; line-height:1.4; }
-    details.rule .body p{ margin:2px 0; }
-    details.rule .body ul{ margin:2px 0 2px 14px; }
-  }
-  /* 竖版（A4 纵向）：稍紧凑，同样 2 页 */
-  @media print and (orientation: portrait){
-    table{ font-size:7.5pt; }
-    .tbl-scroll th{ font-size:7pt; }
-    .tbl-scroll th,.tbl-scroll td{ padding:2.5px 4px; }
-    .tbl-scroll .edit{ font-size:7.5pt; }
-    .card{ padding:6px 9px; margin-top:6px; }
-    .card h2{ font-size:12px; }
-    .stat{ padding:5px 9px; }
-    .stat .v{ font-size:13px; }
-    .tp{ padding:5px 8px; }
-    details.rule .body{ font-size:9.5px; }
-  }
 </style>
 
 </head>
@@ -712,7 +587,6 @@
             <button class="sb-actbtn" id="btnLayoutReset" type="button" title="恢复所有卡片默认位置与大小">恢复默认布局</button>
           </div>
           <div class="set-actions">
-            <button class="sb-actbtn" id="btnPrint" type="button"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>打印 / 输出 PDF</button>
             <button class="sb-actbtn" id="btnExport" type="button" title="导出当前数据为 Excel 可打开的表格"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出 Excel 表格</button>
           </div>
         </div>
@@ -859,7 +733,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.3 —— 操作面板合并 · 浮动盈亏 · 卡片自由布局 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.4 —— 日夜主题 · 卡片自由布局 · 账号云同步</footer>
   </div>
 
 
@@ -1405,13 +1279,6 @@ function render(){
     gv.textContent='--';
     gm.textContent='自动获取中…';
   }
-}
-
-function setStat(id, v, s, cls){
-  var el=document.getElementById(id);
-  el.className='stat'+(cls?' '+cls:'');
-  el.querySelector('.v').textContent=v;
-  el.querySelector('.s').innerHTML=s;
 }
 
 /* ===== 事件 ===== */
@@ -1985,14 +1852,14 @@ var KEY_THEME = 'jcj_theme_v1';
 function applyTheme(t, save){
   var root = document.documentElement;
   if(t==='dark'){ root.setAttribute('data-theme','dark'); }
-  else { root.removeAttribute('data-theme'); }
+  else { root.setAttribute('data-theme','light'); }
   var dark = root.getAttribute('data-theme')==='dark';
   document.getElementById('icMoon').style.display = dark ? 'none' : 'block';
   document.getElementById('icSun').style.display = dark ? 'block' : 'none';
   var tt=document.getElementById('themeTxt');
   if(tt) tt.textContent = dark ? '夜间' : '日间';
   var mt = document.querySelector('meta[name="theme-color"]');
-  if(mt) mt.setAttribute('content', dark ? '#1a1d26' : '#241d12');
+  if(mt) mt.setAttribute('content', dark ? '#1a1d26' : '#f3f5f8');
   if(save){ try{ localStorage.setItem(KEY_THEME, t); }catch(e){} }
 }
 function initTheme(){
@@ -2115,10 +1982,6 @@ initAuth();
 initRuleFolds();
 initLayout();
 document.getElementById('btnRefresh').addEventListener('click', function(){ fetchGoldPrice(true); });
-document.getElementById('btnPrint').addEventListener('click', function(){
-  if(window.AndroidPrint && window.AndroidPrint.printPage){ window.AndroidPrint.printPage(); }
-  else { window.print(); }
-});
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
 /* 黄金建仓助手 V2.2.1 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
@@ -2248,7 +2111,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.3 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2326,30 +2189,6 @@ document.getElementById('btnExport').addEventListener('click', exportExcel);
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
   navigator.serviceWorker.register('./sw.js').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
-// 打印前将表格输入框/勾选框替换为纯文本（避免控件高度撑大行高）、强制展开规则，打印后重建恢复
-window.addEventListener('beforeprint', function(){
-  document.querySelectorAll('details.rule').forEach(function(d){
-    if(!d.open){ d.open = true; d.dataset.forceOpen = '1'; }
-  });
-  document.querySelectorAll('#tbody input.chk').forEach(function(el){
-    var sp = document.createElement('span');
-    sp.className = 'print-chk';
-    sp.textContent = '✓';
-    el.parentNode.replaceChild(sp, el);
-  });
-  document.querySelectorAll('#tbody input.edit').forEach(function(el){
-    var sp = document.createElement('span');
-    sp.className = 'print-val';
-    sp.textContent = el.value || el.getAttribute('placeholder') || '—';
-    el.parentNode.replaceChild(sp, el);
-  });
-});
-window.addEventListener('afterprint', function(){
-  document.querySelectorAll('details.rule[data-force-open]').forEach(function(d){
-    d.open = false; delete d.dataset.forceOpen;
-  });
-  core.render();
-});
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);
 } else {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.1</title>
+<title>黄金建仓助手 V3.5.2</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -163,6 +163,7 @@
     border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:11px;
     padding:10px 8px; font-size:.8rem; font-weight:600; cursor:pointer; font-family:inherit; transition:all .16s;}
   .sb-actbtn svg{color:var(--gold-deep);}
+  .sb-actbtn.span2{grid-column:span 2;}
   .sb-actbtn:hover{border-color:var(--gold); color:var(--gold-deep); background:var(--gold-bg); box-shadow:0 4px 16px -6px rgba(226,184,79,.4); transform:translateY(-1px);}
   .sb-actbtn:active{transform:scale(.97);}
   .sb-mask{display:none;}
@@ -667,7 +668,10 @@
           </div>
           <div class="set-actions">
             <button class="sb-actbtn" id="btnExport" type="button" title="导出当前数据为 Excel 可打开的表格"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>导出 Excel 表格</button>
+            <button class="sb-actbtn" id="btnBackup" type="button" title="备份全部数据到 JSON 文件（含方案/持仓/参数/布局/折叠状态）"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>备份数据</button>
+            <button class="sb-actbtn span2" id="btnRestore" type="button" title="从备份 JSON 文件恢复数据（覆盖当前全部数据）"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><polyline points="3 3 3 8 8 8"/></svg>恢复数据（覆盖）</button>
           </div>
+          <input type="file" id="restoreFile" accept=".json,application/json" style="display:none;">
         </div>
       </div>
       </div>
@@ -818,7 +822,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.5.1 —— 6列铺满一屏 · 展开9列 · 记住账号 · 日夜主题</footer>
+    <footer class="foot">黄金建仓助手 V3.5.2 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
   </div>
 
 
@@ -2294,7 +2298,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.2 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2367,6 +2371,51 @@ function abToBase64(buf){
   return btoa(bin);
 }
 document.getElementById('btnExport').addEventListener('click', exportExcel);
+
+/* ===== 数据备份 / 恢复（JSON 完整快照，含方案/持仓/参数/布局/折叠/主题/字号） ===== */
+var BK_KEYS=['jcj_helper_local_v2','jcj_ui_folds_v1','jcj_layout_v1','jcj_theme_v1','jcj_fsize_v1','jcj_local_ts_v3'];
+function backupData(){
+  try{
+    var d={};
+    for(var i=0;i<BK_KEYS.length;i++){
+      var v=localStorage.getItem(BK_KEYS[i]);
+      if(v!=null) d[BK_KEYS[i]]=v;
+    }
+    var payload={app:'黄金建仓助手', version:(document.title.match(/V[\d.]+/)||['V3.5.2'])[0], exportedAt:new Date().toISOString(), data:d};
+    var blob=new Blob([JSON.stringify(payload,null,1)], {type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    var t=new Date(), pad=function(n){ return (n<10?'0':'')+n; };
+    a.download='黄金建仓助手备份_'+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate())+'_'+pad(t.getHours())+pad(t.getMinutes())+'.json';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+    toast('已备份全部数据（JSON 文件）');
+  }catch(e){ toast('备份失败：' + (e&&e.message?e.message:'未知错误')); }
+}
+function restoreData(ev){
+  var f=ev.target.files && ev.target.files[0];
+  ev.target.value='';
+  if(!f) return;
+  try{
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{
+        var o=JSON.parse(rd.result);
+        if(!o || o.app!=='黄金建仓助手' || !o.data || typeof o.data!=='object'){ toast('备份文件格式不正确，请选择本应用导出的备份'); return; }
+        if(!window.confirm('恢复将覆盖当前全部数据（方案/持仓/参数/布局），确定继续？')) return;
+        var n=0;
+        for(var k in o.data){ try{ localStorage.setItem(k, String(o.data[k])); n++; }catch(e){} }
+        toast('已恢复 '+n+' 项数据，正在刷新…');
+        setTimeout(function(){ location.reload(); }, 700);
+      }catch(e){ toast('恢复失败：文件解析错误'); }
+    };
+    rd.onerror=function(){ toast('读取文件失败'); };
+    rd.readAsText(f);
+  }catch(e){ toast('恢复失败：' + (e&&e.message?e.message:'未知错误')); }
+}
+document.getElementById('btnBackup').addEventListener('click', backupData);
+document.getElementById('btnRestore').addEventListener('click', function(){ document.getElementById('restoreFile').click(); });
+document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){

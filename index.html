@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.3</title>
+<title>黄金建仓助手 V3.5.4</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -822,7 +822,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.5.3 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
+    <footer class="foot">黄金建仓助手 V3.5.4 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
   </div>
 
 
@@ -2305,7 +2305,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.3 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.4 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2350,27 +2350,60 @@ function esc(v){
   if(/[",\r\n]/.test(s)) s = '"' + s.replace(/"/g,'""') + '"';
   return s;
 }
+/* ===== 统一文件保存（安卓App桥接 / 移动端系统分享 / 浏览器下载，带明确位置反馈） ===== */
+function isMobileUA(){ return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||''); }
+function fallbackDownload(blob, fname){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = fname; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+function saveBlob(blob, fname, kind){
+  var tip = kind==='xlsx' ? 'Excel 表格' : '备份数据';
+  try{
+    /* 1) 安卓 App 原生桥接：保存到手机「下载」目录 */
+    if(window.AndroidExport && window.AndroidExport.saveExcel){
+      var reader = new FileReader();
+      reader.onload = function(){
+        try{
+          window.AndroidExport.saveExcel(fname, reader.result.split(',')[1]);
+          toast('已保存到手机「下载」目录：'+fname);
+        }catch(e){ toast('保存失败：'+(e&&e.message?e.message:'未知错误')); }
+      };
+      reader.onerror = function(){ toast('保存失败：文件读取错误'); };
+      reader.readAsDataURL(blob);
+      return;
+    }
+    /* 2) 移动端优先系统分享：可选择保存位置，用户能明确看到文件去向 */
+    if(isMobileUA() && navigator.canShare){
+      try{
+        var file = new File([blob], fname, {type: blob.type || 'application/octet-stream'});
+        if(navigator.canShare({files:[file]})){
+          navigator.share({files:[file], title: fname})
+            .then(function(){ toast('已生成 '+tip+'：'+fname+'（可在系统分享中选择「存储到文件/下载」）'); })
+            .catch(function(e){
+              if(!e || e.name!=='AbortError'){ fallbackDownload(blob, fname); toast('分享未完成，已改用浏览器下载：'+fname+'（查看通知栏/下载管理）'); }
+            });
+          return;
+        }
+      }catch(e){ /* canShare 异常则走下载兜底 */ }
+    }
+    /* 3) 桌面/兜底：浏览器下载 */
+    fallbackDownload(blob, fname);
+    toast(isMobileUA()
+      ? '已生成 '+tip+'：'+fname+'（已开始下载；若未弹出下载，请在系统浏览器中打开本页重试，文件在通知栏/文件管理可查）'
+      : '已生成 '+tip+'：'+fname+'（已存入浏览器下载目录）');
+  }catch(e){ toast('保存失败：'+(e&&e.message?e.message:'未知错误')); }
+}
 function exportExcel(){
   var R = core.calc();
   var d = new Date(), pad = function(x){ return (x<10?'0':'')+x; };
   var fname = '黄金建仓助手-数据-' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + '.xlsx';
   var ab;
   try{ ab = buildXlsx(R, core.cur ? core.cur() : null); }catch(e){ toast('导出失败：' + (e && e.message ? e.message : '生成错误')); return; }
-  if(window.AndroidExport && window.AndroidExport.saveExcel){
-    /* 安卓 App：原生保存到手机「下载」目录并调起系统分享 */
-    try{
-      window.AndroidExport.saveExcel(fname, abToBase64(ab));
-      return;
-    }catch(e){ toast('导出失败：' + (e && e.message ? e.message : '未知错误')); return; }
-  }
-  /* 网页/浏览器：下载 .xlsx */
   var blob = new Blob([ab], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url; a.download = fname;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-  toast('已导出 Excel 表格（.xlsx）');
+  saveBlob(blob, fname, 'xlsx');
 }
 function abToBase64(buf){
   var bytes = new Uint8Array(buf), bin='', i, CHUNK=0x8000;
@@ -2388,15 +2421,11 @@ function backupData(){
       var v=localStorage.getItem(BK_KEYS[i]);
       if(v!=null) d[BK_KEYS[i]]=v;
     }
-    var payload={app:'黄金建仓助手', version:(document.title.match(/V[\d.]+/)||['V3.5.2'])[0], exportedAt:new Date().toISOString(), data:d};
+    var payload={app:'黄金建仓助手', version:(document.title.match(/V[\d.]+/)||['V3.5.4'])[0], exportedAt:new Date().toISOString(), data:d};
     var blob=new Blob([JSON.stringify(payload,null,1)], {type:'application/json'});
-    var a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
     var t=new Date(), pad=function(n){ return (n<10?'0':'')+n; };
-    a.download='黄金建仓助手备份_'+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate())+'_'+pad(t.getHours())+pad(t.getMinutes())+'.json';
-    document.body.appendChild(a); a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
-    toast('已备份全部数据（JSON 文件）');
+    var fname='黄金建仓助手备份_'+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate())+'_'+pad(t.getHours())+pad(t.getMinutes())+'.json';
+    saveBlob(blob, fname, 'json');
   }catch(e){ toast('备份失败：' + (e&&e.message?e.message:'未知错误')); }
 }
 function restoreData(ev){

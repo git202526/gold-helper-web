@@ -1,7 +1,7 @@
 {
-  "name": "黄金建仓助手 V3.3",
+  "name": "黄金建仓助手 V3.4",
   "short_name": "黄金建仓",
-  "description": "操作面板合并·浮动盈亏·卡片自由布局·黑金视觉·多方案·双逻辑·云同步",
+  "description": "日夜主题·卡片自由布局·黑金视觉·多方案·双逻辑·云同步",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

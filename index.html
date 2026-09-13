@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.4.2</title>
+<title>黄金建仓助手 V3.4.3</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -374,7 +374,6 @@
   .op-plan{font-size:.82rem; color:var(--ink-2); margin-bottom:12px;}
   .op-plan-line{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   .op-plan-line b{color:var(--ink); font-size:.92rem;}
-  .op-plan-sub{font-size:.72rem; color:var(--ink-3); margin-top:4px;}
   .op-tag{font-size:.66rem; color:var(--gold-deep); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); background:var(--gold-bg); border-radius:99px; padding:2px 9px; white-space:nowrap;}
   .op-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
   .op-item{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--card-2); box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
@@ -436,14 +435,15 @@
     #btnSbOpen{position:absolute; right:6px; bottom:8px; z-index:6; min-width:60px; height:36px; font-size:1rem; border-radius:10px;}
     #btnRefresh{font-size:.8rem; border-radius:10px;}
     header.top{padding:10px 12px; border-radius:14px; box-shadow:none;}
-    .price-bar{gap:5px; padding-right:40px;}
+    .price-bar{gap:5px; padding-right:0; align-items:center;}
+    .price-cols{width:auto; flex:1 1 auto; min-width:0;}
+    #btnRefresh{margin-left:auto; flex:none; align-self:center;}
     .price-bar .val{font-size:1.2rem;}
     .price-cols{gap:0;}
     #opCard{padding:11px 12px;}
     #opCard h2{font-size:1rem; margin-bottom:7px;}
     .op-plan{padding:6px 9px; margin-bottom:7px; border-radius:10px;}
     .op-plan-line{font-size:.8rem;}
-    .op-plan-sub{font-size:.66rem;}
     .op-grid{gap:5px; margin-bottom:7px;}
     .op-item{padding:6px 8px; border-radius:10px;}
     .op-item .op-k{font-size:.62rem;}
@@ -479,7 +479,7 @@
     .price-bar .label,.price-bar .meta,.field label,.field .hint,.stat .k,.stat .s,
     .price-group .label{font-size:13px;}
     .price-group .val{font-size:1.3rem;}
-    .price-cols{width:100%;}
+
     .price-bar .label,.price-bar .meta,.field label,.field .hint,.stat .k,.stat .s,
     .tier-zone,.legend,.tp .t,.tp .st,.disclaim,.rule .body{font-size:14px;}
     .stat .v{font-size:1.2rem;}
@@ -668,7 +668,6 @@
       <h2>操作面板 <span class="tag" id="opTag">建仓建议</span></h2>
       <div class="op-plan">
         <div class="op-plan-line"><span class="op-k">当前方案</span><b id="opPlanName">默认方案</b><span class="op-tag" id="opLogicTxt">逻辑1 · 原版</span></div>
-        <div class="op-plan-sub">点击左侧「建仓逻辑」图标可切换方案与逻辑</div>
       </div>
       <div class="op-grid">
         <div class="op-item"><span class="op-k">当前档位</span><b id="opTier">--</b><span class="op-s" id="opTierSub">--</span></div>
@@ -776,7 +775,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.4.2 —— 金价自动刷新 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.4.3 —— 金价自动刷新 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
   </div>
 
 
@@ -2203,7 +2202,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.2 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.3 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

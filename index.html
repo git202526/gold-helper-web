@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.4.4</title>
+<title>黄金建仓助手 V3.4.5</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -434,11 +434,12 @@
     header.top{padding:10px; border-radius:14px; box-shadow:none;}
     .price-bar{display:grid; grid-template-columns:1fr 64px; gap:8px; align-items:stretch; width:100%;}
     .price-cols{display:flex; flex-direction:column; gap:6px; width:100%; flex:none; min-width:0;}
-    .price-group{display:flex; align-items:baseline; gap:5px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:7px 10px; flex:none; min-width:0;}
-    .price-group .label{font-size:.68rem; color:var(--ink-2); white-space:nowrap;}
-    .price-group .val{font-size:1.12rem; color:var(--gold-deep);}
-    .price-group .unit{font-size:.64rem; color:var(--ink-3);}
-    .price-time{flex-direction:row; align-items:center;}
+    .price-group{display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 6px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:6px 10px; flex:none; min-width:0;}
+    .price-group .label{flex-basis:100%; font-size:.66rem; color:var(--ink-2); white-space:nowrap;}
+    .price-group .val{font-size:1.1rem; color:var(--gold-deep); font-weight:800;}
+    .price-group .unit{font-size:.62rem; color:var(--ink-3);}
+    .price-time{display:flex; flex-wrap:nowrap; align-items:center; gap:6px;}
+    .price-time .label{flex-basis:auto; white-space:nowrap;}
     .price-time .val2{font-size:.76rem; font-weight:600; color:var(--ink-2); font-variant-numeric:tabular-nums;}
     .price-actions{display:grid; grid-template-rows:repeat(3,1fr); gap:6px;}
     #btnRefresh{width:100%; min-width:0; margin:0; padding:0 4px; font-size:.72rem; border-radius:10px; height:100%;}
@@ -787,7 +788,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.4.4 —— 金价分卡布局 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.4.5 —— 金价分卡布局 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
   </div>
 
 
@@ -2214,7 +2215,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.4 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.5 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

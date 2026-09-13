@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.4</title>
+<title>黄金建仓助手 V3.4.1</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -256,7 +256,7 @@
   .price-bar .val{font-size:1.7rem; font-weight:800; color:#ffd873; font-variant-numeric:tabular-nums; letter-spacing:.3px;
     text-shadow:0 0 18px rgba(240,207,107,.55);}
   .price-bar .unit{font-size:.75rem; color:#cbbd9d;}
-  .price-bar .meta{font-size:.76rem; color:#a99e88; max-width:300px;}
+  .price-bar .meta{display:none;}
   .price-cols{display:flex; flex-direction:column; gap:1px; flex:1 1 auto; min-width:0;}
   .price-group{display:flex; align-items:baseline; gap:8px; flex:none;}
   .price-group .label{font-size:.8rem; color:#d8cbaa;}
@@ -431,7 +431,29 @@
 
   /* ===== 手机端（<761px） ===== */
   @media (max-width:760px){
-    .wrap{display:block; padding:14px 12px 50px;}
+    .wrap{display:block; padding:8px 10px 50px;}
+    .price-bar{position:relative;}
+    #btnSbOpen{position:absolute; right:6px; bottom:6px; z-index:6; min-width:34px; height:30px; font-size:.95rem; border-radius:9px;}
+    header.top{padding:10px 12px; border-radius:14px; box-shadow:none;}
+    .price-bar{gap:5px; padding-right:40px;}
+    .price-bar .val{font-size:1.2rem;}
+    .price-cols{gap:0;}
+    #opCard{padding:11px 12px;}
+    #opCard h2{font-size:1rem; margin-bottom:7px;}
+    .op-plan{padding:6px 9px; margin-bottom:7px; border-radius:10px;}
+    .op-plan-line{font-size:.8rem;}
+    .op-plan-sub{font-size:.66rem;}
+    .op-grid{gap:5px; margin-bottom:7px;}
+    .op-item{padding:6px 8px; border-radius:10px;}
+    .op-item .op-k{font-size:.62rem;}
+    .op-item b{font-size:.95rem;}
+    .op-item .op-s{font-size:.6rem; margin-top:1px;}
+    .op-advice{padding:7px 9px; margin-bottom:7px; border-radius:10px; font-size:.8rem;}
+    .op-advice .extra{font-size:.68rem; margin-top:2px;}
+    .op-btns{gap:6px; margin-bottom:7px;}
+    .op-btn{padding:7px 6px; font-size:.78rem;}
+    .op-risk{font-size:.62rem; margin-top:5px; padding-top:4px;}
+    .wrap{display:block; padding:8px 10px 50px;}
     .main{display:block;}
     .cd-bar,.cd-resize{display:none !important;}
     .sidebar{position:fixed; top:0; left:0; bottom:0; width:min(86vw,340px); max-height:none; border-radius:0;
@@ -753,7 +775,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.4 —— 日夜主题 · 卡片自由布局 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.4.1 —— 金价双独立源 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
   </div>
 
 
@@ -1920,13 +1942,22 @@ function fetchGoldUsd(){
         });
     });
 }
-/* 汇率源（USD→CNY）：多源依次尝试 */
+/* 汇率源（USD→CNY）：仅作为人民币金价独立源失效时的兜底 */
 function fetchCnyRate(){
   return getJson('https://open.er-api.com/v6/latest/USD')
     .then(function(r){ var c=r&&r.rates&&r.rates.CNY; if(!c||!isFinite(c)) throw new Error('fx-a'); return c; })
     .catch(function(){
       return getJson('https://api.frankfurter.app/latest?from=USD&to=CNY')
         .then(function(r){ var c=r&&r.rates&&r.rates.CNY; if(!c||!isFinite(c)) throw new Error('fx-b'); return c; });
+    });
+}
+/* 人民币金价（元/克）独立源：Gold-API XAU/CNY 直接人民币报价（仅盎司→克单位换算，不依赖美元价） */
+function fetchCnyGold(){
+  return getJson('https://api.gold-api.com/price/XAU/CNY')
+    .then(function(d){
+      var p = d && d.price;
+      if(!p || !isFinite(p)) throw new Error('cny-a');
+      return { price:p/31.1034768, src:'Gold-API' };
     });
 }
 
@@ -1937,40 +1968,73 @@ function fetchGoldPrice(manual){
   var CP = core.cur ? core.cur() : state.profiles[0];
   clearTimeout(retryTimer);
   if(!manual){
-    meta.textContent='自动获取中…';
+    if(meta) meta.textContent='自动获取中…';
     val.textContent='--';
   }
-  fetchGoldUsd()
-    .then(function(g){ return fetchCnyRate().then(function(cny){ return {g:g, cny:cny}; }); })
-    .then(function(res){
-      var usdEl=document.getElementById('goldUsdVal');
-      if(usdEl) usdEl.textContent = core.money(res.g.price);
-      var perGram = res.g.price * res.cny / 31.1034768;
-      if(!CP.priceManual){
-        CP.price = core.round2(perGram);
-        document.getElementById('inPrice').value = CP.price;
-        val.textContent = core.money(CP.price);
-      }
-      var now = new Date();
-      meta.textContent = '国际金价折算（'+res.g.src+'） · 更新时间 '+now.toLocaleTimeString('zh-CN',{hour12:false});
-      core.save(); core.render();
+  /* 人民币金价与美元金价互相独立获取、独立显示，不做换算 */
+  fetchCnyGold()
+    .then(function(cny){
+      return fetchGoldUsd()
+        .then(function(g){
+          var usdEl=document.getElementById('goldUsdVal');
+          if(usdEl) usdEl.textContent = core.money(g.price);
+          if(!CP.priceManual){
+            CP.price = core.round2(cny.price);
+            document.getElementById('inPrice').value = CP.price;
+            val.textContent = core.money(CP.price);
+          }
+          var now = new Date();
+          if(meta) meta.textContent = '人民币 Gold-API · 美元 '+g.src+' · '+now.toLocaleTimeString('zh-CN',{hour12:false});
+          core.save(); core.render();
+        })
+        .catch(function(){
+          /* 美元价独立获取失败不影响人民币价 */
+          var usdEl=document.getElementById('goldUsdVal');
+          if(usdEl) usdEl.textContent='--';
+          if(!CP.priceManual){
+            CP.price = core.round2(cny.price);
+            document.getElementById('inPrice').value = CP.price;
+            val.textContent = core.money(CP.price);
+          }
+          var now = new Date();
+          if(meta) meta.textContent = '人民币 Gold-API · 美元获取失败 · '+now.toLocaleTimeString('zh-CN',{hour12:false});
+          core.save(); core.render();
+        });
     })
     .catch(function(){
-      var auto = !CP.priceManual;
-      var usdEl=document.getElementById('goldUsdVal');
-      if(usdEl) usdEl.textContent='--';
-      if(auto){
-        val.textContent='--';
-        meta.textContent='自动获取失败：请检查网络，点「刷新」重试，或手动输入金价';
-        toast('实时金价获取失败，已切换为手动输入');
-        if(!fetchGoldPrice._autoRetried){
-          fetchGoldPrice._autoRetried = true;
-          meta.textContent='获取失败，5 秒后自动重试…';
-          retryTimer = setTimeout(function(){ fetchGoldPrice(false); }, 5000);
-        }
-      } else {
-        meta.textContent='手动输入模式（点「刷新」可重新自动获取）';
-      }
+      /* 人民币独立源失效：以美元价+汇率为兜底（仅在源失效时启用） */
+      fetchGoldUsd()
+        .then(function(g){ return fetchCnyRate().then(function(cny){ return {g:g, cny:cny}; }); })
+        .then(function(res){
+          var usdEl=document.getElementById('goldUsdVal');
+          if(usdEl) usdEl.textContent = core.money(res.g.price);
+          var auto = !CP.priceManual;
+          if(auto){
+            var perGram = res.g.price * res.cny / 31.1034768;
+            CP.price = core.round2(perGram);
+            document.getElementById('inPrice').value = CP.price;
+            val.textContent = core.money(CP.price);
+          }
+          if(meta) meta.textContent = auto ? '人民币价源失效，已用汇率换算兜底' : '手动输入模式';
+          core.save(); core.render();
+        })
+        .catch(function(){
+          var auto = !CP.priceManual;
+          var usdEl=document.getElementById('goldUsdVal');
+          if(usdEl) usdEl.textContent='--';
+          if(auto){
+            val.textContent='--';
+            if(meta) meta.textContent='自动获取失败：请检查网络，点「刷新」重试，或手动输入金价';
+            toast('实时金价获取失败，已切换为手动输入');
+            if(!fetchGoldPrice._autoRetried){
+              fetchGoldPrice._autoRetried = true;
+              if(meta) meta.textContent='获取失败，5 秒后自动重试…';
+              retryTimer = setTimeout(function(){ fetchGoldPrice(false); }, 5000);
+            }
+          } else {
+            if(meta) meta.textContent='手动输入模式（点「刷新」可重新自动获取）';
+          }
+        });
     });
 }
 
@@ -2131,7 +2195,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

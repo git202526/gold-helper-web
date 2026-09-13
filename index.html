@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.4.1</title>
+<title>黄金建仓助手 V3.4.2</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -256,7 +256,7 @@
   .price-bar .val{font-size:1.7rem; font-weight:800; color:#ffd873; font-variant-numeric:tabular-nums; letter-spacing:.3px;
     text-shadow:0 0 18px rgba(240,207,107,.55);}
   .price-bar .unit{font-size:.75rem; color:#cbbd9d;}
-  .price-bar .meta{display:none;}
+  .price-bar .meta{display:block; flex-basis:100%; font-size:.72rem; color:var(--ink-3); max-width:none; margin-top:0; line-height:1.4;}
   .price-cols{display:flex; flex-direction:column; gap:1px; flex:1 1 auto; min-width:0;}
   .price-group{display:flex; align-items:baseline; gap:8px; flex:none;}
   .price-group .label{font-size:.8rem; color:#d8cbaa;}
@@ -433,7 +433,8 @@
   @media (max-width:760px){
     .wrap{display:block; padding:8px 10px 50px;}
     .price-bar{position:relative;}
-    #btnSbOpen{position:absolute; right:6px; bottom:6px; z-index:6; min-width:34px; height:30px; font-size:.95rem; border-radius:9px;}
+    #btnSbOpen{position:absolute; right:6px; bottom:8px; z-index:6; min-width:60px; height:36px; font-size:1rem; border-radius:10px;}
+    #btnRefresh{font-size:.8rem; border-radius:10px;}
     header.top{padding:10px 12px; border-radius:14px; box-shadow:none;}
     .price-bar{gap:5px; padding-right:40px;}
     .price-bar .val{font-size:1.2rem;}
@@ -775,7 +776,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.4.1 —— 金价双独立源 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.4.2 —— 金价自动刷新 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
   </div>
 
 
@@ -1978,26 +1979,29 @@ function fetchGoldPrice(manual){
         .then(function(g){
           var usdEl=document.getElementById('goldUsdVal');
           if(usdEl) usdEl.textContent = core.money(g.price);
-          if(!CP.priceManual){
+          /* 手动点刷新时恢复自动获取并更新人民币价；自动模式下自动更新 */
+          if(manual || !CP.priceManual){
+            if(manual) CP.priceManual = false;
             CP.price = core.round2(cny.price);
             document.getElementById('inPrice').value = CP.price;
             val.textContent = core.money(CP.price);
           }
           var now = new Date();
-          if(meta) meta.textContent = '人民币 Gold-API · 美元 '+g.src+' · '+now.toLocaleTimeString('zh-CN',{hour12:false});
+          if(meta) meta.textContent = '更新时间 '+now.toLocaleTimeString('zh-CN',{hour12:false});
           core.save(); core.render();
         })
         .catch(function(){
           /* 美元价独立获取失败不影响人民币价 */
           var usdEl=document.getElementById('goldUsdVal');
           if(usdEl) usdEl.textContent='--';
-          if(!CP.priceManual){
+          if(manual || !CP.priceManual){
+            if(manual) CP.priceManual = false;
             CP.price = core.round2(cny.price);
             document.getElementById('inPrice').value = CP.price;
             val.textContent = core.money(CP.price);
           }
           var now = new Date();
-          if(meta) meta.textContent = '人民币 Gold-API · 美元获取失败 · '+now.toLocaleTimeString('zh-CN',{hour12:false});
+          if(meta) meta.textContent = '更新时间 '+now.toLocaleTimeString('zh-CN',{hour12:false})+'（美元获取失败）';
           core.save(); core.render();
         });
     })
@@ -2024,15 +2028,14 @@ function fetchGoldPrice(manual){
           if(usdEl) usdEl.textContent='--';
           if(auto){
             val.textContent='--';
-            if(meta) meta.textContent='自动获取失败：请检查网络，点「刷新」重试，或手动输入金价';
+            if(meta) meta.textContent='获取失败，5 秒后自动重试…';
             toast('实时金价获取失败，已切换为手动输入');
             if(!fetchGoldPrice._autoRetried){
               fetchGoldPrice._autoRetried = true;
-              if(meta) meta.textContent='获取失败，5 秒后自动重试…';
               retryTimer = setTimeout(function(){ fetchGoldPrice(false); }, 5000);
             }
           } else {
-            if(meta) meta.textContent='手动输入模式（点「刷新」可重新自动获取）';
+            if(meta) meta.textContent='手动输入中';
           }
         });
     });
@@ -2066,6 +2069,11 @@ initAuth();
 initRuleFolds();
 initLayout();
 document.getElementById('btnRefresh').addEventListener('click', function(){ fetchGoldPrice(true); });
+/* 每 60 秒自动刷新一次实时金价（手动输入模式不覆盖） */
+setInterval(function(){
+  var CP = core.cur ? core.cur() : state.profiles[0];
+  if(!CP.priceManual){ fetchGoldPrice(false); }
+}, 60000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
 /* 黄金建仓助手 V2.2.1 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
@@ -2195,7 +2203,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.2 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

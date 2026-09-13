@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.4.6</title>
+<title>黄金建仓助手 V3.4.7</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -383,7 +383,16 @@
   .op-item .op-s{display:block; font-size:.68rem; color:var(--ink-2); margin-top:3px; line-height:1.35;}
   .op-item .op-s.up{color:var(--ok);} .op-item .op-s.down{color:var(--warn);}
   .op-advice{display:flex; gap:10px; align-items:flex-start; border-radius:12px; padding:11px 13px; font-size:.88rem; margin-bottom:12px;
-    border:1px solid var(--line); background:var(--card-2);}
+    border:1px solid rgba(224,69,58,.20); background:rgba(224,69,58,.07);
+    animation:advGlow 3s ease-in-out infinite;}
+  .op-advice b{transition:color .2s;}
+  .op-advice b.pop{animation:titlePop .5s ease;}
+  #opPnL.pnl-up{color:var(--danger); font-weight:800;}
+  #opPnL.pnl-down{color:var(--ok); font-weight:800;}
+  #opPnL.pop{animation:pnlPop .45s ease;}
+  @keyframes advGlow{0%,100%{box-shadow:0 0 0 0 rgba(224,69,58,0)}50%{box-shadow:0 0 16px 1px rgba(224,69,58,.20)}}
+  @keyframes pnlPop{0%{transform:scale(1)}55%{transform:scale(1.16)}100%{transform:scale(1)}}
+  @keyframes titlePop{0%{transform:scale(1)}55%{transform:scale(1.07)}100%{transform:scale(1)}}
   .op-advice .dot{flex:none; width:9px; height:9px; border-radius:50%; margin-top:6px; box-shadow:0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);}
   .op-advice.a-hold .dot{background:#8a8f98; color:#8a8f98;}
   .op-advice.a-buy .dot{background:var(--ok); color:var(--ok);}
@@ -788,7 +797,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.4.6 —— 金价10秒快刷 · 日夜主题 · 卡片自由布局 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.4.7 —— 红涨绿跌 · 建议氛围卡 · 日夜主题 · 账号云同步</footer>
   </div>
 
 
@@ -1222,7 +1231,11 @@ function render(){
   var pnlTxt='--', pnlSub='按当前金价估算';
   if(R.pnl!=null){ pnlTxt=(R.pnl>=0?'+':'')+money(R.pnl)+' 元'; pnlSub=(R.pnlPct!=null?(R.pnl>=0?'+':'')+R.pnlPct+'%':'')+' · 按当前金价估算'; }
   var opPnL=document.getElementById('opPnL');
-  if(opPnL){ opPnL.textContent=pnlTxt; opPnL.className = R.pnl==null?'':(R.pnl>=0?'v-ok':'v-danger'); }
+  if(opPnL){
+    opPnL.textContent=pnlTxt;
+    opPnL.className = R.pnl==null?'':(R.pnl>=0?'pnl-up':'pnl-down');
+    if(pnlTxt!==opPnL._last){ opPnL._last=pnlTxt; opPnL.classList.remove('pop'); void opPnL.offsetWidth; opPnL.classList.add('pop'); }
+  }
   var opPnLSub=document.getElementById('opPnLSub');
   if(opPnLSub) opPnLSub.textContent = pnlSub;
   var opTag=document.getElementById('opTag');
@@ -1246,7 +1259,9 @@ function render(){
   var opAdv=document.getElementById('opAdvice');
   if(opAdv){
     opAdv.className = 'op-advice '+adv.cls+(adv.cls==='a-sell'||adv.cls==='a-clear'?' pulse':'');
-    opAdv.querySelector('b').textContent = adv.title;
+    var advB=opAdv.querySelector('b');
+    if(advB.textContent!==adv.title){ advB.textContent=adv.title; advB.classList.remove('pop'); void advB.offsetWidth; advB.classList.add('pop'); }
+    else{ advB.textContent=adv.title; }
     var ex=opAdv.querySelector('.extra');
     if(ex) ex.textContent = adv.extra || '填写阶段高点与当前金价后，这里会给出对应操作建议。';
   }
@@ -2211,7 +2226,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.6 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.7 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

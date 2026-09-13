@@ -57,6 +57,26 @@
     --glass-blur:blur(8px);
     --glow:0 0 18px rgba(184,134,11,.16);
   }
+  /* ===== 日间主题：金价卡（第一栏）浅色化 ===== */
+  :root[data-theme="light"] header.top{
+    background:linear-gradient(135deg,#fffaf0 0%,#fdf3da 100%);
+    color:#3d3120; border:1px solid rgba(184,134,11,.35);
+    box-shadow:0 10px 30px -14px rgba(70,55,20,.18), var(--glow);
+  }
+  :root[data-theme="light"] header.top::before{background:radial-gradient(circle,rgba(226,184,79,.20) 0%,transparent 65%);}
+  :root[data-theme="light"] header.top h1{background:linear-gradient(120deg,#8a6508,#b8860b 55%,#c9962e); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  :root[data-theme="light"] header.top .ver{color:#8a6508; background:rgba(184,134,11,.10); border-color:rgba(184,134,11,.4);}
+  :root[data-theme="light"] header.top .sub{color:#5c6674;}
+  :root[data-theme="light"] .price-bar .label{color:#6b5320;}
+  :root[data-theme="light"] .price-bar .val{color:#8a6508;}
+  :root[data-theme="light"] .price-bar .unit{color:#8f7a3a;}
+  :root[data-theme="light"] .price-bar .meta{color:#6b7280;}
+  :root[data-theme="light"] .btn-sb-open{color:#5a4a12; border-color:rgba(184,134,11,.35); background:rgba(255,255,255,.55);}
+  :root[data-theme="light"] .btn-ic{color:#5a4a12; border-color:rgba(184,134,11,.3); background:rgba(255,255,255,.55);}
+  :root[data-theme="light"] .btn-plan-top{color:#5a4a12; background:rgba(184,134,11,.12); border-color:rgba(184,134,11,.4);}
+  :root[data-theme="light"] .btn-logout{color:#5c6674; border-color:rgba(100,116,139,.3);}
+  :root[data-theme="light"] .sync-dot{color:#5c6674; background:rgba(255,255,255,.6); border-color:rgba(184,134,11,.3);}
+  :root[data-theme="light"] .sync-dot.ok{color:#1d7a45; border-color:rgba(29,122,69,.4);}
   *{box-sizing:border-box; margin:0; padding:0;}
   html{font-size:18px;}
   body{

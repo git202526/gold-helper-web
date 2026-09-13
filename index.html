@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.2</title>
+<title>黄金建仓助手 V3.3</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -266,6 +266,9 @@
   #tierCard.collapsed .tier-body{display:none;}
   #tierCard.collapsed .fold-btn .ar{transform:rotate(-90deg);}
   #tierCard.collapsed h2{margin-bottom:0;}
+  #ruleCard.collapsed .rule-body{display:none;}
+  #ruleCard.collapsed .fold-btn .ar{transform:rotate(-90deg);}
+  #ruleCard.collapsed h2{margin-bottom:0;}
   .tier-body{margin-top:0;}
 
   /* ===== 方案管理 ===== */
@@ -393,6 +396,9 @@
   .op-item{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--card-2); box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
   .op-item .op-k{display:block; font-size:.68rem; color:var(--ink-3); margin-bottom:3px;}
   .op-item b{font-size:1.06rem; color:var(--gold-deep); font-variant-numeric:tabular-nums;}
+  .op-item b.v-ok{color:var(--ok);} .op-item b.v-danger{color:var(--danger);}
+  .op-item .op-s{display:block; font-size:.68rem; color:var(--ink-2); margin-top:3px; line-height:1.35;}
+  .op-item .op-s.up{color:var(--ok);} .op-item .op-s.down{color:var(--warn);}
   .op-next{border:1px solid var(--line); border-radius:12px; padding:11px 12px; background:var(--card-2); margin-bottom:12px;}
   .op-next .op-k{font-size:.68rem; color:var(--ink-3);}
   .op-next-line b{font-size:1.06rem; color:var(--gold-deep); font-variant-numeric:tabular-nums;}
@@ -512,7 +518,21 @@
     .wrap{ max-width:100%; padding:0; display:block; }
     .main{ width:100%; display:block; }
     .cd-bar,.cd-resize{ display:none !important; }
-    .op-panel{ display:none; }
+    .op-plan{ margin-bottom:5px; }
+    .op-plan-sub{ font-size:9px; }
+    .op-grid{ gap:5px; margin-bottom:6px; }
+    .op-item{ padding:5px 8px; border-radius:8px; }
+    .op-item b{ font-size:12px; }
+    .op-item .op-s{ font-size:9px; margin-top:1px; }
+    .op-advice{ padding:6px 9px; margin-bottom:6px; font-size:11px; }
+    .op-advice .extra{ font-size:9.5px; }
+    .op-btns{ gap:6px; }
+    .op-btn{ padding:7px 6px; font-size:11px; }
+    .op-risk{ margin-top:6px; padding-top:5px; font-size:9px; }
+    #ruleCard .rule summary{ font-size:11px; padding:2px 0; }
+    #ruleCard .rule .body{ padding:2px 0; }
+    #ruleCard .rule .body p, #ruleCard .rule .body li{ font-size:10px; margin:2px 0; line-height:1.3; }
+    #ruleCard .disclaim{ font-size:9px; margin-top:4px; }
     header.top{ border-radius:10px; padding:6px 12px; }
     header.top h1{ font-size:16px; }
     header.top .ver{ font-size:8.5px; padding:0 6px; }
@@ -726,18 +746,30 @@
     </header>
 
     <!-- ===== 当前状态 ===== -->
-    <section class="card" id="stCard">
-      <h2>当前状态 <span class="tag" id="tierTag">--</span></h2>
-      <div class="status">
-        <div class="stat" id="stTier"><div class="k">当前档位</div><div class="v">--</div><div class="s">相对高点回撤</div></div>
-        <div class="stat" id="stPos"><div class="k">总持仓</div><div class="v">--</div><div class="s">占持仓上限 --</div></div>
-        <div class="stat" id="stAvg"><div class="k">持仓均价</div><div class="v">--</div><div class="s">保本价 --（均价×1.004）</div></div>
-        <div class="stat" id="stPnL"><div class="k">浮动盈亏</div><div class="v">--</div><div class="s">按当前金价估算</div></div>
+    <!-- ===== 操作面板（合并当前状态） ===== -->
+    <section class="card op-panel" id="opCard">
+      <h2>操作面板 <span class="tag" id="opTag">建仓建议</span></h2>
+      <div class="op-plan">
+        <div class="op-plan-line"><span class="op-k">当前方案</span><b id="opPlanName">默认方案</b><span class="op-tag" id="opLogicTxt">逻辑1 · 原版</span></div>
+        <div class="op-plan-sub">点击左侧「建仓逻辑」图标可切换方案与逻辑</div>
       </div>
-      <div class="advice" id="advice">
+      <div class="op-grid">
+        <div class="op-item"><span class="op-k">当前档位</span><b id="opTier">--</b><span class="op-s" id="opTierSub">--</span></div>
+        <div class="op-item"><span class="op-k">总持仓</span><b id="opGrams">--</b><span class="op-s" id="opGramsSub">--</span></div>
+        <div class="op-item"><span class="op-k">持仓均价</span><b id="opAvg">--</b><span class="op-s" id="opAvgSub">--</span></div>
+        <div class="op-item"><span class="op-k">保本价</span><b id="opBreak">--</b><span class="op-s">均价×1.004</span></div>
+        <div class="op-item" id="opPnLBox"><span class="op-k">浮动盈亏</span><b id="opPnL">--</b><span class="op-s" id="opPnLSub">按当前金价估算</span></div>
+        <div class="op-item"><span class="op-k">下一档建仓</span><b id="opNext">--</b><span class="op-s" id="opNextSub">--</span></div>
+      </div>
+      <div class="op-advice" id="opAdvice">
         <span class="dot"></span>
         <div><b>--</b><div class="extra">填写阶段高点与当前金价后，这里会给出对应操作建议。</div></div>
       </div>
+      <div class="op-btns">
+        <button class="op-btn op-btn-gold" id="btnGoTier" type="button">查看建仓计划</button>
+        <button class="op-btn" id="btnGoProfit" type="button">查看止盈计划</button>
+      </div>
+      <div class="op-risk">风险提示：-100 以下停止加仓，到价才买不预埋；反弹到价分批止盈，不追高。</div>
     </section>
 
     <!-- ===== 档位表 ===== -->
@@ -790,7 +822,10 @@
 
     <!-- ===== 规则说明 ===== -->
     <section class="card" id="ruleCard">
-      <h2>规则说明</h2>
+      <h2>规则说明
+        <button class="fold-btn" id="foldRule" type="button" title="收起/展开规则说明"><span class="ar">▾</span><span class="ftxt">收起</span></button>
+      </h2>
+      <div class="rule-body">
       <details class="rule" open>
         <summary>建仓规则（下跌过程执行）<span class="ar">▶</span></summary>
         <div class="body">
@@ -821,38 +856,10 @@
         </div>
       </details>
       <p class="disclaim">本工具仅作交易策略推演与盯盘对照，不构成投资建议。</p>
+      </div>
     </section>
 
-    <!-- ===== 操作面板 ===== -->
-    <section class="card op-panel" id="opCard">
-      <h2>操作面板 <span class="tag">建仓建议</span></h2>
-      <div class="op-plan">
-        <div class="op-plan-line"><span class="op-k">当前方案</span><b id="opPlanName">默认方案</b><span class="op-tag" id="opLogicTxt">逻辑1 · 原版</span></div>
-        <div class="op-plan-sub">点击左侧「建仓逻辑」图标可切换方案与逻辑</div>
-      </div>
-      <div class="op-grid">
-        <div class="op-item"><span class="op-k">当前档位</span><b id="opTier">--</b></div>
-        <div class="op-item"><span class="op-k">总持仓</span><b id="opGrams">--</b></div>
-        <div class="op-item"><span class="op-k">持仓均价</span><b id="opAvg">--</b></div>
-        <div class="op-item"><span class="op-k">保本价</span><b id="opBreak">--</b></div>
-      </div>
-      <div class="op-next">
-        <span class="op-k">下一档建仓</span>
-        <div class="op-next-line"><b id="opNext">--</b></div>
-        <div class="op-next-sub" id="opNextSub">--</div>
-      </div>
-      <div class="op-advice" id="opAdvice">
-        <span class="dot"></span>
-        <div><b>--</b></div>
-      </div>
-      <div class="op-btns">
-        <button class="op-btn op-btn-gold" id="btnGoTier" type="button">查看建仓计划</button>
-        <button class="op-btn" id="btnGoProfit" type="button">查看止盈计划</button>
-      </div>
-      <div class="op-risk">风险提示：-100 以下停止加仓，到价才买不预埋；反弹到价分批止盈，不追高。</div>
-    </section>
-
-    <footer class="foot">黄金建仓助手 V3.2 —— 卡片自由布局 · 拖拽摆放 · 放大缩小 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.3 —— 操作面板合并 · 浮动盈亏 · 卡片自由布局 · 账号云同步</footer>
   </div>
 
 
@@ -1191,7 +1198,7 @@ function toggleDrawer(){
 }
 /* ---- 折叠状态记忆（本地 UI 偏好，不跨设备同步） ---- */
 var FOLD_KEY = 'jcj_ui_folds_v1';
-var FOLD_MAP = {account:'sbAccount', logic:'sbLogic', params:'sbParams', settings:'sbSettings', tier:'tierCard'};
+var FOLD_MAP = {account:'sbAccount', logic:'sbLogic', params:'sbParams', settings:'sbSettings', tier:'tierCard', rule:'ruleCard'};
 function getFolds(){
   try{ var f = JSON.parse(localStorage.getItem(FOLD_KEY)||'{}'); return (f&&typeof f==='object')?f:{}; }catch(e){ return {}; }
 }
@@ -1237,16 +1244,22 @@ function render(){
     }
   }
 
-  /* ---- 状态卡 ---- */
-  var tierTxt='--', drawTxt='--';
-  if(R.tier!=null){
-    tierTxt = R.tier===14?'跌破13档':(R.tier===0?'第0档 越过高点':'第'+R.tier+'档');
-    if(R.tier===14){ drawTxt = R.logic===2?'超过-120':'超过-100（停止加仓）'; }
-    else if(R.tier===0){ drawTxt = '<b class="up">高点上方 +'+round2(R.price-R.high)+' 元</b>'; }
-    else { drawTxt = '回撤 -'+R.draw; }
+  /* ---- 操作面板（合并当前状态） ---- */
+  var opPlan=document.getElementById('opPlanName');
+  if(opPlan) opPlan.textContent = P.name;
+  var opLogic=document.getElementById('opLogicTxt');
+  if(opLogic) opLogic.textContent = (P.logic===2 ? '逻辑2 · 深跌版' : '逻辑1 · 原版');
+  var opTier=document.getElementById('opTier');
+  if(opTier) opTier.textContent = R.tier!=null ? (R.tier===14?'跌破13档':(R.tier===0?'第0档 越过高点':'第'+R.tier+'档')) : '待输入';
+  var opTierSub=document.getElementById('opTierSub');
+  if(opTierSub){
+    if(R.tier===14){ opTierSub.textContent='超过'+(R.logic===2?'-120':'-100')+'，停止加仓'; }
+    else if(R.tier===0){ opTierSub.innerHTML='高点上方 +'+round2(R.price-R.high)+' 元'; }
+    else if(R.tier!=null){ opTierSub.textContent='回撤 -'+R.draw; }
+    else opTierSub.textContent='--';
   }
-  setStat('stTier', tierTxt, drawTxt, R.tier===14?'v-danger':(R.tier!=null?'v-info':''));
-  var posTxt = R.totalGrams>0 ? (R.totalGrams+' g') : '0 g';
+  var opGrams=document.getElementById('opGrams');
+  if(opGrams) opGrams.textContent = R.totalGrams>0 ? (R.totalGrams+' g') : '0 g';
   var posPct = R.cap>0 ? round2(R.totalGrams/R.cap*100) : 0;
   // 总持仓下方：占上限 + 加仓说明（下一档买入提示 / 满仓提示 / 空仓等待）
   var posSub = '占持仓上限 '+(R.totalGrams>0?posPct+'%':'--');
@@ -1269,33 +1282,22 @@ function render(){
     else if(R.totalGrams>0 && (R.tier<=4 || R.tier===0)){ posSub += ' · 反弹中，不追买'; }
     else if(R.totalGrams===0 && (R.tier<=4 || R.tier===0)){ posSub += R.logic===2?' · 空仓等待，-60档（7档）起建仓':' · 空仓等待，5档起建仓'; }
   }
-  setStat('stPos', posTxt, posSub, R.totalGrams>=R.cap&&R.totalGrams>0?'v-warn':'v-gold');
-  setStat('stAvg', R.avgPrice!=null?money(R.avgPrice):'--', '保本价 '+(R.breakeven!=null?money(R.breakeven):'--')+'（均价×1.004）', R.avgPrice!=null?'':'');
-  var pnlTxt='--', pnlSub='按当前金价估算';
-  if(R.pnl!=null){ pnlTxt=(R.pnl>=0?'+':'')+money(R.pnl)+' 元'; pnlSub=(R.pnlPct!=null?(R.pnl>=0?'+':'')+R.pnlPct+'%':'')+' · 按当前金价估算'; }
-  setStat('stPnL', pnlTxt, pnlSub, R.pnl==null?'':(R.pnl>=0?'v-ok':'v-danger'));
-  document.getElementById('tierTag').textContent = R.tier!=null ? (R.tier===14?'跌破13档':(R.tier===0?'第0档 · 越过高点':'第'+R.tier+'档')) : '待输入';
-
-  /* ---- 建议（止盈/清仓类加闪动放大动效） ---- */
-  var adv = judge(R);
-  var advEl=document.getElementById('advice');
-  advEl.className = 'advice '+adv.cls+(adv.cls==='a-sell'||adv.cls==='a-clear'?' pulse':'');
-  advEl.querySelector('b').textContent = adv.title;
-  advEl.querySelector('.extra').textContent = adv.extra;
-
-  /* ---- 操作面板（右栏） ---- */
-  var opPlan=document.getElementById('opPlanName');
-  if(opPlan) opPlan.textContent = P.name;
-  var opLogic=document.getElementById('opLogicTxt');
-  if(opLogic) opLogic.textContent = (P.logic===2 ? '逻辑2 · 深跌版' : '逻辑1 · 原版');
-  var opTier=document.getElementById('opTier');
-  if(opTier) opTier.textContent = R.tier!=null ? (R.tier===14?'跌破13档':(R.tier===0?'第0档 · 越过高点':'第'+R.tier+'档')) : '待输入';
-  var opGrams=document.getElementById('opGrams');
-  if(opGrams) opGrams.textContent = R.totalGrams>0 ? (R.totalGrams+' g') : '0 g';
+  var opGramsSub=document.getElementById('opGramsSub');
+  if(opGramsSub) opGramsSub.textContent = posSub;
   var opAvg=document.getElementById('opAvg');
   if(opAvg) opAvg.textContent = R.avgPrice!=null ? money(R.avgPrice) : '--';
+  var opAvgSub=document.getElementById('opAvgSub');
+  if(opAvgSub) opAvgSub.textContent = R.breakeven!=null ? ('保本价 '+money(R.breakeven)+'（均价×1.004）') : '--';
   var opBrk=document.getElementById('opBreak');
   if(opBrk) opBrk.textContent = R.breakeven!=null ? money(R.breakeven) : '--';
+  var pnlTxt='--', pnlSub='按当前金价估算';
+  if(R.pnl!=null){ pnlTxt=(R.pnl>=0?'+':'')+money(R.pnl)+' 元'; pnlSub=(R.pnlPct!=null?(R.pnl>=0?'+':'')+R.pnlPct+'%':'')+' · 按当前金价估算'; }
+  var opPnL=document.getElementById('opPnL');
+  if(opPnL){ opPnL.textContent=pnlTxt; opPnL.className = R.pnl==null?'':(R.pnl>=0?'v-ok':'v-danger'); }
+  var opPnLSub=document.getElementById('opPnLSub');
+  if(opPnLSub) opPnLSub.textContent = pnlSub;
+  var opTag=document.getElementById('opTag');
+  if(opTag) opTag.textContent = R.tier!=null ? (R.tier===14?'跌破13档':(R.tier===0?'第0档 · 越过高点':'第'+R.tier+'档')) : '建仓建议';
   var nxt=document.getElementById('opNext'), nsub=document.getElementById('opNextSub');
   if(nxt){
     var ni=-1;
@@ -1310,10 +1312,14 @@ function render(){
       nsub.textContent = R.totalGrams>0 ? '全部档位已建仓' : '填写阶段高点后自动计算';
     }
   }
+  /* ---- 建议（止盈/清仓类加闪动放大动效，保留详细描述） ---- */
+  var adv = judge(R);
   var opAdv=document.getElementById('opAdvice');
   if(opAdv){
     opAdv.className = 'op-advice '+adv.cls+(adv.cls==='a-sell'||adv.cls==='a-clear'?' pulse':'');
     opAdv.querySelector('b').textContent = adv.title;
+    var ex=opAdv.querySelector('.extra');
+    if(ex) ex.textContent = adv.extra || '填写阶段高点与当前金价后，这里会给出对应操作建议。';
   }
 
   /* ---- 档位表（0档 + 1-13档，按当前逻辑显示可建仓档） ---- */
@@ -1426,6 +1432,12 @@ function bind(){
     var c = document.getElementById('tierCard');
     c.classList.toggle('collapsed');
     setFold('tier', c.classList.contains('collapsed'));
+  });
+  var fr = document.getElementById('foldRule');
+  if(fr) fr.addEventListener('click', function(){
+    var c = document.getElementById('ruleCard');
+    c.classList.toggle('collapsed');
+    setFold('rule', c.classList.contains('collapsed'));
   });
   var fa = document.getElementById('foldAccount');
   if(fa) fa.addEventListener('click', function(){
@@ -1761,13 +1773,12 @@ function initRuleFolds(){
 /* ===== V3.2 卡片自由布局：拖拽摆放 + 放大缩小 ===== */
 var LAYOUT_KEY='jcj_layout_v1';
 
-var LAYOUT_IDS=['goldCard','stCard','tierCard','tpCard','opCard','ruleCard'];
+var LAYOUT_IDS=['goldCard','tierCard','tpCard','opCard','ruleCard'];
 var DEF_LAYOUT={
   goldCard:{c:1,s:3,r:1,rs:1,h:0},
-  stCard:{c:1,s:3,r:2,rs:1,h:0},
+  opCard:{c:1,s:3,r:2,rs:2,h:0},
   tierCard:{c:4,s:6,r:1,rs:2,h:0},
-  tpCard:{c:10,s:3,r:2,rs:1,h:0},
-  opCard:{c:10,s:3,r:1,rs:1,h:0},
+  tpCard:{c:10,s:3,r:1,rs:2,h:0},
   ruleCard:{c:4,s:6,r:3,rs:1,h:0}
 };
 function layoutClone(o){ return JSON.parse(JSON.stringify(o)); }
@@ -2237,7 +2248,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.2 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.3 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

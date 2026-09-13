@@ -416,6 +416,7 @@
   .op-risk{font-size:.7rem; color:var(--ink-3); margin-top:12px; border-top:1px dashed var(--line); padding-top:9px; line-height:1.5;}
 
   footer.foot{text-align:center; font-size:.8rem; color:var(--ink-3); margin-top:26px;}
+
   .disclaim{font-size:.72rem; color:var(--ink-3); margin-top:8px;}
 
   /* ===== toast ===== */
@@ -1759,6 +1760,7 @@ function initRuleFolds(){
 }
 /* ===== V3.2 卡片自由布局：拖拽摆放 + 放大缩小 ===== */
 var LAYOUT_KEY='jcj_layout_v1';
+
 var LAYOUT_IDS=['goldCard','stCard','tierCard','tpCard','opCard','ruleCard'];
 var DEF_LAYOUT={
   goldCard:{c:1,s:3,r:1,rs:1,h:0},
@@ -1888,6 +1890,7 @@ function initLayout(){
     layoutApply(layoutClone(DEF_LAYOUT));
   });
 }
+
 
 function initSidebar(){
   core.applyFolds();

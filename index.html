@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.4.7</title>
+<title>黄金建仓助手 V3.4.8</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -213,6 +213,8 @@
     padding:14px; border-radius:12px; box-shadow:0 8px 24px -8px rgba(226,184,79,.6); letter-spacing:4px;}
   .btn-login:active{transform:translateY(1px);}
   .login-msg{margin-top:12px; min-height:20px; font-size:.82rem; color:var(--danger);}
+  .login-remember{display:flex; align-items:center; gap:6px; font-size:.72rem; color:var(--ink-2); margin:8px 2px 0; cursor:pointer; user-select:none;}
+  .login-remember input{width:15px; height:15px; accent-color:var(--gold-deep); cursor:pointer;}
   .login-tip{margin-top:14px; font-size:.74rem; color:var(--ink-3); line-height:1.6; border-top:1px dashed var(--line); padding-top:12px;}
 
   /* ===== 顶栏 ===== */
@@ -560,8 +562,9 @@
             <input id="loginPass" type="password" autocomplete="current-password" placeholder="密码">
           </div>
           <button class="btn-login" id="btnLogin" type="button">登 录</button>
+          <label class="login-remember"><input type="checkbox" id="loginRemember"> 记住账号密码</label>
           <div class="login-msg" id="loginMsg"></div>
-          <div class="login-tip">登录后数据自动云端同步，多端同一账号数据一致<br>（重开浏览器需重新登录）</div>
+          <div class="login-tip">登录后数据自动云端同步，多端同一账号数据一致<br>（勾选记住后，重开浏览器自动登录）</div>
         </div>
         <div id="sbUserInfo" style="display:none">
           <div class="sb-user">已登录：<b id="loginUserTag">--</b></div>
@@ -797,7 +800,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.4.7 —— 红涨绿跌 · 建议氛围卡 · 日夜主题 · 账号云同步</footer>
+    <footer class="foot">黄金建仓助手 V3.4.8 —— 记住账号 · 红涨绿跌 · 日夜主题 · 账号云同步</footer>
   </div>
 
 
@@ -1673,6 +1676,11 @@ function doAuth(){
     setAuthUI(true);
     document.getElementById('loginUserTag').textContent=u;
     msg.textContent='';
+    try{
+      var _rm=document.getElementById('loginRemember');
+      if(_rm && _rm.checked){ localStorage.setItem('gold_rmb', JSON.stringify({u:u, p:p})); }
+      else{ localStorage.removeItem('gold_rmb'); }
+    }catch(e){}
     toast('欢迎回来，'+u);
     setSyncUI('同步中…', true);
     cloudPull(false);
@@ -1686,6 +1694,10 @@ function doLogout(){
   document.getElementById('loginUserTag').textContent='--';
   document.getElementById('loginMsg').textContent='';
   document.getElementById('loginPass').value='';
+  try{
+    localStorage.removeItem('gold_rmb');
+    var _rk=document.getElementById('loginRemember'); if(_rk) _rk.checked=false;
+  }catch(e){}
   setAuthUI(false);
   setSyncUI('', false);
   toast('已退出登录，数据保留在云端');
@@ -1912,6 +1924,25 @@ function initAuth(){
   document.getElementById('btnLogin').addEventListener('click', doAuth);
   document.getElementById('loginPass').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
   document.getElementById('loginUser').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('loginPass').focus(); });
+  /* 侧边栏标题跟随版本号 */
+  try{
+    var _vt=(document.title.match(/V[\d.]+/)||[''])[0];
+    var _bt=document.querySelector('.sb-brand-t');
+    if(_bt && _vt) _bt.textContent='黄金建仓助手 '+_vt;
+  }catch(e){}
+  /* 记住账号：自动填充并登录 */
+  try{
+    var _rmb=localStorage.getItem('gold_rmb');
+    if(_rmb){
+      var _rd=JSON.parse(_rmb);
+      if(_rd && _rd.u){
+        document.getElementById('loginUser').value=_rd.u||'';
+        document.getElementById('loginPass').value=_rd.p||'';
+        var _rk=document.getElementById('loginRemember'); if(_rk) _rk.checked=true;
+        doAuth();
+      }
+    }
+  }catch(e){}
   var lo=document.getElementById('btnLogout');
   if(lo) lo.addEventListener('click', doLogout);
   initSidebar();
@@ -2226,7 +2257,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.7 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.8 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

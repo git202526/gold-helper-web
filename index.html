@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.4.9</title>
+<title>黄金建仓助手 V3.5.0</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -525,34 +525,27 @@
 
   /* ===== 打印 / 输出 PDF（保留网页卡片布局，横版竖版均 2 页） ===== */
 
-/* ===== V3.4.9 建仓计划手机端：一屏完整显示（9列重排3行网格） ===== */
+/* ===== V3.5.0 建仓计划手机端：默认6核心列一屏显示 + 一键展开全部9列 ===== */
+.cols-btn{display:none;}
 @media (max-width:760px){
-  .tbl-scroll{overflow-x:hidden; border-radius:10px;}
-  .tbl-scroll table{min-width:0; table-layout:fixed; font-size:.62rem;}
-  .tbl-scroll thead{display:none;}
-  .tbl-scroll tbody tr{display:grid; grid-template-columns:22px 1fr 1fr 1fr; grid-template-rows:auto auto auto; column-gap:3px; row-gap:1px; padding:5px 4px; border-bottom:1px dashed var(--line-2);}
-  .tbl-scroll tbody tr:last-child{border-bottom:none;}
-  .tbl-scroll td{border:none; padding:1px 2px; font-size:.62rem; display:flex; align-items:center; gap:2px; white-space:nowrap; overflow:hidden; min-width:0; text-align:left;}
-  .tbl-scroll td:nth-child(1){grid-area:1/1/4/2; justify-content:center;}
-  .tbl-scroll td:nth-child(2){grid-area:1/2/1/5; font-size:.72rem; padding-bottom:2px;}
-  .tbl-scroll td:nth-child(3){grid-area:2/2;}
-  .tbl-scroll td:nth-child(4){grid-area:2/3;}
-  .tbl-scroll td:nth-child(5){grid-area:2/4;}
-  .tbl-scroll td:nth-child(6){grid-area:3/2;}
-  .tbl-scroll td:nth-child(7){display:none;}
-  .tbl-scroll td:nth-child(8){grid-area:3/3;}
-  .tbl-scroll td:nth-child(9){grid-area:3/4;}
-  .tbl-scroll td:nth-child(3)::before{content:'参考'; font-size:.5rem; color:var(--ink-3); margin-right:1px; flex:none;}
-  .tbl-scroll td:nth-child(4)::before{content:'成交'; font-size:.5rem; color:var(--ink-3); margin-right:1px; flex:none;}
-  .tbl-scroll td:nth-child(5)::before{content:'重量'; font-size:.5rem; color:var(--ink-3); margin-right:1px; flex:none;}
-  .tbl-scroll td:nth-child(6)::before{content:'实重'; font-size:.5rem; color:var(--ink-3); margin-right:1px; flex:none;}
-  .tbl-scroll td:nth-child(8)::before{content:'累计'; font-size:.5rem; color:var(--ink-3); margin-right:1px; flex:none;}
-  .tbl-scroll td:nth-child(9)::before{content:'均价'; font-size:.5rem; color:var(--ink-3); margin-right:1px; flex:none;}
-  .tbl-scroll .edit{width:100%; min-width:0; padding:1px 2px; font-size:.62rem; border-radius:6px;}
-  .tbl-scroll .chk{width:20px; height:20px; margin:0 auto;}
-  .tbl-scroll tr.tier-cur{background:var(--tier-cur-row) !important;}
-  .tbl-scroll tr.tier-cur td{background:transparent !important;}
-  .tbl-scroll td.act{background:transparent;}
+  .cols-btn{display:inline-flex; margin-left:6px; border:1px solid var(--line); background:var(--card-2); color:var(--ink); border-radius:8px; padding:3px 8px; font-size:.68rem; cursor:pointer; font-family:inherit;}
+  .cols-btn:active{transform:translateY(1px);}
+  .tbl-scroll table{min-width:0; table-layout:fixed; font-size:.7rem;}
+  .tbl-scroll th,.tbl-scroll td{padding:7px 3px; font-size:.66rem;}
+  .tbl-scroll th{font-size:.62rem; padding:7px 2px;}
+  .tbl-scroll .edit{font-size:.64rem; padding:2px 2px;}
+  .tbl-scroll col:nth-child(1){width:26px !important;}
+  .tbl-scroll col:nth-child(2){width:80px !important;}
+  .tbl-scroll col:nth-child(n+3){width:auto !important;}
+  /* 默认折叠次要列：参考克重、实际加仓重量、该档投入 */
+  .tbl-scroll th:nth-child(5),.tbl-scroll td:nth-child(5),
+  .tbl-scroll th:nth-child(6),.tbl-scroll td:nth-child(6),
+  .tbl-scroll th:nth-child(7),.tbl-scroll td:nth-child(7){display:none;}
+  /* 展开全部9列（允许横向滑动查看） */
+  .tbl-scroll.show-all th:nth-child(5),.tbl-scroll.show-all td:nth-child(5),
+  .tbl-scroll.show-all th:nth-child(6),.tbl-scroll.show-all td:nth-child(6),
+  .tbl-scroll.show-all th:nth-child(7),.tbl-scroll.show-all td:nth-child(7){display:table-cell;}
+  .tbl-scroll.show-all table{min-width:700px;}
 }
 </style>
 
@@ -746,6 +739,7 @@
     <!-- ===== 档位表 ===== -->
     <section class="card" id="tierCard">
       <h2>档位 · 建仓计划 <span class="tag">勾选=已买入</span>
+        <button class="cols-btn" id="btnCols" type="button" title="展开/收起次要列">展开列</button>
         <button class="fold-btn" id="foldTier" type="button" title="收起/展开档位表"><span class="ar">▾</span><span class="ftxt">收起</span></button>
       </h2>
       <div class="tier-body">
@@ -763,14 +757,14 @@
           <thead>
             <tr>
               <th class="c">已买</th>
-              <th class="l">档位（回撤）</th>
+              <th class="l">档位</th>
               <th>参考价</th>
-              <th>实际成交价</th>
-              <th>参考克重</th>
-              <th>实际加仓重量</th>
-              <th>该档投入</th>
-              <th>累计投入</th>
-              <th>当前均价</th>
+              <th>成交价</th>
+              <th>参考重量</th>
+              <th>实际加仓</th>
+              <th>档投入</th>
+              <th>累计</th>
+              <th>均价</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -830,7 +824,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.4.9 —— 建仓计划一屏显示 · 记住账号 · 日夜主题</footer>
+    <footer class="foot">黄金建仓助手 V3.5.0 —— 6列一屏·展开9列 · 记住账号 · 日夜主题</footer>
   </div>
 
 
@@ -1930,6 +1924,11 @@ function initSidebar(){
   /* 侧边栏展开时点击面板外空白不关闭；默认展示账号分组内容 */
   showSec('account');
   /* 操作面板：查看建仓计划 / 查看止盈计划 */
+  var bt=document.getElementById('btnCols');
+  if(bt) bt.addEventListener('click', function(){
+    var sc=document.querySelector('.tbl-scroll');
+    if(sc){ sc.classList.toggle('show-all'); bt.textContent = sc.classList.contains('show-all') ? '收起列' : '展开列'; }
+  });
   var gt=document.getElementById('btnGoTier');
   if(gt) gt.addEventListener('click', function(){
     var c=document.getElementById('tierCard');
@@ -2287,7 +2286,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.4.9 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.0 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

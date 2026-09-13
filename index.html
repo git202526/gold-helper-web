@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.0</title>
+<title>黄金建仓助手 V3.5.1</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -525,27 +525,21 @@
 
   /* ===== 打印 / 输出 PDF（保留网页卡片布局，横版竖版均 2 页） ===== */
 
-/* ===== V3.5.0 建仓计划手机端：默认6核心列一屏显示 + 一键展开全部9列 ===== */
+/* ===== V3.5.1 建仓计划手机端：默认6核心列铺满一屏 + 一键展开全部9列 ===== */
 .cols-btn{display:none;}
 @media (max-width:760px){
   .cols-btn{display:inline-flex; margin-left:6px; border:1px solid var(--line); background:var(--card-2); color:var(--ink); border-radius:8px; padding:3px 8px; font-size:.68rem; cursor:pointer; font-family:inherit;}
   .cols-btn:active{transform:translateY(1px);}
-  .tbl-scroll table{min-width:0; table-layout:fixed; font-size:.7rem;}
-  .tbl-scroll th,.tbl-scroll td{padding:7px 3px; font-size:.66rem;}
-  .tbl-scroll th{font-size:.62rem; padding:7px 2px;}
-  .tbl-scroll .edit{font-size:.64rem; padding:2px 2px;}
-  .tbl-scroll col:nth-child(1){width:26px !important;}
-  .tbl-scroll col:nth-child(2){width:80px !important;}
-  .tbl-scroll col:nth-child(n+3){width:auto !important;}
-  /* 默认折叠次要列：参考克重、实际加仓重量、该档投入 */
-  .tbl-scroll th:nth-child(5),.tbl-scroll td:nth-child(5),
-  .tbl-scroll th:nth-child(6),.tbl-scroll td:nth-child(6),
-  .tbl-scroll th:nth-child(7),.tbl-scroll td:nth-child(7){display:none;}
+  .tbl-scroll{overflow-x:hidden;}
+  .tbl-scroll.show-all{overflow-x:auto;}
+  .tbl-scroll table{min-width:0; table-layout:fixed; font-size:.6rem;}
+  .tbl-scroll col{width:auto !important;}
+  .tbl-scroll th,.tbl-scroll td{padding:6px 2px; font-size:.6rem; white-space:nowrap;}
+  .tbl-scroll th{font-size:.58rem; padding:6px 2px;}
+  .tbl-scroll .edit{font-size:.58rem; padding:2px 2px; width:100%; min-width:26px;}
+  .tbl-scroll .chk{width:16px; height:16px; margin:0 auto;}
   /* 展开全部9列（允许横向滑动查看） */
-  .tbl-scroll.show-all th:nth-child(5),.tbl-scroll.show-all td:nth-child(5),
-  .tbl-scroll.show-all th:nth-child(6),.tbl-scroll.show-all td:nth-child(6),
-  .tbl-scroll.show-all th:nth-child(7),.tbl-scroll.show-all td:nth-child(7){display:table-cell;}
-  .tbl-scroll.show-all table{min-width:700px;}
+  .tbl-scroll.show-all table{min-width:690px;}
 }
 </style>
 
@@ -824,7 +818,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.5.0 —— 6列一屏·展开9列 · 记住账号 · 日夜主题</footer>
+    <footer class="foot">黄金建仓助手 V3.5.1 —— 6列铺满一屏 · 展开9列 · 记住账号 · 日夜主题</footer>
   </div>
 
 
@@ -1297,6 +1291,7 @@ function render(){
   var tb = document.getElementById('tbody');
   var P = cur();
   var pos = P.pos[P.logic];
+  var showAllCols = window.innerWidth>760 || (document.querySelector('.tbl-scroll')||{}).classList && document.querySelector('.tbl-scroll').classList.contains('show-all');
   var html='';
   // 0档（高点上方）提示行：不参与买入
   html += '<tr class="'+(R.tier===0?'tier-cur ':'')+'">';
@@ -1315,33 +1310,40 @@ function render(){
     var buyZone = isBuyTier(i);
     var cls = (pos.checked[i]?'checked ':'') + (R.tier===tierNo?'tier-cur ':'');
     html += '<tr class="'+cls+'">';
-    html += '<td class="c">'+(buyZone
+    html += '<td class="c" style="width:'+(showAllCols?'':'6%')+'">'+(buyZone
       ? '<input type="checkbox" class="chk" data-tier="'+tierNo+'" '+(pos.checked[i]?'checked':'')+'>'
       : '<span class="num-empty">—</span>')+'</td>';
-    html += '<td class="l"><b>'+tierNo+'档</b> <span class="ref">(-'+draw+')</span></td>';
-    html += '<td>'+(R.tierPrice[i]!=null?money(R.tierPrice[i]):'<span class="num-empty">—</span>')+'</td>';
-    html += '<td class="act">'+(buyZone
+    html += '<td class="l" style="width:'+(showAllCols?'':'25%')+'"><b>'+tierNo+'档</b> <span class="ref">(-'+draw+')</span></td>';
+    html += '<td style="width:'+(showAllCols?'':'19%')+'">'+(R.tierPrice[i]!=null?money(R.tierPrice[i]):'<span class="num-empty">—</span>')+'</td>';
+    html += '<td class="act" style="width:'+(showAllCols?'':'13%')+'">'+(buyZone
       ? '<input class="edit" type="number" step="0.01" min="0" data-f="actPrice" data-tier="'+tierNo+'" value="'+(pos.actPrice[i]!=null?pos.actPrice[i]:'')+'" placeholder="'+((R.tierPrice[i]!=null)?R.tierPrice[i]:'参考价')+'">'
       : '<span class="num-empty">—</span>')+'</td>';
-    html += '<td>'+(buyZone
+    if(showAllCols) html += '<td>'+(buyZone
       ? (R.refGrams[i]>0?R.refGrams[i]:'<span class="num-empty">—</span>')
       : '<span class="num-empty">—</span>')+'</td>';
-    html += '<td class="act">'+(buyZone
+    if(showAllCols) html += '<td class="act">'+(buyZone
       ? '<input class="edit" type="number" step="0.01" min="0" data-f="actGrams" data-tier="'+tierNo+'" value="'+(pos.actGrams[i]!=null?pos.actGrams[i]:'')+'" placeholder="'+(R.refGrams[i]>0?R.refGrams[i]:'参考')+'">'
       : '<span class="num-empty">—</span>')+'</td>';
-    // 该档投入
+    // 该档投入（折叠时隐藏）
     var useAct = (pos.actPrice[i]!=null || pos.actGrams[i]!=null);
     var invHtml = (buyZone && R.invest[i]!=null)
       ? '<span class="'+(useAct?'use-act':'')+'" '+(pos.checked[i]?'title="已计入累计"':'')+'>'+money(R.invest[i])+'</span>'
       : '<span class="num-empty">—</span>';
-    html += '<td>'+invHtml+'</td>';
+    if(showAllCols) html += '<td>'+invHtml+'</td>';
     // 累计投入（按已勾选档位实时计算）
-    html += '<td>'+(R.cumInvest[i]!=null?'<b>'+money(R.cumInvest[i])+'</b>':'<span class="num-empty">—</span>')+'</td>';
+    html += '<td style="width:'+(showAllCols?'':'18%')+'">'+(R.cumInvest[i]!=null?'<b>'+money(R.cumInvest[i])+'</b>':'<span class="num-empty">—</span>')+'</td>';
     // 当前均价（按已勾选档位实时计算）
-    html += '<td>'+(R.cumAvg[i]!=null?money(R.cumAvg[i]):'<span class="num-empty">—</span>')+'</td>';
+    html += '<td style="width:'+(showAllCols?'':'19%')+'">'+(R.cumAvg[i]!=null?money(R.cumAvg[i]):'<span class="num-empty">—</span>')+'</td>';
     html += '</tr>';
   }
   tb.innerHTML = html;
+  /* 手机折叠时：表头只显示6列（隐藏次要列）+ 按列给内联宽度（fixed布局以表头行为准） */
+  var ths=document.querySelectorAll('.tbl-scroll thead th');
+  var _tw=['6%','25%','19%','13%','','','','18%','19%'];
+  for(var _ti=0;_ti<ths.length;_ti++){
+    ths[_ti].style.width = showAllCols ? '' : _tw[_ti];
+    ths[_ti].style.display = (showAllCols || _ti<4 || _ti>6) ? '' : 'none';
+  }
 
   /* ---- 止盈5卡（10/20/20/20 + 保留30%搏高） ---- */
   var tp = document.getElementById('tpGrid');
@@ -1377,6 +1379,7 @@ function render(){
     gm.textContent='自动获取中…';
   }
 }
+window.render = render;  /* 暴露供折叠列按钮等外部调用 */
 
 /* ===== 事件 ===== */
 function bind(){
@@ -1927,7 +1930,12 @@ function initSidebar(){
   var bt=document.getElementById('btnCols');
   if(bt) bt.addEventListener('click', function(){
     var sc=document.querySelector('.tbl-scroll');
-    if(sc){ sc.classList.toggle('show-all'); bt.textContent = sc.classList.contains('show-all') ? '收起列' : '展开列'; }
+    if(sc){ sc.classList.toggle('show-all'); bt.textContent = sc.classList.contains('show-all') ? '收起列' : '展开列'; render(); }
+  });
+  var _lastMob = window.innerWidth<=760;
+  window.addEventListener('resize', function(){
+    var m = window.innerWidth<=760;
+    if(m!==_lastMob){ _lastMob=m; render(); }
   });
   var gt=document.getElementById('btnGoTier');
   if(gt) gt.addEventListener('click', function(){
@@ -2286,7 +2294,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.0 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.1 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

@@ -1,5 +1,5 @@
 /* 黄金建仓助手 V2.5.1 —— Service Worker：离线缓存 */
-var CACHE = 'gold-assistant-v3.2';
+var CACHE = 'gold-assistant-v3.3';
 var ASSETS = [
   './',
   './index.html',

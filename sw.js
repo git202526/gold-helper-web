@@ -32,19 +32,21 @@ self.addEventListener('fetch', function(e){
   if(req.method !== 'GET') return;
   // 只处理同源页面/静态资源；跨域行情接口（gold-api 等）直接放行
   if(req.url.indexOf(self.location.origin) !== 0) return;
+  // 网络优先：先请求最新内容（线上更新即时生效），失败才回退缓存
   e.respondWith(
-    caches.match(req).then(function(cached){
-      if(cached) return cached;
-      return fetch(req).then(function(res){
+    fetch(req)
+      .then(function(res){
         if(res && res.status === 200){
           var copy = res.clone();
           caches.open(CACHE).then(function(c){ c.put(req, copy); });
         }
         return res;
-      }).catch(function(){
-        // 离线时兜底回主页
-        return caches.match('./index.html');
-      });
-    })
+      })
+      .catch(function(){
+        return caches.match(req).then(function(cached){
+          if(cached) return cached;
+          return caches.match('./index.html');
+        });
+      })
   );
 });

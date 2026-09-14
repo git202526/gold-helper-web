@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.4</title>
+<title>黄金建仓助手 V3.5.5</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -147,6 +147,13 @@
   .set-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:11px;}
   .set-row:last-child{margin-bottom:0;}
   .set-label{font-size:.8rem; color:var(--ink-2); font-weight:600;}
+  .set-alert{display:flex; align-items:center; gap:8px;}
+  .sb-toggle{min-width:44px; height:30px; border-radius:99px; border:1px solid var(--line); background:var(--card-2); color:var(--ink-2);
+    font-size:.78rem; font-weight:700; cursor:pointer;}
+  .sb-toggle.on{border-color:var(--gold); background:var(--gold-bg); color:var(--gold-deep); box-shadow:var(--glow);}
+  .ipt-mini{width:58px; height:30px; border-radius:9px; border:1px solid var(--line); background:var(--card-2); color:var(--ink-1);
+    font-size:.85rem; text-align:center; padding:0 4px;}
+  .set-hint{font-size:.68rem; color:var(--ink-2); white-space:nowrap;}
   .set-font{display:flex; align-items:center; gap:9px;}
   .set-font .fsize{font-size:.74rem; color:var(--gold-deep); font-weight:800; min-width:34px; text-align:center;
     background:var(--gold-bg); border:1px solid color-mix(in srgb, var(--gold) 40%, transparent); border-radius:99px; padding:2px 8px;}
@@ -388,6 +395,17 @@
   .op-advice{display:flex; gap:10px; align-items:flex-start; border-radius:12px; padding:11px 13px; font-size:.88rem; margin-bottom:12px;
     border:1px solid rgba(224,69,58,.20); background:rgba(224,69,58,.07);
     animation:advGlow 3s ease-in-out infinite;}
+  /* ===== 价格提醒条（到保本价 / 每克盈利+40） ===== */
+  .alert-bar{display:flex; flex-direction:column; gap:8px; margin:0 0 12px;}
+  .alert-item{display:none; align-items:center; gap:8px; border-radius:12px; padding:10px 13px; font-size:.86rem; line-height:1.4;
+    border:1px solid rgba(230,196,106,.55); background:linear-gradient(135deg, rgba(230,196,106,.17), rgba(230,196,106,.05));
+    color:#e6c46a; animation:alertPulse 1.4s ease-in-out infinite;}
+  .alert-item.alert-profit{border-color:rgba(111,217,160,.55); background:linear-gradient(135deg, rgba(111,217,160,.16), rgba(111,217,160,.04)); color:#8fe0b4;}
+  .alert-item svg{flex:none; width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .alert-item b{font-size:.95rem;}
+  @keyframes alertPulse{0%,100%{box-shadow:0 0 0 0 rgba(230,196,106,0)}50%{box-shadow:0 0 0 5px rgba(230,196,106,.16)}}
+  .alert-profit{animation-name:alertPulseGreen;}
+  @keyframes alertPulseGreen{0%,100%{box-shadow:0 0 0 0 rgba(111,217,160,0)}50%{box-shadow:0 0 0 5px rgba(111,217,160,.16)}}
   .op-advice b{transition:color .2s;}
   .op-advice b.pop{animation:titlePop .5s ease;}
   #opPnL.pnl-up{color:var(--danger); font-weight:800;}
@@ -663,6 +681,14 @@
             </button>
           </div>
           <div class="set-row">
+            <span class="set-label">价格提醒</span>
+            <div class="set-alert">
+              <button class="sb-toggle" id="btnAlertToggle" type="button" title="开关价格提醒">开</button>
+              <input class="ipt-mini" id="alertStep" type="number" min="5" step="5" value="40" title="每克盈利提醒间隔（元）">
+              <span class="set-hint">元/克盈利</span>
+            </div>
+          </div>
+          <div class="set-row">
             <span class="set-label">卡片布局</span>
             <button class="sb-actbtn" id="btnLayoutReset" type="button" title="恢复所有卡片默认位置与大小">恢复默认布局</button>
           </div>
@@ -722,6 +748,16 @@
         <div class="op-item"><span class="op-k">保本价</span><b id="opBreak">--</b><span class="op-s">均价×1.004</span></div>
         <div class="op-item" id="opPnLBox"><span class="op-k">浮动盈亏</span><b id="opPnL">--</b><span class="op-s" id="opPnLSub">按当前金价估算</span></div>
         <div class="op-item"><span class="op-k">下一档建仓</span><b id="opNext">--</b><span class="op-s" id="opNextSub">--</span></div>
+      </div>
+      <div class="alert-bar" id="alertBar">
+        <div class="alert-item" id="alertBE">
+          <svg viewBox="0 0 24 24"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8z"/></svg>
+          <span>已到达保本价 <b id="alertBEVal">--</b>，回本了！</span>
+        </div>
+        <div class="alert-item alert-profit" id="alertP40">
+          <svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>
+          <span>每克盈利 <b id="alertP40Val">--</b>，达到目标！</span>
+        </div>
       </div>
       <div class="op-advice" id="opAdvice">
         <span class="dot"></span>
@@ -822,7 +858,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.5.4 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
+    <footer class="foot">黄金建仓助手 V3.5.5 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
   </div>
 
 
@@ -1179,6 +1215,40 @@ function applyFolds(){
 function fmt(n, d){ return (n==null||isNaN(n)) ? '--' : (d? n.toFixed(d) : String(n)); }
 function money(n){ return fmt(n,2); }
 
+/* ===== 价格提醒（到保本价 / 每克盈利+step），配置存 localStorage，触发即时 toast + 提醒条常显 ===== */
+var KEY_ALERT='jcj_alert_v1';
+function getAlertCfg(){
+  try{
+    var s=localStorage.getItem(KEY_ALERT);
+    if(s){ var o=JSON.parse(s); return {on:o.on!==false, step:(o.step>0?o.step:40)}; }
+  }catch(e){}
+  return {on:true, step:40};
+}
+function setAlertCfg(c){ try{ localStorage.setItem(KEY_ALERT, JSON.stringify(c)); }catch(e){} }
+function checkAlerts(R, P){
+  var be=document.getElementById('alertBE'), p40=document.getElementById('alertP40');
+  if(!be || !p40) return;
+  var cfg=getAlertCfg();
+  function hide(){ be.style.display='none'; p40.style.display='none'; window.__alertPrev=null; }
+  if(!cfg.on || R.price==null || R.totalGrams<=0 || R.avgPrice==null || R.breakeven==null){ hide(); return; }
+  var step=(cfg.step>0?cfg.step:40);
+  var hitBE = R.price >= R.breakeven;
+  var hitP  = R.price >= R.avgPrice + step;
+  if(!hitBE && !hitP){ hide(); return; }
+  if(!window.__alertPrev) window.__alertPrev={be:false,p40:false};
+  if(hitBE){
+    be.style.display='flex';
+    document.getElementById('alertBEVal').textContent = money(R.breakeven);
+    if(!window.__alertPrev.be){ toast('价格已到保本价 ¥'+money(R.breakeven)+'，回本了！'); }
+  } else be.style.display='none';
+  if(hitP){
+    p40.style.display='flex';
+    document.getElementById('alertP40Val').textContent = '+'+(R.price-R.avgPrice).toFixed(2)+' 元（目标 +'+step+'）';
+    if(!window.__alertPrev.p40){ toast('每克盈利已达目标 +'+step+' 元（当前 +'+(R.price-R.avgPrice).toFixed(2)+'），可分批止盈！'); }
+  } else p40.style.display='none';
+  window.__alertPrev.be=hitBE; window.__alertPrev.p40=hitP;
+}
+
 function render(){
   var R = calc();
   var P = cur();
@@ -1383,6 +1453,8 @@ function render(){
     gv.textContent='--';
     gm.textContent='自动获取中…';
   }
+  /* ---- 价格提醒：到保本价 / 每克盈利+step ---- */
+  checkAlerts(R, CP);
 }
 window.render = render;  /* 暴露供折叠列按钮等外部调用 */
 
@@ -1423,6 +1495,32 @@ function bind(){
     c.classList.toggle('collapsed');
     setFold('settings', c.classList.contains('collapsed'));
   });
+  /* 价格提醒：开关 + 盈利步长 */
+  var at = document.getElementById('btnAlertToggle');
+  if(at){
+    var ac = getAlertCfg();
+    at.textContent = ac.on ? '开' : '关';
+    at.classList.toggle('on', !!ac.on);
+    at.addEventListener('click', function(){
+      var c = getAlertCfg(); c.on = !c.on; setAlertCfg(c);
+      this.textContent = c.on ? '开' : '关';
+      this.classList.toggle('on', !!c.on);
+      toast(c.on ? '已开启价格提醒' : '已关闭价格提醒');
+      render();
+    });
+  }
+  var ast = document.getElementById('alertStep');
+  if(ast){
+    ast.value = getAlertCfg().step;
+    ast.addEventListener('input', function(){
+      var v = parseFloat(this.value);
+      if(v!=null && !isNaN(v) && v>0){ var c=getAlertCfg(); c.step=v; setAlertCfg(c); }
+    });
+    ast.addEventListener('blur', function(){
+      var v = parseFloat(this.value);
+      if(!(v>0)){ var c=getAlertCfg(); this.value=c.step; }
+    });
+  }
   document.getElementById('inHigh').addEventListener('input', function(){
     var P = cur(); P.high = toNum(this.value); P.hitHigh = false;   // 新高点 = 新行情，重置反弹记录
     save(); render();
@@ -2305,7 +2403,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.4 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.5 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

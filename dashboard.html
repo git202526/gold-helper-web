@@ -150,7 +150,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.1</span>
+    <span class="ver" id="appVer">V1.2</span>
   </div>
   <div class="top-actions">
     <button class="btn" id="btnTheme" title="日夜切换">
@@ -257,11 +257,16 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
 /* ============ 常量与状态 ============ */
 var KEY = 'jcj_helper_local_v2';
 var REF = [1010,1000,990,980,970,960,950,940,930,920,910,900,890]; // 参考价兜底（0-12档）
-var g = { profiles:[], px:{cny:null,usd:null,rate:null}, charts:{}, theme:localStorage.getItem('jcj_info_theme')||'dark' };
+var g = { profiles:[], px:{cny:null,usd:null,rate:null}, charts:{},
+  theme:(localStorage.getItem('jcj_theme_v1')||localStorage.getItem('jcj_info_theme')||'dark') };
 
 /* ============ 工具 ============ */
 function $(id){return document.getElementById(id)}
-function money(v){return (v<0?'-':'')+'¥'+Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function money(v){
+  var neg = v<0;
+  var s = Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return (neg?'-':'+')+s;
+}
 function num(v,d){return (v==null||isNaN(v))?'--':Number(v).toFixed(d==null?2:d)}
 function round2(v){return Math.round(v*100)/100}
 function cls(ok){return ok?'up':'down'}
@@ -275,8 +280,13 @@ function applyTheme(){
   $('themeTxt').textContent = g.theme==='dark'?'夜间':'日间';
   Object.keys(g.charts).forEach(function(k){ if(g.charts[k]) g.charts[k].dispose() });
   g.charts={};
+  if(document.querySelector('.pf-card')) render();   /* 主题切换后全量重建（含方案环形图） */
 }
-$('btnTheme').onclick=function(){ g.theme = g.theme==='dark'?'light':'dark'; localStorage.setItem('jcj_info_theme',g.theme); applyTheme(); renderCharts(); };
+$('btnTheme').onclick=function(){
+  g.theme = g.theme==='dark'?'light':'dark';
+  try{ localStorage.setItem('jcj_theme_v1', g.theme); localStorage.setItem('jcj_info_theme', g.theme); }catch(e){}
+  applyTheme();
+};
 
 /* ============ 数据读取 ============ */
 function loadData(){
@@ -295,9 +305,15 @@ function profileName(pr,i){
   return '方案'+(i+1);
 }
 
-/* 计算一个方案的全部持仓（逻辑1+逻辑2 合并） */
+/* 业务常量（与主应用一致，勿改） */
+var DRAWDOWN=[0,10,20,30,40,50,60,70,80,90,100,110,120];
+var BASE1=[0,0,0,0,6,10,17,27,44,72,124,0,0];
+var BASE2=[0,0,0,0,0,0,20,0,40,0,80,0,160];
+
+/* 计算一个方案的全部持仓（逻辑1+逻辑2 合并，复刻主应用 effPrice/effGrams 口径） */
 function calcProfile(pr, px, idx){
   if(!px || isNaN(px) || px<=0) px = (+pr.price)||0;   /* 实时金价缺失时回退方案保存价格 */
+  var scale = ((+pr.cap)||300)/300;
   var logicData=[];
   var total=0, grams=0;
   [1,2].forEach(function(lg){
@@ -308,12 +324,18 @@ function calcProfile(pr, px, idx){
       var checked=!!(pos.checked&&pos.checked[i]);
       var actP=pos.actPrice&&pos.actPrice[i];
       var actG=pos.actGrams&&pos.actGrams[i];
-      var price = (actP!=null&&!isNaN(+actP)&&+actP>0)? +actP : (REF[i]||0);
-      var w = (checked&&actG!=null&&!isNaN(+actG)&&+actG>0)? +actG : 0;
+      /* 参考价：高点-回撤（主应用口径），high 缺失时用静态兜底 */
+      var tierP = (pr.high!=null&&!isNaN(+pr.high))? (+pr.high)-DRAWDOWN[i] : (REF[i]||0);
+      /* 推荐重量：基础克重×scale（主应用口径） */
+      var refG = round2((lg===1?BASE1:BASE2)[i]*scale);
+      /* 成交价：实际成交价优先，否则参考价 */
+      var price = (actP!=null&&!isNaN(+actP)&&+actP>0)? +actP : tierP;
+      /* 重量：勾选后实际重量优先，否则用推荐重量（关键：只勾选未填重量也计持仓） */
+      var w = checked ? (actG!=null&&!isNaN(+actG)&&+actG>0? +actG : refG) : 0;
       if(w>0){
         var invest=w*price;
         lgTotal+=invest; lgGrams+=w;
-        rows.push({tier:i, ref:REF[i], price:price, grams:w, invest:invest});
+        rows.push({tier:i, ref:tierP, price:price, grams:w, invest:invest});
       }
     }
     var lgAvg = lgGrams>0? lgTotal/lgGrams : 0;
@@ -370,7 +392,7 @@ function render(){
 function renderOverview(cards){
   var tot=0, gr=0, pnl=0, cnt=0;
   cards.forEach(function(c){ tot+=c.total; gr+=c.grams; pnl+=c.pnl; if(c.has) cnt++; });
-  $('ovTotal').textContent = tot>0? money(tot) : '--';
+  $('ovTotal').textContent = tot>0? money(tot)+' 元' : '--';
   $('ovGrams').textContent = gr>0? round2(gr)+' g' : '--';
   $('ovPnl').textContent = pnl!==0? (pnl>0?'+':'')+round2(pnl)+' 元' : '--';
   var card=$('ovPnlCard');
@@ -390,7 +412,7 @@ function renderProfiles(cards){
     var pnlClsN = c.pnl>0?'red':(c.pnl<0?'green':'');
     var html = '<div class="pf-head"><span class="pf-name">'+esc(c.name)+'</span><span class="pf-tag">'+(c.has?'持仓中':'空仓')+'</span></div>';
     html += '<div class="pf-metrics">';
-    html += '<div class="pf-m"><div class="m1">总投入</div><div class="m2 gold">'+(c.total>0?money(c.total):'--')+'</div></div>';
+    html += '<div class="pf-m"><div class="m1">总投入</div><div class="m2 gold">'+(c.total>0?money(c.total)+' 元':'--')+'</div></div>';
     html += '<div class="pf-m"><div class="m1">总重量</div><div class="m2 gold">'+(c.grams>0?round2(c.grams)+' g':'--')+'</div></div>';
     html += '<div class="pf-m"><div class="m1">持仓均价</div><div class="m2">'+(c.avg>0?num(c.avg,2):'--')+'</div></div>';
     html += '<div class="pf-m"><div class="m1">浮动盈亏</div><div class="m2 '+pnlClsN+'">'+(c.pnl!==0?(c.pnl>0?'+':'')+round2(c.pnl)+' 元':'--')+'</div></div>';
@@ -414,8 +436,11 @@ function baseOpt(){ return {
   tooltip:{backgroundColor:'rgba(28,21,11,.95)',borderColor:'rgba(233,185,73,.4)',textStyle:{color:'#F2D894',fontSize:12},axisPointer:{type:'shadow'}}
 };}
 function drawPfChart(id, c){
-  if(!hasEcharts()) return;
   var el=document.getElementById(id); if(!el) return;
+  if(!hasEcharts()){
+    el.innerHTML='<div style="text-align:center;color:#8A7A55;font-size:.75rem;padding-top:50px">持仓分布 · 逻辑1/逻辑2</div>';
+    return;
+  }
   var chart=echarts.init(el);
   var rows=c.logic.filter(function(l){return l.grams>0});
   var series=[];
@@ -424,10 +449,10 @@ function drawPfChart(id, c){
       data:rows.map(function(l){return {name:'逻辑'+l.logic, value:Math.round(l.total*100)/100}}),
       label:{show:false}, labelLine:{show:false}, itemStyle:{borderColor:'#16110A',borderWidth:2},
       color:['#E9B949','#C9962E']}];
-    opt.legend={show:false};
   }
   var opt=baseOpt();
   opt.series=series;
+  opt.legend={show:false};
   if(rows.length && rows.length>1){
     opt.graphic=[{type:'text',left:'62%',top:'middle',style:{text:'持仓分布',fill:'#C9BDA3',fontSize:11,textAlign:'center'}}];
   }
@@ -488,31 +513,30 @@ function renderDetail(cards){
 
 /* ============ 刷新 ============ */
 var loading=false;
-function refresh(){
+function refresh(silent){
   if(loading) return; loading=true;
-  $('btnRefresh').style.opacity=.6;
-  toast('正在刷新数据…');
+  if(!silent){ $('btnRefresh').style.opacity=.6; toast('正在刷新数据…'); }
   loadPrice().then(function(rs){
     g.px=rs;
     renderPrice();
     render();
     loading=false;
     $('btnRefresh').style.opacity=1;
-    toast('刷新完成');
+    if(!silent) toast('刷新完成');
   }).catch(function(){
     render();
     loading=false;
     $('btnRefresh').style.opacity=1;
-    toast('金价获取失败，已用方案保存价格估算');
+    if(!silent) toast('金价获取失败，已用方案保存价格估算');
   });
 }
-$('btnRefresh').onclick=refresh;
+$('btnRefresh').onclick=function(){ refresh(false) };
 $('btnGoMain').onclick=function(){ try{ window.location.href='./'; }catch(e){} };
 
 /* ============ 启动 ============ */
 applyTheme();
 refresh();
-setInterval(function(){ if(!document.hidden) refresh(); }, 120000);
+setInterval(function(){ if(!document.hidden) refresh(true); }, 120000);
 </script>
 </body>
 </html>

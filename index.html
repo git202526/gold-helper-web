@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.11</title>
+<title>黄金建仓助手 V3.5.12</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -97,7 +97,7 @@
   input{font-family:inherit;}
 
   /* ===== V3.5.10 头像框侧边栏：折叠为左上角圆形头像，点击悬浮展开 ===== */
-  .sidebar{position:fixed; left:14px; top:14px; z-index:400; width:58px; height:58px; border-radius:50%;
+  .sidebar{position:fixed; left:14px; bottom:14px; z-index:400; width:58px; height:58px; border-radius:50%;
     display:flex; flex-direction:column; background:transparent; border:none; box-shadow:none; overflow:hidden;
     transition:width .3s cubic-bezier(.4,0,.2,1), height .3s cubic-bezier(.4,0,.2,1), border-radius .3s;}
   .sidebar.open{width:322px; height:auto; max-height:calc(100vh - 28px); border-radius:22px;
@@ -888,7 +888,7 @@
     </section>
 
     <footer class="foot">
-      <span class="foot-t">黄金建仓助手 V3.5.11 —— 一键备份/恢复 · 日夜主题</span>
+      <span class="foot-t">黄金建仓助手 V3.5.12 —— 一键备份/恢复 · 日夜主题</span>
       <span class="foot-acts">
         <button class="foot-btn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高">✥ 编辑布局</button>
         <button class="foot-btn" id="btnResetLayout" type="button" title="恢复默认卡片布局">恢复默认布局</button>
@@ -1246,6 +1246,8 @@ function applyFolds(){
   for(var k in FOLD_MAP){
     if(f[k]){ var el = document.getElementById(FOLD_MAP[k]); if(el) el.classList.add('collapsed'); }
   }
+  /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
+  if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
 }
 function fmt(n, d){ return (n==null||isNaN(n)) ? '--' : (d? n.toFixed(d) : String(n)); }
 function money(n){ return fmt(n,2); }
@@ -1969,15 +1971,16 @@ function initRuleFolds(){
   }
 }
 /* ===== V3.2 卡片自由布局：拖拽摆放 + 放大缩小 ===== */
-var LAYOUT_KEY='jcj_layout_v1';
+var LAYOUT_KEY='jcj_layout_v2';
 
 var LAYOUT_IDS=['goldCard','tierCard','tpCard','opCard','ruleCard'];
+/* V3.5.12 桌面布局（参考 2×2 示意图）：金价左上 / 止盈右上长 / 操作面板左下竖 / 建仓右下大 / 规则说明底部整行 */
 var DEF_LAYOUT={
   goldCard:{c:1,s:3,r:1,rs:1,h:0},
-  opCard:{c:1,s:3,r:2,rs:2,h:0},
-  tierCard:{c:4,s:6,r:1,rs:2,h:0},
-  tpCard:{c:10,s:3,r:1,rs:2,h:0},
-  ruleCard:{c:4,s:6,r:3,rs:1,h:0}
+  tpCard:{c:4,s:9,r:1,rs:2,h:0},
+  opCard:{c:1,s:3,r:2,rs:3,h:0},
+  tierCard:{c:4,s:9,r:3,rs:2,h:0},
+  ruleCard:{c:1,s:12,r:5,rs:1,h:0}
 };
 function layoutClone(o){ return JSON.parse(JSON.stringify(o)); }
 function layoutLoad(){
@@ -2021,7 +2024,7 @@ function initLayout(){
   var btnReset=document.getElementById('btnResetLayout');
   if(btnReset) btnReset.addEventListener('click', function(){
     if(!confirm('恢复默认卡片布局？当前自定义布局将被覆盖。')) return;
-    try{ localStorage.removeItem('jcj_layout_v1'); }catch(e){}
+    try{ localStorage.removeItem('jcj_layout_v2'); }catch(e){}
     layoutApply(layoutClone(DEF_LAYOUT));
     toast('已恢复默认布局');
   });
@@ -2553,7 +2556,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.11 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.12 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

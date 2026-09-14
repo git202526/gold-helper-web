@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.13</title>
+<title>黄金建仓助手 V4.14</title>
 <style>
 /* ============================================================
-   V4.13 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.14 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -272,7 +272,7 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .cols-btn{margin-left:auto;font-size:.66rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);
   border-radius:99px;padding:3px 10px;font-family:inherit;white-space:nowrap}
 
-/* ===== 止盈计划（V4.13 视觉升级：与操作面板风格统一） ===== */
+/* ===== 止盈计划（V4.14 视觉升级：与操作面板风格统一） ===== */
 .tp-body{padding:0 18px 16px}
 .tp-profitbar{display:flex;gap:10px;margin:12px 18px 0;padding:0}
 .tpb-item{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;
@@ -285,6 +285,8 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .tpb-k{font-size:.7rem;color:var(--ink-3);letter-spacing:.6px;font-weight:700}
 .tpb-v{font-size:1.26rem;font-weight:900;color:var(--gold-soft);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:0;word-break:break-all;
   text-shadow:0 0 18px rgba(233,185,73,.28)}
+.tpb-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;width:100%;min-width:0}
+.tpb-g{font-size:.74rem;font-weight:800;color:var(--gold-soft);white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.3px}
 .tpb-v.up{color:var(--up);text-shadow:0 0 16px rgba(242,85,90,.3)}
 .tpb-v.down{color:var(--down);text-shadow:0 0 16px rgba(52,211,153,.3)}
 html[data-theme="light"] .tpb-v{text-shadow:none}
@@ -717,7 +719,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.13</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.14</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -851,8 +853,15 @@ html[data-theme="light"] .sb-avatar{color:#fff}
   <section class="card" id="tpCard">
     <h2>止盈计划 <span class="tag">反弹到价分批卖出</span></h2>
     <div class="tp-profitbar" id="tpProfitBar">
-      <div class="tpb-item"><span class="tpb-k">分批止盈目标</span><b class="tpb-v" id="tpbBatch">--</b></div>
-      <div class="tpb-item"><span class="tpb-k">回1档清仓目标</span><b class="tpb-v" id="tpbFull">--</b></div>
+      <div class="tpb-item"><span class="tpb-k">分批止盈目标</span>
+        <span class="tpb-row"><b class="tpb-v" id="tpbBatch">--</b><span class="tpb-g" id="tpbBatchG">--</span></span>
+      </div>
+      <div class="tpb-item"><span class="tpb-k">回1档清仓目标</span>
+        <span class="tpb-row"><b class="tpb-v" id="tpbFull">--</b><span class="tpb-g" id="tpbFullG">--</span></span>
+      </div>
+      <div class="tpb-item"><span class="tpb-k">过高点+20清仓</span>
+        <span class="tpb-row"><b class="tpb-v" id="tpbPlus">--</b><span class="tpb-g" id="tpbPlusG">--</span></span>
+      </div>
     </div>
     <div class="tp-grid" id="tpGrid"></div>
   </section>
@@ -900,7 +909,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.13 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.14 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -1270,7 +1279,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.13：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.14：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -1504,22 +1513,36 @@ function render(){
   var tp = document.getElementById('tpGrid');
   var hasPos = R.totalGrams>0;
   /* 止盈目标盈利长条：分批全卖目标盈利 / 回1档清仓目标盈利 */
-  var tpb1=document.getElementById('tpbBatch'), tpb2=document.getElementById('tpbFull');
-  if(tpb1 && tpb2){
+  var tpb1=document.getElementById('tpbBatch'), tpb2=document.getElementById('tpbFull'), tpb3=document.getElementById('tpbPlus');
+  var tpb1g=document.getElementById('tpbBatchG'), tpb2g=document.getElementById('tpbFullG'), tpb3g=document.getElementById('tpbPlusG');
+  if(tpb1 && tpb2 && tpb3){
     if(R.valid && hasPos && R.avgPrice!=null){
-      var tpP=[R.high-30, R.high-20, R.high-10, R.high, R.high+20];
-      var tpG=[R.sell1, R.sell2, R.sell3, R.sell4, R.sell5];
+      /* 分批止盈目标：4 批合计卖出（10+20+20+20=70%仓位） */
+      var tpP=[R.high-30, R.high-20, R.high-10, R.high];
+      var tpG=[R.sell1, R.sell2, R.sell3, R.sell4];
+      var batchG = tpG[0]+tpG[1]+tpG[2]+tpG[3];
       var batch=0;
-      for(var b=0;b<5;b++) batch += tpG[b]*tpP[b];
-      batch -= R.totalGrams*R.avgPrice;
+      for(var b=0;b<4;b++) batch += tpG[b]*tpP[b];
+      batch -= batchG*R.avgPrice;
+      /* 回1档清仓目标：全仓按高点卖出 */
+      var fullG = R.totalGrams;
       var full = R.totalGrams*(R.high-R.avgPrice);
+      /* 过高点+20清仓：全仓按高点+20卖出 */
+      var plusG = R.totalGrams;
+      var plus = R.totalGrams*(R.high+20-R.avgPrice);
       tpb1.textContent=(batch>=0?'+':'')+money(batch)+' 元';
       tpb2.textContent=(full>=0?'+':'')+money(full)+' 元';
+      tpb3.textContent=(plus>=0?'+':'')+money(plus)+' 元';
       tpb1.className='tpb-v'+(batch>=0?' up':' down');
       tpb2.className='tpb-v'+(full>=0?' up':' down');
+      tpb3.className='tpb-v'+(plus>=0?' up':' down');
+      tpb1g.textContent='卖出 '+round2(batchG)+'g';
+      tpb2g.textContent='卖出 '+round2(fullG)+'g';
+      tpb3g.textContent='卖出 '+round2(plusG)+'g';
     } else {
-      tpb1.textContent='--'; tpb2.textContent='--';
-      tpb1.className='tpb-v'; tpb2.className='tpb-v';
+      tpb1.textContent='--'; tpb2.textContent='--'; tpb3.textContent='--';
+      tpb1g.textContent='--'; tpb2g.textContent='--'; tpb3g.textContent='--';
+      tpb1.className='tpb-v'; tpb2.className='tpb-v'; tpb3.className='tpb-v';
     }
   }
   var sell5st = R.hitHigh
@@ -2098,7 +2121,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.13 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.14 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2585,7 +2608,7 @@ setInterval(function(){
 }, 10000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.13 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.14 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2712,7 +2735,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.13 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.14 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2862,7 +2885,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.13').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.14').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.10</title>
+<title>黄金建仓助手 V3.5.11</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -188,8 +188,7 @@
   /* 拖拽/缩放手柄 */
   .card, #goldCard{position:relative;}
   .cd-bar{position:absolute; top:8px; right:10px; display:none; gap:6px; align-items:center; z-index:6;}
-  .card:hover .cd-bar, #goldCard:hover .cd-bar{display:flex;}
-  .card h2 .fold-btn{margin-right:34px;}
+    .card h2 .fold-btn{margin-right:34px;}
   #goldCard .cd-bar{top:12px;}
   .cd-handle{width:26px; height:24px; border-radius:8px; background:var(--card-2); border:1px solid var(--line);
     color:var(--ink-2); font-size:.85rem; line-height:1; cursor:grab; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-user-select:none;}
@@ -198,18 +197,15 @@
   .cd-resize{position:absolute; right:-5px; bottom:-5px; width:18px; height:18px; border-radius:6px;
     background:var(--card-2); border:1px solid var(--line); color:var(--ink-2); cursor:nwse-resize;
     display:flex; align-items:center; justify-content:center; font-size:.75rem; z-index:6; opacity:.28;}
-  .card:hover .cd-resize, #goldCard:hover .cd-resize{opacity:1;}
-  .cd-resize:hover{opacity:1; color:var(--gold-deep); border-color:var(--gold);}
+    .cd-resize:hover{opacity:1; color:var(--gold-deep); border-color:var(--gold);}
   .cd-resize-e{position:absolute; right:-4px; top:10px; bottom:10px; width:9px; border-radius:5px;
     background:var(--gold-bg); cursor:ew-resize; z-index:6; display:block; opacity:.28;
     border:1px solid color-mix(in srgb, var(--gold) 45%, transparent);}
-  .card:hover .cd-resize-e, #goldCard:hover .cd-resize-e{opacity:1;}
-  .cd-resize-e:hover{background:var(--gold-bg); border-color:var(--gold); box-shadow:var(--glow); opacity:1;}
+    .cd-resize-e:hover{background:var(--gold-bg); border-color:var(--gold); box-shadow:var(--glow); opacity:1;}
   .cd-resize-s{position:absolute; bottom:-4px; left:10px; right:10px; height:9px; border-radius:5px;
     background:var(--gold-bg); cursor:ns-resize; z-index:6; display:block; opacity:.28;
     border:1px solid color-mix(in srgb, var(--gold) 45%, transparent);}
-  .card:hover .cd-resize-s, #goldCard:hover .cd-resize-s{opacity:1;}
-  .cd-resize-s:hover{background:var(--gold-bg); border-color:var(--gold); box-shadow:var(--glow); opacity:1;}
+    .cd-resize-s:hover{background:var(--gold-bg); border-color:var(--gold); box-shadow:var(--glow); opacity:1;}
   .cd-dragging{opacity:.55; z-index:50; box-shadow:0 24px 60px -18px rgba(0,0,0,.75), var(--glow);}
   .cd-src{outline:2px dashed color-mix(in srgb, var(--gold) 60%, transparent); outline-offset:2px;}
   .cd-target{outline:2px solid var(--gold); outline-offset:2px;}
@@ -450,6 +446,19 @@
   .op-risk{font-size:.7rem; color:var(--ink-3); margin-top:12px; border-top:1px dashed var(--line); padding-top:9px; line-height:1.5;}
 
   footer.foot{text-align:center; font-size:.8rem; color:var(--ink-3); margin-top:26px;}
+  footer.foot{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;}
+  .foot-btn{display:inline-flex; align-items:center; gap:5px; border:1px solid var(--line); background:var(--card);
+    color:var(--ink-2); border-radius:10px; padding:6px 13px; font-size:.78rem; font-weight:600; cursor:pointer; font-family:inherit;
+    transition:all .15s;}
+  .foot-btn:hover{border-color:var(--gold); color:var(--gold-deep); box-shadow:var(--glow);}
+  .foot-btn.on{border-color:var(--gold); color:var(--gold-deep); background:var(--gold-bg); box-shadow:0 0 0 1px var(--gold) inset, var(--glow);}
+  /* ===== 布局编辑模式：进入后显示手柄与卡片边框 ===== */
+  .cd-bar{display:none;}
+  .cd-resize, .cd-resize-e, .cd-resize-s{display:none !important;}
+  body.editing .card, body.editing #goldCard{outline:1.5px dashed color-mix(in srgb, var(--gold) 55%, transparent); outline-offset:2px;}
+  body.editing .cd-bar{display:flex;}
+  body.editing .cd-resize{display:flex !important;}
+  body.editing .cd-resize-e, body.editing .cd-resize-s{display:block !important;}
 
   .disclaim{font-size:.72rem; color:var(--ink-3); margin-top:8px;}
 
@@ -513,6 +522,8 @@
     .wrap{display:block; padding:8px 10px 50px;}
     .main{display:block; padding-left:0;}
     .cd-bar,.cd-resize,.cd-resize-e,.cd-resize-s{display:none !important;}
+    #btnEditLayout{display:none !important;}
+    body.editing .card, body.editing #goldCard{outline:none;}
     .sidebar{position:fixed; top:0; left:0; bottom:0; width:min(86vw,340px); max-height:none; border-radius:0;
       border-right:1px solid var(--line); z-index:400; transform:translateX(-102%); transition:transform .26s ease;}
     .sidebar.open{transform:translateX(0); box-shadow:var(--shadow-2); width:min(86vw,340px);}
@@ -876,7 +887,13 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.5.10 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
+    <footer class="foot">
+      <span class="foot-t">黄金建仓助手 V3.5.11 —— 一键备份/恢复 · 日夜主题</span>
+      <span class="foot-acts">
+        <button class="foot-btn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高">✥ 编辑布局</button>
+        <button class="foot-btn" id="btnResetLayout" type="button" title="恢复默认卡片布局">恢复默认布局</button>
+      </span>
+    </footer>
   </div>
 
 
@@ -1981,6 +1998,9 @@ function layoutApply(l){
     p.s=Math.max(1, Math.min(13-p.c, Math.round(p.s||1)));
     p.r=Math.max(1, Math.round(p.r||1));
     p.rs=Math.max(1, Math.round(p.rs||1));
+    /* 极端布局修复：单列卡无实用价值（表格会被压扁），恢复默认宽度；过矮卡片恢复自适应 */
+    if(p.s<2){ var _d=DEF_LAYOUT[id]||{}; p.s=Math.max(2, Math.round(_d.s||3)); if(p.c+_d.s<=13) p.c=_d.c||p.c; }
+    if(p.h>0 && p.h<140){ p.h=0; }
     el.style.gridColumn = p.c+' / '+(p.c+p.s);
     el.style.gridRow = p.r+' / '+(p.r+p.rs);
     el.style.minHeight = (p.h>0) ? (p.h+'px') : '';
@@ -1991,6 +2011,20 @@ function initLayout(){
   if(!g) return;
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
+  var btnEdit=document.getElementById('btnEditLayout');
+  if(btnEdit) btnEdit.addEventListener('click', function(){
+    var editing=document.body.classList.toggle('editing');
+    btnEdit.classList.toggle('on', editing);
+    btnEdit.innerHTML = editing ? '✓ 完成布局' : '✥ 编辑布局';
+    toast(editing ? '进入布局编辑：拖动六点换位，拖边缘改宽高' : '布局已保存');
+  });
+  var btnReset=document.getElementById('btnResetLayout');
+  if(btnReset) btnReset.addEventListener('click', function(){
+    if(!confirm('恢复默认卡片布局？当前自定义布局将被覆盖。')) return;
+    try{ localStorage.removeItem('jcj_layout_v1'); }catch(e){}
+    layoutApply(layoutClone(DEF_LAYOUT));
+    toast('已恢复默认布局');
+  });
   LAYOUT_IDS.forEach(function(id){
     var el=document.getElementById(id); if(!el) return;
     if(el.querySelector('.cd-bar')) return;
@@ -2006,7 +2040,7 @@ function initLayout(){
   });
   var drag=null;
   function onDown(e){
-    if(window.innerWidth<=760) return;
+    if(window.innerWidth<=760 || !document.body.classList.contains('editing')) return;
     var hd=e.target.closest('.cd-handle'); if(!hd) return;
     var card=hd.closest('.card, #goldCard'); if(!card) return;
     e.preventDefault();
@@ -2052,12 +2086,13 @@ function initLayout(){
       a.c=b.c; a.s=b.s; a.r=b.r; a.rs=b.rs;
       b.c=tmp.c; b.s=tmp.s; b.r=tmp.r; b.rs=tmp.rs;
       layoutApply(l); layoutSave(l);
+      toast('布局已保存');
     }
     drag=null;
     document.body.style.userSelect=''; document.body.style.webkitUserSelect='';
   }
   function onRzDown(e){
-    if(window.innerWidth<=760) return;
+    if(window.innerWidth<=760 || !document.body.classList.contains('editing')) return;
     var rz=e.target.closest('.cd-resize, .cd-resize-e, .cd-resize-s'); if(!rz) return;
     var card=rz.closest('.card, #goldCard'); if(!card) return;
     e.preventDefault(); e.stopPropagation();
@@ -2080,7 +2115,7 @@ function initLayout(){
       }
       layoutSave(l);
     }
-    function up(){ document.removeEventListener('pointermove',mv); document.removeEventListener('pointerup',up); }
+    function up(){ document.removeEventListener('pointermove',mv); document.removeEventListener('pointerup',up); toast('布局已保存'); }
     document.addEventListener('pointermove',mv);
     document.addEventListener('pointerup',up);
   }
@@ -2518,7 +2553,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.10 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.11 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

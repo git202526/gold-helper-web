@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.5</title>
+<title>黄金建仓助手 V4.6</title>
 <style>
 /* ============================================================
-   V4.5 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.6 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -133,19 +133,31 @@ img{display:block;max-width:100%}
 
 /* ===== 操作面板 ===== */
 .op-panel{display:flex;flex-direction:column}
-.op-plan{padding:12px 18px 0}
+.op-plan{padding:13px 18px 0;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .op-plan-line{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--ink-2)}
-.op-plan-line b{color:var(--gold-soft);font-size:.9rem}
+.op-plan-line b{color:var(--gold-soft);font-size:1rem;letter-spacing:.3px}
 .op-tag{font-size:.64rem;color:var(--gold-deep);border:1px solid var(--line);border-radius:99px;padding:1px 8px}
-.op-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-2);
-  border-radius:var(--r-card);border:1px solid var(--line-2);overflow:hidden;margin:13px 18px 0}
-.op-item{background:var(--card-2);padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
-.op-item .op-k{font-size:.66rem;color:var(--ink-3);letter-spacing:.8px;font-weight:600}
-.op-item b{font-size:1.32rem;font-weight:900;letter-spacing:-.3px;font-variant-numeric:tabular-nums;color:var(--ink);
+.op-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:transparent;
+  border-radius:var(--r-card);margin:14px 18px 0}
+.op-item{background:linear-gradient(165deg,var(--card-3),var(--card-2));padding:13px 15px;display:flex;flex-direction:column;gap:4px;min-width:0;
+  border:1px solid var(--line-2);border-radius:var(--r-card);position:relative;overflow:hidden;
+  transition:transform .22s var(--ease),border-color .22s,box-shadow .22s}
+.op-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(var(--gold),transparent);opacity:.65}
+.op-item:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:var(--glow)}
+.op-item .op-k{font-size:.66rem;color:var(--ink-3);letter-spacing:.9px;font-weight:700;display:flex;align-items:center;gap:5px}
+.op-item .op-k::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold-deep);flex:none;opacity:.85}
+.op-item b{font-size:1.5rem;font-weight:900;letter-spacing:-.3px;font-variant-numeric:tabular-nums;color:var(--ink);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.op-item b.pnl-up{color:var(--up)}
-.op-item b.pnl-down{color:var(--down)}
+.op-item b.gold{color:var(--gold-soft);text-shadow:0 0 20px rgba(233,185,73,.32)}
+.op-item b.pnl-up{color:var(--up);text-shadow:0 0 18px rgba(242,85,90,.3)}
+.op-item b.pnl-down{color:var(--down);text-shadow:0 0 18px rgba(52,211,153,.3)}
 .op-item .op-s{font-size:.66rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-item.cur{background:linear-gradient(160deg,var(--gold-bg),var(--card-2) 72%);border-color:rgba(233,185,73,.42);box-shadow:var(--glow)}
+.op-item.cur::before{opacity:1;background:linear-gradient(var(--gold),transparent)}
+html[data-theme="light"] .op-item b.gold{text-shadow:none}
+html[data-theme="light"] .op-item b.pnl-up{text-shadow:none}
+html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .alert-bar{display:flex;flex-direction:column;gap:8px;margin:12px 18px 0}
 .alert-item{display:none;align-items:center;gap:9px;font-size:.78rem;color:var(--ink);
   background:linear-gradient(90deg,var(--gold-bg),transparent);border:1px solid var(--line);
@@ -176,12 +188,12 @@ img{display:block;max-width:100%}
 .op-advice.a-clear .dot{background:var(--up);box-shadow:0 0 10px rgba(242,85,90,.8)}
 .op-advice.pulse .dot{animation:blink 1.3s infinite}
 .op-btns{display:flex;gap:10px;margin:14px 18px 0}
-.op-btn{flex:1;padding:11px 10px;border-radius:var(--r-ctl);font-size:.86rem;font-weight:700;
-  background:var(--card-2);border:1px solid var(--line);color:var(--ink-2);transition:all .2s}
-.op-btn:hover{border-color:var(--gold);color:var(--gold-soft)}
+.op-btn{flex:1;padding:12px 10px;border-radius:var(--r-ctl);font-size:.88rem;font-weight:800;
+  background:var(--card-2);border:1px solid var(--line);color:var(--ink-2);transition:all .22s var(--ease);cursor:pointer}
+.op-btn:hover{transform:translateY(-1px);border-color:var(--gold);color:var(--gold-soft);box-shadow:var(--glow)}
 .op-btn-gold{background:linear-gradient(135deg,#F0C96A,#C9962E 60%,#A67B1E);color:#171007;border:1px solid rgba(255,255,255,.28);
-  box-shadow:0 8px 22px -8px rgba(233,185,73,.5)}
-.op-btn-gold:hover{filter:brightness(1.07);color:#171007}
+  box-shadow:0 10px 26px -8px rgba(233,185,73,.55)}
+.op-btn-gold:hover{filter:brightness(1.08);color:#171007;transform:translateY(-1px);box-shadow:0 14px 30px -8px rgba(233,185,73,.65)}
 .op-risk{font-size:.68rem;color:var(--ink-3);padding:10px 18px 14px;line-height:1.55}
 
 /* ===== 档位·建仓计划 ===== */
@@ -414,8 +426,9 @@ body.editing .cd-bar{display:flex}
   color:var(--gold);display:inline-flex;align-items:center;justify-content:center;padding:0 8px;font-size:.68rem;font-weight:700;cursor:pointer;opacity:.85;letter-spacing:.4px}
 .cd-edit:hover{opacity:1}
 .cd-edit.on{background:linear-gradient(135deg,#F0C96A,#C9962E 60%,#A67B1E);color:#171007}
-.cd-resize-e{position:absolute;top:0;bottom:0;right:-4px;width:8px;cursor:ew-resize;z-index:31}
-.cd-resize-s{position:absolute;left:0;right:0;bottom:-4px;height:8px;cursor:ns-resize;z-index:31}
+.cd-resize-e{position:absolute;top:0;bottom:0;right:-4px;width:8px;cursor:ew-resize;z-index:31;display:none}
+.cd-resize-s{position:absolute;left:0;right:0;bottom:-4px;height:8px;cursor:ns-resize;z-index:31;display:none}
+body.editing .cd-resize-e,body.editing .cd-resize-s{display:block}
 .cd-target{outline:2px solid var(--gold)!important;outline-offset:2px}
 
 /* 列底空位：拖卡片到此追加到列末（如规则说明下方） */
@@ -644,7 +657,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.5</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.6</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -698,12 +711,12 @@ html[data-theme="light"] .sb-avatar{color:#fff}
       <div class="op-plan-line"><span class="op-k" style="color:var(--ink-3);font-size:.68rem;letter-spacing:.6px">当前方案</span><b id="opPlanName">默认方案</b><span class="op-tag" id="opLogicTxt">逻辑1 · 原版</span></div>
     </div>
     <div class="op-grid">
-      <div class="op-item"><span class="op-k">当前档位</span><b id="opTier">--</b><span class="op-s" id="opTierSub">--</span></div>
-      <div class="op-item"><span class="op-k">总持仓</span><b id="opGrams">--</b><span class="op-s" id="opGramsSub">--</span></div>
-      <div class="op-item"><span class="op-k">持仓均价</span><b id="opAvg">--</b><span class="op-s" id="opAvgSub">--</span></div>
-      <div class="op-item"><span class="op-k">保本价</span><b id="opBreak">--</b><span class="op-s">均价×1.004</span></div>
+      <div class="op-item cur"><span class="op-k">当前档位</span><b id="opTier" class="gold">--</b><span class="op-s" id="opTierSub">--</span></div>
+      <div class="op-item"><span class="op-k">总持仓</span><b id="opGrams" class="gold">--</b><span class="op-s" id="opGramsSub">--</span></div>
+      <div class="op-item"><span class="op-k">持仓均价</span><b id="opAvg" class="gold">--</b><span class="op-s" id="opAvgSub">--</span></div>
+      <div class="op-item"><span class="op-k">保本价</span><b id="opBreak" class="gold">--</b><span class="op-s">均价×1.004</span></div>
       <div class="op-item"><span class="op-k">浮动盈亏</span><b id="opPnL">--</b><span class="op-s" id="opPnLSub">按当前金价估算</span></div>
-      <div class="op-item"><span class="op-k">下一档建仓</span><b id="opNext">--</b><span class="op-s" id="opNextSub">--</span></div>
+      <div class="op-item"><span class="op-k">下一档建仓</span><b id="opNext" class="gold">--</b><span class="op-s" id="opNextSub">--</span></div>
     </div>
     <div class="alert-bar" id="alertBar">
       <div class="alert-item" id="alertBE">
@@ -821,7 +834,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.5 · 一键备份 / 日夜主题 / 卡片布局</span>
+  <span class="foot-t">黄金建仓助手 V4.6 · 一键备份 / 日夜主题 / 卡片布局</span>
   <span class="foot-acts">
     <button class="foot-btn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高">✥ 编辑布局</button>
     <button class="foot-btn" id="btnResetLayout" type="button" title="恢复默认卡片布局">恢复默认布局</button>
@@ -1193,7 +1206,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.5：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.6：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -1997,7 +2010,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.5 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.6 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2483,7 +2496,7 @@ setInterval(function(){
 }, 10000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.5 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.6 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2610,7 +2623,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.5 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.6 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2760,7 +2773,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.5').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.6').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

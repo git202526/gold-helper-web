@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.14</title>
+<title>黄金建仓助手 V4.15</title>
 <style>
 /* ============================================================
-   V4.14 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.15 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -272,7 +272,7 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .cols-btn{margin-left:auto;font-size:.66rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);
   border-radius:99px;padding:3px 10px;font-family:inherit;white-space:nowrap}
 
-/* ===== 止盈计划（V4.14 视觉升级：与操作面板风格统一） ===== */
+/* ===== 止盈计划（V4.15 视觉升级：与操作面板风格统一） ===== */
 .tp-body{padding:0 18px 16px}
 .tp-profitbar{display:flex;gap:10px;margin:12px 18px 0;padding:0}
 .tpb-item{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;
@@ -719,7 +719,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.14</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.15</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -909,7 +909,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.14 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.15 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -1279,7 +1279,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.14：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.15：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -1501,12 +1501,15 @@ function render(){
     html += '</tr>';
   }
   tb.innerHTML = html;
-  /* 手机折叠时：表头只显示6列（隐藏次要列）+ 按列给内联宽度（fixed布局以表头行为准） */
+  /* 手机折叠时：表头只显示6列（隐藏次要列）+ colgroup 均分列宽（fixed 布局以 colgroup 为准） */
   var ths=document.querySelectorAll('.tbl-scroll thead th');
-  var _tw=['8%','22%','17%','17%','','','','18%','18%'];
+  var _cols=document.querySelectorAll('.tbl-scroll colgroup col');
   for(var _ti=0;_ti<ths.length;_ti++){
-    ths[_ti].style.width = showAllCols ? '' : _tw[_ti];
     ths[_ti].style.display = (showAllCols || _ti<4 || _ti>6) ? '' : 'none';
+  }
+  for(var _ci=0;_ci<_cols.length;_ci++){
+    if(showAllCols){ _cols[_ci].style.width=''; _cols[_ci].style.display=''; }
+    else{ _cols[_ci].style.display = (_ci>=4&&_ci<=6) ? 'none' : ''; _cols[_ci].style.width='16.66%'; }
   }
 
   /* ---- 止盈5卡（10/20/20/20 + 保留30%搏高） ---- */
@@ -2121,7 +2124,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.14 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.15 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2608,7 +2611,7 @@ setInterval(function(){
 }, 10000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.14 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.15 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2735,7 +2738,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.14 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.15 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2885,7 +2888,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.14').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.15').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

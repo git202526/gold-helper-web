@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.16</title>
+<title>黄金建仓助手 V4.17</title>
 <style>
 /* ============================================================
-   V4.16 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.17 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -272,7 +272,7 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .cols-btn{margin-left:auto;font-size:.66rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);
   border-radius:99px;padding:3px 10px;font-family:inherit;white-space:nowrap}
 
-/* ===== 止盈计划（V4.16 视觉升级：与操作面板风格统一） ===== */
+/* ===== 止盈计划（V4.17 视觉升级：与操作面板风格统一） ===== */
 .tp-body{padding:0 18px 16px}
 .tp-profitbar{display:flex;gap:10px;margin:12px 18px 0;padding:0}
 .tpb-item{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;
@@ -719,7 +719,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.16</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.17</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -912,7 +912,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.16 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.17 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -946,8 +946,9 @@ function defaultProfile(){
     id: 'p' + Date.now(),
     name: '默认方案',
     logic: 1,
-    high: null, price: null, priceManual: false, cap: 300, hitHigh: false,
-    firstBuyTs: null,   /* 首次开仓时间戳（开仓天数用） */
+    high: null, price: null, priceManual: false, cap: 300,
+    hitHigh: {1:false, 2:false},   /* 按逻辑隔离：该逻辑是否反弹到过阶段高点 */
+    firstBuyTs: {1:null, 2:null},  /* 按逻辑隔离：该逻辑首次开仓时间戳（开仓天数用） */
     pos: { 1: emptyPos(), 2: emptyPos() }   /* 逻辑1/逻辑2 各自独立持仓 */
   };
 }
@@ -968,6 +969,12 @@ function recTier(i){
 
 function round2(n){ return Math.round(n*100)/100; }
 function toNum(v){ if(v===null||v===undefined||v==='') return null; var n=parseFloat(v); return isFinite(n)?n:null; }
+function escHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+/* 按逻辑隔离的过高点/开仓时间访问器（兼容旧数据与运行时按逻辑读写） */
+function hitHighOf(P){ return !!(P.hitHigh && P.hitHigh[P.logic]); }
+function setHitHigh(P,v){ if(P.hitHigh && typeof P.hitHigh==='object') P.hitHigh[P.logic]=!!v; }
+function firstBuyOf(P){ var t = P.firstBuyTs && P.firstBuyTs[P.logic]; return (typeof t==='number'&&t>0)?t:null; }
+function setFirstBuy(P,t){ if(P.firstBuyTs && typeof P.firstBuyTs==='object') P.firstBuyTs[P.logic]=t; }
 
 /* ===== 本地持久化（多方案） ===== */
 function fillPos(dst, src, arrName, conv){
@@ -982,8 +989,14 @@ function normalizeProfile(p){
   d.price = toNum(p.price);
   d.priceManual = !!p.priceManual;
   d.cap = (typeof p.cap==='number'&&isFinite(p.cap)&&p.cap>0) ? p.cap : 300;
-  d.hitHigh = !!p.hitHigh;
-  d.firstBuyTs = (typeof p.firstBuyTs==='number'&&p.firstBuyTs>0) ? p.firstBuyTs : null;
+  /* 过高点/开仓时间：兼容旧平铺格式（旧值归入逻辑1）与新的按逻辑对象格式 */
+  d.hitHigh = (p.hitHigh && typeof p.hitHigh==='object')
+    ? {1:!!p.hitHigh[1], 2:!!p.hitHigh[2]}
+    : {1:!!p.hitHigh, 2:false};
+  d.firstBuyTs = (p.firstBuyTs && typeof p.firstBuyTs==='object')
+    ? {1:(typeof p.firstBuyTs[1]==='number'&&p.firstBuyTs[1]>0?p.firstBuyTs[1]:null),
+       2:(typeof p.firstBuyTs[2]==='number'&&p.firstBuyTs[2]>0?p.firstBuyTs[2]:null)}
+    : {1:(typeof p.firstBuyTs==='number'&&p.firstBuyTs>0?p.firstBuyTs:null), 2:null};
   if(p.pos && typeof p.pos==='object'){
     for(var lg=1;lg<=2;lg++){
       var s = p.pos[lg];
@@ -1028,7 +1041,7 @@ function load(){
         p.high = toNum(o.high); p.price = toNum(o.price);
         p.priceManual = !!o.priceManual;
         p.cap = (typeof o.cap==='number'&&isFinite(o.cap)&&o.cap>0) ? o.cap : 300;
-        p.hitHigh = !!o.hitHigh;
+        p.hitHigh = {1:!!o.hitHigh, 2:false};   /* v1 旧数据归入逻辑1 */
         if(Array.isArray(o.checked)) for(var i=0;i<11;i++) p.pos[1].checked[i]=!!o.checked[i];
         if(Array.isArray(o.actPrice)) for(var j=0;j<11;j++) p.pos[1].actPrice[j]=toNum(o.actPrice[j]);
         if(Array.isArray(o.actGrams)) for(var k=0;k<11;k++) p.pos[1].actGrams[k]=toNum(o.actGrams[k]);
@@ -1067,14 +1080,6 @@ function calc(){
     cumGrams[j] = cG>0 ? round2(cG) : 0;
     cumAvg[j] = cG>0 ? round2(cI/cG) : null;
   }
-  // 计划推进累计（从建仓起始档起，仅在可建仓档累加；实际值优先，未填用参考）
-  var planInvest=[], planGrams=[], planAvg=[];
-  var pI=0, pG=0;
-  for(var p=0;p<13;p++){
-    if(p>=startI && base[p]>0 && invest[p]!=null){ pI += invest[p]; pG += effGrams[p]; }
-    if(p>=startI && pG>0){ planInvest[p]=round2(pI); planGrams[p]=round2(pG); planAvg[p]=round2(pI/pG); }
-    else { planInvest[p]=null; planGrams[p]=0; planAvg[p]=null; }
-  }
   var totalGrams = cumGrams[12]>0 ? cumGrams[12] : 0;
   var totalInvest = cumInvest[12]!=null ? cumInvest[12] : 0;
   var avgPrice = totalGrams>0 ? totalInvest/totalGrams : null;
@@ -1095,7 +1100,6 @@ function calc(){
   R.tier = tier; R.draw = draw; R.startI = startI;
   R.tierPrice=tierPrice; R.refGrams=refGrams; R.effPrice=effPrice; R.effGrams=effGrams;
   R.invest=invest; R.cumInvest=cumInvest; R.cumGrams=cumGrams; R.cumAvg=cumAvg;
-  R.planInvest=planInvest; R.planGrams=planGrams; R.planAvg=planAvg;
   R.totalGrams=totalGrams; R.totalInvest=totalInvest; R.avgPrice=avgPrice;
   R.breakeven=breakeven; R.pnl=pnl; R.pnlPct=pnlPct; R.price=price;
   // 分批止盈：10%/20%/20%/20%，保留30%搏更高（高点+20），跌回0档（高点附近）全部清仓
@@ -1106,9 +1110,9 @@ function calc(){
   R.sell4 = round2(total*0.20);
   R.sell5 = round2(total*0.30);
   // 本轮是否反弹到过 1 档（高点），用于「跌回0档清仓保留仓」
-  if(R.valid && price!=null && price>=high && !P.hitHigh){ P.hitHigh = true; save(); }
-  R.hitHigh = P.hitHigh;
-  R.sell5Done = (R.valid && price!=null && (price>=high+20 || (P.hitHigh && price<high)));
+  if(R.valid && price!=null && price>=high && !hitHighOf(P)){ setHitHigh(P,true); save(); }
+  R.hitHigh = hitHighOf(P);
+  R.sell5Done = (R.valid && price!=null && (price>=high+20 || (hitHighOf(P) && price<high)));
   var any=false;
   for(var a=0;a<13;a++) if(isBuyTier(a) && pos.checked[a]) any=true;
   R.checkedAny = any;
@@ -1225,9 +1229,9 @@ function renderPlanList(){
     var p = state.profiles[i];
     var on = p.id===state.activeId ? ' on' : '';
     var tag = p.logic===2 ? '逻辑2' : '逻辑1';
-    html += '<li class="'+on+'" data-id="'+p.id+'">'
-      + '<span class="pname">'+p.name+'</span>'
-      + '<span class="ptag">'+tag+'</span>'
+    html += '<li class="'+on+'" data-id="'+escHtml(p.id)+'">'
+      + '<span class="pname">'+escHtml(p.name)+'</span>'
+      + '<span class="ptag">'+escHtml(tag)+'</span>'
       + '<span class="pact">'
       + '<button type="button" class="p-ren" data-act="rename" title="重命名">✎</button>'
       + '<button type="button" class="p-del" data-act="del" title="删除">✕</button>'
@@ -1282,7 +1286,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.16：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.17：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -1378,11 +1382,12 @@ function render(){
     opBar.classList.toggle('over', pctV>100);
     opBar.style.width = Math.min(pctV,100)+'%';
   }
-  /* 开仓天数 */
+  /* 开仓天数（按当前逻辑的首次开仓时间） */
   var opDays=document.getElementById('opDays');
   if(opDays){
-    if(P.firstBuyTs>0){
-      var daysN=Math.max(1, Math.floor((Date.now()-P.firstBuyTs)/86400000)+1);
+    var _fbt = firstBuyOf(P);
+    if(_fbt>0){
+      var daysN=Math.max(1, Math.floor((Date.now()-_fbt)/86400000)+1);
       opDays.textContent = daysN+' 天';
     } else opDays.textContent = '--';
   }
@@ -1662,7 +1667,7 @@ function bind(){
     });
   }
   document.getElementById('inHigh').addEventListener('input', function(){
-    var P = cur(); P.high = toNum(this.value); P.hitHigh = false;   // 新高点 = 新行情，重置反弹记录
+    var P = cur(); P.high = toNum(this.value); setHitHigh(P,false);   // 新高点 = 新行情，重置当前逻辑反弹记录
     save(); render();
   });
   document.getElementById('inPrice').addEventListener('input', function(){
@@ -1683,11 +1688,11 @@ function bind(){
     if(t.classList.contains('chk')){
       var ti = parseInt(t.getAttribute('data-tier'),10)-1;
       pos.checked[ti] = t.checked;
-      /* 首次买入记录开仓时间（任意档位首次勾选） */
-      if(t.checked && !P.firstBuyTs){
+      /* 首次买入记录开仓时间（该逻辑任意档位首次勾选） */
+      if(t.checked && !firstBuyOf(P)){
         var hasAny=false;
         for(var ck=0;ck<13;ck++) if(pos.checked[ck]){ hasAny=true; break; }
-        if(hasAny) P.firstBuyTs = Date.now();
+        if(hasAny) setFirstBuy(P, Date.now());
       }
       save(); render();
     } else if(t.classList.contains('edit')){
@@ -1707,7 +1712,7 @@ function bind(){
     np.name = '方案 ' + (state.profiles.length+1);
     np.logic = P.logic;
     np.high = P.high; np.price = P.price; np.priceManual = P.priceManual;
-    np.cap = P.cap; np.hitHigh = false;
+    np.cap = P.cap;   /* hitHigh/firstBuyTs 保持 defaultProfile 的按逻辑新值（复制持仓但不复制反弹/开仓记录） */
     np.pos[1].checked = P.pos[1].checked.slice();
     np.pos[1].actPrice = P.pos[1].actPrice.slice();
     np.pos[1].actGrams = P.pos[1].actGrams.slice();
@@ -2133,7 +2138,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.16 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.17 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2327,7 +2332,8 @@ function initLayout(){
   if(ca) ca.addEventListener('click', function(){
     var P = core.cur();
     if(!window.confirm('将清空当前方案「'+P.name+'」的：\n· 持仓勾选与实际成交\n· 阶段高点与当前金价\n· 到过高点 / 回落记录\n（保留方案名称、建仓逻辑、持仓上限）\n\n确定继续？')) return;
-    P.high = null; P.price = null; P.priceManual = false; P.hitHigh = false; P.firstBuyTs = null;
+    P.high = null; P.price = null; P.priceManual = false;
+    setHitHigh(P,false); setFirstBuy(P,null);   /* 按逻辑重置过高点/开仓记录 */
     for(var lg=1; lg<=2; lg++){
       var pos = P.pos[lg];
       for(var i=0;i<13;i++){ pos.checked[i]=false; pos.actPrice[i]=null; pos.actGrams[i]=null; }
@@ -2620,7 +2626,7 @@ setInterval(function(){
 }, 10000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.16 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.17 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2747,7 +2753,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.16 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.17 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2855,7 +2861,7 @@ function abToBase64(buf){
 document.getElementById('btnExport').addEventListener('click', exportExcel);
 
 /* ===== 数据备份 / 恢复（JSON 完整快照，含方案/持仓/参数/布局/折叠/主题/字号） ===== */
-var BK_KEYS=['jcj_helper_local_v2','jcj_ui_folds_v1','jcj_layout_v1','jcj_theme_v1','jcj_fsize_v1','jcj_local_ts_v3'];
+var BK_KEYS=['jcj_helper_local_v2','jcj_ui_folds_v1','jcj_layout_v2','jcj_theme_v1','jcj_fsize_v1','jcj_local_ts_v3'];
 function backupData(){
   try{
     var d={};
@@ -2897,7 +2903,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.16').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.17').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

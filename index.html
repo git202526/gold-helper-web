@@ -1710,14 +1710,32 @@ function hasUserData(){
     return false;
   }catch(e){ return false; }
 }
-/* 方案合并：云端方案为基底，补入本地有而云端没有的方案（按 id 去重），避免同步覆盖丢失本地方案 */
+/* 方案合并：云端方案为基底，补入本地有而云端没有的方案（按 id 去重）；同名不同 id 时本地优先（本机为最近操作端），避免同步覆盖丢失本地方案 */
 function mergeProfiles(localList, cloudList){
   var out = (cloudList||[]).slice();
-  var ids = {};
-  for(var i=0;i<out.length;i++) if(out[i] && out[i].id) ids[out[i].id]=true;
+  var ids = {}, names = {};
+  for(var i=0;i<out.length;i++){
+    if(out[i] && out[i].id) ids[out[i].id]=true;
+    if(out[i] && out[i].name) names[out[i].name]=true;
+  }
   for(var j=0;j<(localList||[]).length;j++){
     var lp = localList[j];
-    if(lp && lp.id && !ids[lp.id]){ out.push(lp); ids[lp.id]=true; }
+    if(!lp) continue;
+    if(lp.id && !ids[lp.id]){
+      if(lp.name && names[lp.name]){
+        /* 同名但 id 不同：以本地为准替换云端同名方案 */
+        for(var k=0;k<out.length;k++){
+          if(out[k] && out[k].name===lp.name){
+            if(out[k].id) ids[out[k].id]=true;
+            out[k]=lp; ids[lp.id]=true;
+            break;
+          }
+        }
+      } else {
+        out.push(lp); ids[lp.id]=true;
+      }
+      if(lp.name) names[lp.name]=true;
+    }
   }
   return out;
 }

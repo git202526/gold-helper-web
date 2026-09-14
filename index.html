@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.12</title>
+<title>黄金建仓助手 V3.5.13</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -96,23 +96,31 @@
   button:active{transform:translateY(1px);}
   input{font-family:inherit;}
 
-  /* ===== V3.5.10 头像框侧边栏：折叠为左上角圆形头像，点击悬浮展开 ===== */
-  .sidebar{position:fixed; left:14px; bottom:14px; z-index:400; width:58px; height:58px; border-radius:50%;
-    display:flex; flex-direction:column; background:transparent; border:none; box-shadow:none; overflow:hidden;
-    transition:width .3s cubic-bezier(.4,0,.2,1), height .3s cubic-bezier(.4,0,.2,1), border-radius .3s;}
-  .sidebar.open{width:322px; height:auto; max-height:calc(100vh - 28px); border-radius:22px;
-    background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow-2), var(--glow);
-    overflow:auto; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);}
-  .sb-avatar{width:58px; height:58px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+  /* ===== V3.5.13 悬浮菜单面板（顶栏头像触发） ===== */
+  .sidebar{position:fixed; left:20px; top:88px; z-index:400; width:322px; max-height:calc(100vh - 106px);
+    display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:22px;
+    box-shadow:var(--shadow-2), var(--glow); overflow:auto; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    transform:translateX(-130%) scale(.96); opacity:0; pointer-events:none;
+    transition:transform .26s cubic-bezier(.4,0,.2,1), opacity .22s;}
+  .sidebar.open{transform:translateX(0) scale(1); opacity:1; pointer-events:auto;}
+  .sb-avatar{width:44px; height:44px; border-radius:50%; flex:none; display:inline-flex; align-items:center; justify-content:center;
     background:var(--gold-grad); color:#171208; border:2px solid rgba(255,255,255,.28); cursor:pointer; font-family:inherit;
-    box-shadow:0 8px 26px -8px rgba(226,184,79,.8); transition:transform .18s; position:relative; overflow:hidden;}
+    box-shadow:0 6px 20px -6px rgba(226,184,79,.8); transition:transform .18s; position:relative; overflow:hidden;}
   .sb-avatar::after{content:''; position:absolute; top:-30%; right:-25%; width:70%; height:70%; border-radius:50%;
     background:radial-gradient(circle,rgba(255,255,255,.45) 0%,transparent 65%); pointer-events:none;}
-  .sb-avatar:hover{transform:scale(1.08);}
-  .sb-avatar:active{transform:scale(.96);}
-  .sidebar.open .sb-avatar{display:none;}
-  .sb-panel{display:none; flex:1; min-height:0; flex-direction:column;}
-  .sidebar.open .sb-panel{display:flex;}
+  .sb-avatar:hover{transform:scale(1.07);}
+  .sb-avatar:active{transform:scale(.95);}
+  .sb-panel{display:flex; flex:1; min-height:0; flex-direction:column;}
+  /* ===== V3.5.13 顶部栏 ===== */
+  .topbar{grid-column:1 / 13; grid-row:1 / 2; display:flex; align-items:center; gap:14px;
+    background:var(--card); border:1px solid var(--line); border-radius:18px; padding:9px 16px;
+    box-shadow:var(--shadow-2), var(--glow); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    position:sticky; top:0; z-index:80;}
+  .topbar-t{font-size:1.1rem; font-weight:800; letter-spacing:1px;
+    background:linear-gradient(120deg, var(--gold), #f0cf7f 60%, var(--gold-deep)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  .topbar-r{margin-left:auto; display:flex; align-items:center; gap:10px;}
+  .topbar-ver{font-size:.72rem; color:var(--ink-2); background:var(--gold-bg); border:1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    border-radius:99px; padding:3px 10px; font-weight:700; white-space:nowrap;}
   .sb-panel-head{display:flex; align-items:center; justify-content:space-between; padding:13px 16px 9px; border-bottom:1px solid var(--line-2); flex:none;}
   .sb-panel-head b{font-size:.95rem; font-weight:800; color:var(--ink);}
   .sb-panel-head .sb-close{position:static; display:inline-flex;}
@@ -175,15 +183,14 @@
   .sb-actbtn.sb-danger:hover{border-color:var(--danger); color:#ff7a70; background:rgba(224,69,58,.12); box-shadow:0 4px 16px -6px rgba(224,69,58,.45);}
   .sb-actbtn:active{transform:scale(.97);}
   .sb-mask{display:none;}
-  .main{flex:1; min-width:0; display:grid; grid-template-columns:repeat(12,1fr); grid-auto-rows:minmax(80px,auto);
-    grid-auto-flow:row; gap:18px; align-items:start; align-content:start; padding-left:86px;}
-  /* ===== V3.2 卡片自由布局：默认磁贴位置（可被自定义布局覆盖） ===== */
-  #goldCard{grid-column:1 / 4; grid-row:1 / 2;}
-  #stCard{grid-column:1 / 4; grid-row:2 / 3;}
-  #tierCard{grid-column:4 / 10; grid-row:1 / 3;}
-  #tpCard{grid-column:10 / 13; grid-row:2 / 3;}
-  #opCard{grid-column:10 / 13; grid-row:1 / 2;}
-  #ruleCard{grid-column:4 / 10; grid-row:3 / 4;}
+  .main{flex:1; min-width:0; display:grid; grid-template-columns:repeat(12,1fr); grid-auto-rows:auto;
+    grid-auto-flow:row; gap:18px; align-items:stretch; align-content:start; padding-left:0;}
+  /* ===== V3.5.13 顶部栏 + 2×2 磁贴（金价/操作同行、止盈/建仓同行、规则底部） ===== */
+  #goldCard{grid-column:1 / 5; grid-row:2 / 3;}
+  #opCard{grid-column:5 / 13; grid-row:2 / 3;}
+  #tpCard{grid-column:1 / 5; grid-row:3 / 4;}
+  #tierCard{grid-column:5 / 13; grid-row:3 / 4;}
+  #ruleCard{grid-column:1 / 13; grid-row:4 / 5;}
   footer.foot{grid-column:1 / 13;}
   /* 拖拽/缩放手柄 */
   .card, #goldCard{position:relative;}
@@ -282,7 +289,7 @@
   .btn-sm{padding:6px 14px; font-size:.82rem;}
 
   /* ===== 卡片 ===== */
-  .card{background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px 24px; margin-top:18px;
+  .card{background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px 24px; margin-top:0;
     box-shadow:var(--shadow-2); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
     position:relative; overflow:hidden; transition:box-shadow .25s, transform .2s;}
   .card::before{content:''; position:absolute; top:0; left:0; right:0; height:2px;
@@ -521,6 +528,8 @@
     .op-risk{font-size:.62rem; margin-top:5px; padding-top:4px;}
     .wrap{display:block; padding:8px 10px 50px;}
     .main{display:block; padding-left:0;}
+    .main .card, #goldCard{margin-top:14px;}
+    .topbar{position:static; margin-top:0;}
     .cd-bar,.cd-resize,.cd-resize-e,.cd-resize-s{display:none !important;}
     #btnEditLayout{display:none !important;}
     body.editing .card, body.editing #goldCard{outline:none;}
@@ -594,11 +603,8 @@
 <body>
 <div class="wrap">
 
-  <!-- ===== 侧边栏：折叠为头像框，点击悬浮展开（账号同步 / 建仓逻辑 / 行情参数 / 设置） ===== -->
+  <!-- ===== 悬浮菜单面板（顶栏头像触发，fixed 浮层） ===== -->
   <aside class="sidebar" id="sidebar">
-    <button class="sb-avatar" id="sbAvatar" type="button" title="黄金建仓助手菜单">
-      <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="#171208"/></svg>
-    </button>
     <div class="sb-panel" id="sbPanel">
       <div class="sb-panel-head"><b id="sbPanelTitle">菜单</b><button class="sb-close" id="btnSbClose" type="button" title="收起菜单">×</button></div>
       <div class="sb-scroll">
@@ -732,6 +738,15 @@
 
   <!-- ===== 主区：首页 ===== -->
   <div class="main" id="layoutGrid">
+
+    <!-- ===== V3.5.13 顶部栏：菜单头像 + 固定标题 ===== -->
+    <header class="topbar" id="topBar">
+      <button class="sb-avatar" id="sbAvatar" type="button" title="黄金建仓助手菜单">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="#171208"/></svg>
+      </button>
+      <div class="topbar-t">黄金建仓助手</div>
+      <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V3.5.13</span></div>
+    </header>
 
     <header class="top" id="goldCard">
       <div class="price-bar">
@@ -888,7 +903,7 @@
     </section>
 
     <footer class="foot">
-      <span class="foot-t">黄金建仓助手 V3.5.12 —— 一键备份/恢复 · 日夜主题</span>
+      <span class="foot-t">黄金建仓助手 V3.5.13 —— 一键备份/恢复 · 日夜主题</span>
       <span class="foot-acts">
         <button class="foot-btn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高">✥ 编辑布局</button>
         <button class="foot-btn" id="btnResetLayout" type="button" title="恢复默认卡片布局">恢复默认布局</button>
@@ -1974,13 +1989,13 @@ function initRuleFolds(){
 var LAYOUT_KEY='jcj_layout_v2';
 
 var LAYOUT_IDS=['goldCard','tierCard','tpCard','opCard','ruleCard'];
-/* V3.5.12 桌面布局（参考 2×2 示意图）：金价左上 / 止盈右上长 / 操作面板左下竖 / 建仓右下大 / 规则说明底部整行 */
+/* V3.5.13 桌面布局（顶部栏 + 2×2）：金价/操作同行、止盈/建仓同行、规则说明底部整行 */
 var DEF_LAYOUT={
-  goldCard:{c:1,s:3,r:1,rs:1,h:0},
-  tpCard:{c:4,s:9,r:1,rs:2,h:0},
-  opCard:{c:1,s:3,r:2,rs:3,h:0},
-  tierCard:{c:4,s:9,r:3,rs:2,h:0},
-  ruleCard:{c:1,s:12,r:5,rs:1,h:0}
+  goldCard:{c:1,s:4,r:2,rs:1,h:0},
+  opCard:{c:5,s:8,r:2,rs:1,h:0},
+  tpCard:{c:1,s:4,r:3,rs:1,h:0},
+  tierCard:{c:5,s:8,r:3,rs:1,h:0},
+  ruleCard:{c:1,s:12,r:4,rs:1,h:0}
 };
 function layoutClone(o){ return JSON.parse(JSON.stringify(o)); }
 function layoutLoad(){
@@ -2556,7 +2571,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.12 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.13 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

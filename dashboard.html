@@ -93,6 +93,22 @@ body{padding-top:66px}
 .pf-empty b{color:var(--gold-soft)}
 /* ===== 汇总分析 ===== */
 .ana-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ana-card.wide{grid-column:1/-1}
+.tp-tip{font-size:.62rem;color:var(--ink3);font-weight:500;margin-left:8px}
+.tp-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:8px}
+.tp-item:last-child{margin-bottom:0}
+.tp-item .t{flex:1;font-size:.78rem;color:var(--ink2)}
+.tp-item .g{font-size:.72rem;color:var(--gold-soft);font-weight:700;white-space:nowrap}
+.tp-item b{font-size:.85rem;font-weight:900;white-space:nowrap}
+.pf-use{display:flex;align-items:baseline;gap:8px;margin:2px 0 6px;font-size:.7rem;color:var(--ink3)}
+.pf-use .u2{font-weight:900;color:var(--gold-soft);font-size:.82rem}
+.pf-use .u3{margin-left:auto;font-size:.62rem;color:var(--ink3)}
+.use-bar{height:6px;border-radius:4px;background:var(--card3);overflow:hidden;margin-bottom:8px}
+.use-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#C9962E,#E9B949)}
+.pf-line{display:flex;align-items:baseline;gap:6px;font-size:.68rem;color:var(--ink3);margin-bottom:8px}
+.pf-line b{font-weight:900;font-size:.78rem}
+.tier-strip{display:flex;gap:2px;height:9px;margin-top:2px}
+.tier-strip i{flex:0.3;border-radius:2px;background:var(--card3);min-width:2px}
 .ana-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
 .ana-title{font-size:.82rem;font-weight:800;color:var(--gold-soft);letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .ana-title svg{width:15px;height:15px}
@@ -150,7 +166,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.3</span>
+    <span class="ver" id="appVer">V1.4</span>
   </div>
   <div class="top-actions">
     <button class="btn" id="btnTheme" title="日夜切换">
@@ -207,6 +223,13 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
   <section class="sec fade-in" id="anaSec">
     <div class="sec-h"><span class="bar"></span><h2>汇总可视化分析</h2><span class="tip">浮盈红 · 浮亏绿 · 实时金价估算</span></div>
     <div class="ana-grid">
+      <div class="ana-card wide">
+        <div class="ana-title">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v4H4zM4 10h16v4H4zM4 16h16v4H4z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          止盈目标测算<span class="tp-tip">按当前均价与实时金价估算</span>
+        </div>
+        <div id="tpCard"></div>
+      </div>
       <div class="ana-card">
         <div class="ana-title">
           <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16M6 20V10M12 20V4M18 20v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -220,6 +243,13 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
           各方案资金投入占比
         </div>
         <div class="chart-box" id="chartShare"></div>
+      </div>
+      <div class="ana-card wide">
+        <div class="ana-title">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="4" height="14" rx="1" stroke="currentColor" stroke-width="2"/><rect x="10" y="3" width="4" height="16" rx="1" stroke="currentColor" stroke-width="2"/><rect x="17" y="8" width="4" height="11" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+          档位持仓分布<span class="tp-tip">全部方案合并 · 回撤档位</span>
+        </div>
+        <div class="chart-box" id="chartTier" style="height:230px"></div>
       </div>
     </div>
   </section>
@@ -315,7 +345,7 @@ function calcProfile(pr, px, idx){
   if(!px || isNaN(px) || px<=0) px = (+pr.price)||0;   /* 实时金价缺失时回退方案保存价格 */
   var scale = ((+pr.cap)||300)/300;
   var logicData=[];
-  var total=0, grams=0;
+  var total=0, grams=0, tierG=[0,0,0,0,0,0,0,0,0,0,0,0,0];
   [1,2].forEach(function(lg){
     var pos=(pr.pos&&pr.pos[lg])||{checked:[],actPrice:[],actGrams:[]};
     var rows=[];
@@ -335,6 +365,7 @@ function calcProfile(pr, px, idx){
       if(w>0){
         var invest=w*price;
         lgTotal+=invest; lgGrams+=w;
+        tierG[i]+=w;
         rows.push({tier:i, ref:tierP, price:price, grams:w, invest:invest});
       }
     }
@@ -345,7 +376,8 @@ function calcProfile(pr, px, idx){
   });
   var avg = grams>0? total/grams : 0;
   var pnl = grams>0? (px-avg)*grams : 0;
-  return {name:profileName(pr,idx==null?0:idx), high:pr.high, cap:pr.cap, firstBuyTs:pr.firstBuyTs,
+  return {name:profileName(pr,idx==null?0:idx), high:(pr.high!=null&&!isNaN(+pr.high))? +pr.high : null, cap:(+pr.cap)||300, firstBuyTs:pr.firstBuyTs,
+    tierG:tierG,
     total:total, grams:grams, avg:avg, pnl:pnl, logic:logicData, has:grams>0};
 }
 
@@ -385,6 +417,7 @@ function render(){
   renderProfiles(cards);
   if(any){ $('profilesSec').style.display=''; $('anaSec').style.display=''; $('detailSec').style.display=''; $('emptySec').style.display='none'; }
   else{ $('profilesSec').style.display='none'; $('anaSec').style.display='none'; $('detailSec').style.display='none'; $('emptySec').style.display=''; }
+  renderTp(cards);
   renderCharts();
   renderDetail(cards);
 }
@@ -417,6 +450,23 @@ function renderProfiles(cards){
     html += '<div class="pf-m"><div class="m1">持仓均价</div><div class="m2">'+(c.avg>0?num(c.avg,2):'--')+'</div></div>';
     html += '<div class="pf-m"><div class="m1">浮动盈亏</div><div class="m2 '+pnlClsN+'">'+(c.pnl!==0?(c.pnl>0?'+':'')+round2(c.pnl)+' 元':'--')+'</div></div>';
     html += '</div>';
+    if(c.has){
+      /* D 仓位使用率 */
+      var use = c.cap>0? c.grams/c.cap*100 : 0;
+      html += '<div class="pf-use"><span class="u1">仓位使用率</span><span class="u2">'+round2(use)+'%</span><span class="u3">'+round2(c.grams)+'/'+round2(c.cap)+' g</span></div>';
+      html += '<div class="use-bar"><i style="width:'+Math.min(100,use)+'%"></i></div>';
+      /* G 距清仓线 */
+      var rpx=g.px.cny||0;
+      if(c.high && rpx>0){
+        var diff=(c.high-rpx)/c.high*100;
+        html += '<div class="pf-line">距 0 档清仓线 <b class="'+(diff>0?'down':'up')+'">'+(diff>0?'已回落 ':'越过高点 ')+Math.abs(diff).toFixed(1)+'%</b><span class="u3">高点 '+num(c.high,0)+'</span></div>';
+      }
+      /* A 建仓进度条（13档重量分布） */
+      var maxT=1; c.tierG.forEach(function(w){ if(w>maxT) maxT=w; });
+      html += '<div class="tier-strip">'+c.tierG.map(function(w,i){
+        return '<i title="'+i+'档 '+(w>0?round2(w)+'g':'未建仓')+'"'+(w>0?' style="flex:'+(w/maxT*10).toFixed(2)+';background:var(--gold);box-shadow:0 0 6px var(--gold-bg)"':'')+'></i>';
+      }).join('')+'</div>';
+    }
     if(!c.has){
       html += '<div class="pf-empty">该方案暂无买入记录<br><b>在黄金建仓助手中勾选档位买入</b>后自动同步</div>';
     }
@@ -458,6 +508,35 @@ function drawPfChart(id, c){
   g.charts['pf'+id]=chart;
 }
 
+/* F 止盈目标测算（全部持仓合并，口径与主应用一致：4批止盈70% + 过高点+20搏高30% + 回1档清仓 + 过高点+40清仓） */
+function renderTp(cards){
+  var box=$('tpCard'); if(!box) return;
+  var px=g.px.cny||0;
+  var W=0, tot=0, pnlByHigh=0, pnlByHigh40=0, pnlHigh20=0;
+  cards.forEach(function(c){
+    if(!c.grams) return;
+    W+=c.grams; tot+=c.total;
+    if(c.high){ pnlByHigh += (c.high-c.avg)*c.grams; pnlByHigh40 += (c.high+40-c.avg)*c.grams; pnlHigh20 += (c.high+20-c.avg)*c.grams*0.3; }
+  });
+  if(!W){ box.innerHTML='<div style="text-align:center;color:#8A7A55;font-size:.8rem;padding:24px">暂无持仓，无目标可测算</div>'; return; }
+  var avgW = tot/W;
+  var sell70 = W*0.7, sell30 = W*0.3;
+  var pnl70 = (px-avgW)*sell70;
+  var pnl30 = pnlHigh20;
+  var items=[
+    {t:'分批止盈目标（4批 10%+20%+20%+20%）', g:round2(sell70)+' g', v:pnl70},
+    {t:'过高点+20 搏高（保留 30% 底仓）', g:round2(sell30)+' g', v:pnl30},
+    {t:'回 1 档清仓（跌回高点附近清仓）', g:round2(W)+' g', v:pnlByHigh},
+    {t:'过高点+40 清仓（搏高兑现）', g:round2(W)+' g', v:pnlByHigh40}
+  ];
+  var html='';
+  items.forEach(function(it){
+    var cls = it.v>0?'up':(it.v<0?'down':'');
+    html += '<div class="tp-item"><span class="t">'+it.t+'</span><span class="g">卖出 '+it.g+'</span><b class="'+cls+'">'+(it.v>0?'+':'')+round2(it.v)+' 元</b></div>';
+  });
+  box.innerHTML=html;
+}
+
 function renderCharts(){
   var cards=g.profiles.map(function(pr,i){return calcProfile(pr, g.px.cny||0, i)}).filter(function(c){return c.has});
   if(!hasEcharts() || !cards.length){ ['chartPnl','chartShare'].forEach(function(id){var el=$(id); if(el) el.innerHTML='<div style="text-align:center;color:#8A7A55;font-size:.8rem;padding-top:90px">暂无数据</div>';}); return; }
@@ -485,6 +564,21 @@ function renderCharts(){
       itemStyle:{borderColor:'#16110A',borderWidth:2}}]
   }));
   g.charts.chartShare=c2;
+  // A 档位持仓分布（13档×总重量）
+  var tierEl=$('chartTier'); if(!tierEl) return;
+  var c3=echarts.init(tierEl);
+  var tierTot=[0,0,0,0,0,0,0,0,0,0,0,0,0];
+  cards.forEach(function(c){ c.tierG.forEach(function(w,i){ tierTot[i]+=w; }); });
+  c3.setOption(Object.assign(baseOpt(),{
+    grid:{left:8,right:16,top:28,bottom:8,containLabel:true},
+    xAxis:{type:'category',data:Array.from({length:13},function(_,i){return i+'档'}),
+      axisLabel:{color:'#C9BDA3',fontSize:9,interval:0},axisLine:{lineStyle:{color:'rgba(233,185,73,.2)'}}},
+    yAxis:{type:'value',name:'g',nameTextStyle:{color:'#8A7A55'},axisLabel:{color:'#8A7A55'},splitLine:{lineStyle:{color:'rgba(233,185,73,.08)'}}},
+    series:[{type:'bar',barWidth:'58%',
+      data:tierTot.map(function(w){return {value:Math.round(w*100)/100,itemStyle:{color:w>0?'#E9B949':'rgba(233,185,73,.12)',borderRadius:3}}}),
+      label:{show:true,position:'top',color:'#F2D894',fontSize:9,formatter:function(p){return p.value>0?p.value:''}} }]
+  }));
+  g.charts.chartTier=c3;
 }
 
 /* ============ 明细表 ============ */

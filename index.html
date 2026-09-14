@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.8</title>
+<title>黄金建仓助手 V4.9</title>
 <style>
 /* ============================================================
-   V4.8 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.9 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -168,9 +168,28 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .alert-item.alert-profit svg{fill:var(--up)}
 .alert-item.alert-profit b{color:var(--up)}
 .op-advice{display:flex;align-items:flex-start;gap:11px;margin:12px 18px 0;padding:13px 15px;
-  border-radius:var(--r-card);background:var(--card-3);border:1px solid var(--line);position:relative;overflow:hidden}
+  border-radius:var(--r-card);background:var(--card-3);border:1px solid var(--line);position:relative;overflow:hidden;
+  animation:advicePulse 2.6s ease-in-out infinite, adviceShadow 2.6s ease-in-out infinite}
 .op-advice::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
   background:linear-gradient(var(--gold),transparent)}
+/* 氛围灯：卡片内顶部光晕呼吸闪烁 */
+.op-advice::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(72% 95% at 50% 0%, rgba(233,185,73,.20), transparent 72%);
+  animation:adviceGlow 2.6s ease-in-out infinite}
+@keyframes advicePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.018)}}
+@keyframes adviceGlow{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes adviceShadow{0%,100%{box-shadow:0 0 0 0 rgba(233,185,73,0)}50%{box-shadow:0 0 24px -6px rgba(233,185,73,.5)}}
+.op-advice.a-buy::after{background:radial-gradient(72% 95% at 50% 0%, rgba(52,211,153,.26), transparent 72%)}
+.op-advice.a-buy{animation:advicePulse 2.6s ease-in-out infinite, adviceShadowBuy 2.6s ease-in-out infinite}
+@keyframes adviceShadowBuy{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 26px -6px rgba(52,211,153,.55)}}
+.op-advice.a-sell::after{background:radial-gradient(72% 95% at 50% 0%, rgba(242,85,90,.28), transparent 72%)}
+.op-advice.a-sell{animation:advicePulse 2.6s ease-in-out infinite, adviceShadowSell 2.6s ease-in-out infinite}
+@keyframes adviceShadowSell{0%,100%{box-shadow:0 0 0 0 rgba(242,85,90,0)}50%{box-shadow:0 0 28px -6px rgba(242,85,90,.6)}}
+.op-advice.a-clear::after{background:radial-gradient(72% 95% at 50% 0%, rgba(242,85,90,.32), transparent 72%)}
+.op-advice.a-clear{animation:advicePulse 2.6s ease-in-out infinite, adviceShadowClear 2.6s ease-in-out infinite}
+@keyframes adviceShadowClear{0%,100%{box-shadow:0 0 0 0 rgba(242,85,90,0)}50%{box-shadow:0 0 30px -6px rgba(242,85,90,.65)}}
+.op-advice.a-wait::after{background:radial-gradient(72% 95% at 50% 0%, rgba(233,185,73,.16), transparent 72%)}
+@media (prefers-reduced-motion:reduce){.op-advice,.op-advice::after{animation:none}}
 .op-advice .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:none;margin-top:5px;
   box-shadow:0 0 10px rgba(233,185,73,.8)}
 .op-advice b{display:block;font-size:1.02rem;color:var(--ink);line-height:1.35}
@@ -660,7 +679,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.8</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.9</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -837,7 +856,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.8 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.9 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -1205,7 +1224,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.8：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.9：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -2009,7 +2028,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.8 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.9 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2496,7 +2515,7 @@ setInterval(function(){
 }, 10000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.8 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.9 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2623,7 +2642,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.8 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.9 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2773,7 +2792,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.8').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.9').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

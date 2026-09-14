@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.13</title>
+<title>黄金建仓助手 V3.5.14</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -89,7 +89,7 @@
     background-attachment:fixed;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1780px; margin:0 auto; padding:22px 20px 60px; display:flex; gap:18px; align-items:flex-start;}
+  .wrap{max-width:1780px; margin:0 auto; padding:22px 20px 60px; display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start;}
   button{font-family:inherit; cursor:pointer; border:none; border-radius:12px; font-size:.92rem; padding:9px 18px;
     transition:filter .15s, transform .12s, box-shadow .15s;}
   button:hover{filter:brightness(1.09);}
@@ -111,11 +111,10 @@
   .sb-avatar:hover{transform:scale(1.07);}
   .sb-avatar:active{transform:scale(.95);}
   .sb-panel{display:flex; flex:1; min-height:0; flex-direction:column;}
-  /* ===== V3.5.13 顶部栏 ===== */
-  .topbar{grid-column:1 / 13; grid-row:1 / 2; display:flex; align-items:center; gap:14px;
+  /* ===== V3.5.14 顶部栏：与普通卡片同级（不悬浮、可编辑高度） ===== */
+  .topbar{display:flex; align-items:center; gap:14px; position:relative;
     background:var(--card); border:1px solid var(--line); border-radius:18px; padding:9px 16px;
-    box-shadow:var(--shadow-2), var(--glow); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
-    position:sticky; top:0; z-index:80;}
+    box-shadow:var(--shadow-2), var(--glow); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);}
   .topbar-t{font-size:1.1rem; font-weight:800; letter-spacing:1px;
     background:linear-gradient(120deg, var(--gold), #f0cf7f 60%, var(--gold-deep)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
   .topbar-r{margin-left:auto; display:flex; align-items:center; gap:10px;}
@@ -183,15 +182,13 @@
   .sb-actbtn.sb-danger:hover{border-color:var(--danger); color:#ff7a70; background:rgba(224,69,58,.12); box-shadow:0 4px 16px -6px rgba(224,69,58,.45);}
   .sb-actbtn:active{transform:scale(.97);}
   .sb-mask{display:none;}
-  .main{flex:1; min-width:0; display:grid; grid-template-columns:repeat(12,1fr); grid-auto-rows:auto;
-    grid-auto-flow:row; gap:18px; align-items:stretch; align-content:start; padding-left:0;}
-  /* ===== V3.5.13 顶部栏 + 2×2 磁贴（金价/操作同行、止盈/建仓同行、规则底部） ===== */
-  #goldCard{grid-column:1 / 5; grid-row:2 / 3;}
-  #opCard{grid-column:5 / 13; grid-row:2 / 3;}
-  #tpCard{grid-column:1 / 5; grid-row:3 / 4;}
-  #tierCard{grid-column:5 / 13; grid-row:3 / 4;}
-  #ruleCard{grid-column:1 / 13; grid-row:4 / 5;}
-  footer.foot{grid-column:1 / 13;}
+  /* ===== V3.5.14 主区：flex 两列独立堆叠（左列金价/止盈，右列操作/建仓，各自吸合、底部不对齐） ===== */
+  .main{flex:1 1 100%; min-width:0; display:flex; gap:18px; align-items:flex-start; padding-left:0;}
+  .lcol{display:flex; flex-direction:column; gap:18px; flex:0 0 33.3%; min-width:0;}
+  .rcol{display:flex; flex-direction:column; gap:18px; flex:1 1 64.7%; min-width:0;}
+  #topBar{flex:1 1 100%; margin-bottom:0;}
+  #ruleCard{flex:1 1 100%; margin-top:0;}
+  footer.foot{width:auto; flex:1 1 100%;}
   /* 拖拽/缩放手柄 */
   .card, #goldCard{position:relative;}
   .cd-bar{position:absolute; top:8px; right:10px; display:none; gap:6px; align-items:center; z-index:6;}
@@ -452,7 +449,7 @@
   .op-btn-gold:hover{color:#171208; filter:brightness(1.08);}
   .op-risk{font-size:.7rem; color:var(--ink-3); margin-top:12px; border-top:1px dashed var(--line); padding-top:9px; line-height:1.5;}
 
-  footer.foot{text-align:center; font-size:.8rem; color:var(--ink-3); margin-top:26px;}
+  footer.foot{text-align:center; font-size:.8rem; color:var(--ink-3); margin-top:0;}
   footer.foot{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;}
   .foot-btn{display:inline-flex; align-items:center; gap:5px; border:1px solid var(--line); background:var(--card);
     color:var(--ink-2); border-radius:10px; padding:6px 13px; font-size:.78rem; font-weight:600; cursor:pointer; font-family:inherit;
@@ -462,7 +459,7 @@
   /* ===== 布局编辑模式：进入后显示手柄与卡片边框 ===== */
   .cd-bar{display:none;}
   .cd-resize, .cd-resize-e, .cd-resize-s{display:none !important;}
-  body.editing .card, body.editing #goldCard{outline:1.5px dashed color-mix(in srgb, var(--gold) 55%, transparent); outline-offset:2px;}
+  body.editing .card, body.editing #goldCard, body.editing #topBar{outline:1.5px dashed color-mix(in srgb, var(--gold) 55%, transparent); outline-offset:2px;}
   body.editing .cd-bar{display:flex;}
   body.editing .cd-resize{display:flex !important;}
   body.editing .cd-resize-e, body.editing .cd-resize-s{display:block !important;}
@@ -527,12 +524,20 @@
     .op-btn{padding:7px 6px; font-size:.78rem;}
     .op-risk{font-size:.62rem; margin-top:5px; padding-top:4px;}
     .wrap{display:block; padding:8px 10px 50px;}
-    .main{display:block; padding-left:0;}
+    /* V3.5.14 移动端：列容器透明化，卡片按 order 顺序纵向堆叠（金价→操作→止盈→建仓→规则） */
+    .main{display:flex; flex-wrap:wrap; padding-left:0;}
+    .lcol,.rcol{display:contents;}
+    #topBar{order:0; flex-basis:100%; position:static; margin:0 0 14px;}
+    #goldCard{order:1; flex-basis:100%;}
+    #opCard{order:2; flex-basis:100%;}
+    #tpCard{order:3; flex-basis:100%;}
+    #tierCard{order:4; flex-basis:100%;}
+    #ruleCard{order:5; flex-basis:100%; margin-top:14px;}
+    footer.foot{margin-top:14px;}
     .main .card, #goldCard{margin-top:14px;}
-    .topbar{position:static; margin-top:0;}
     .cd-bar,.cd-resize,.cd-resize-e,.cd-resize-s{display:none !important;}
     #btnEditLayout{display:none !important;}
-    body.editing .card, body.editing #goldCard{outline:none;}
+    body.editing .card, body.editing #goldCard, body.editing #topBar{outline:none;}
     .sidebar{position:fixed; top:0; left:0; bottom:0; width:min(86vw,340px); max-height:none; border-radius:0;
       border-right:1px solid var(--line); z-index:400; transform:translateX(-102%); transition:transform .26s ease;}
     .sidebar.open{transform:translateX(0); box-shadow:var(--shadow-2); width:min(86vw,340px);}
@@ -736,17 +741,17 @@
   </aside>
   <div class="sb-mask" id="sbMask"></div>
 
+  <!-- ===== V3.5.14 顶部栏：菜单头像 + 固定标题（与主区同级，不悬浮） ===== -->
+  <header class="topbar" id="topBar">
+    <button class="sb-avatar" id="sbAvatar" type="button" title="黄金建仓助手菜单">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="#171208"/></svg>
+    </button>
+    <div class="topbar-t">黄金建仓助手</div>
+    <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V3.5.14</span></div>
+  </header>
+
   <!-- ===== 主区：首页 ===== -->
   <div class="main" id="layoutGrid">
-
-    <!-- ===== V3.5.13 顶部栏：菜单头像 + 固定标题 ===== -->
-    <header class="topbar" id="topBar">
-      <button class="sb-avatar" id="sbAvatar" type="button" title="黄金建仓助手菜单">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="#171208"/></svg>
-      </button>
-      <div class="topbar-t">黄金建仓助手</div>
-      <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V3.5.13</span></div>
-    </header>
 
     <header class="top" id="goldCard">
       <div class="price-bar">
@@ -863,7 +868,9 @@
       <div class="tp-grid" id="tpGrid"></div>
     </section>
 
-    <!-- ===== 规则说明 ===== -->
+    </div>
+
+    <!-- ===== 规则说明（主区同级，默认收起） ===== -->
     <section class="card" id="ruleCard">
       <h2>规则说明
         <button class="fold-btn" id="foldRule" type="button" title="收起/展开规则说明"><span class="ar">▾</span><span class="ftxt">收起</span></button>
@@ -903,13 +910,12 @@
     </section>
 
     <footer class="foot">
-      <span class="foot-t">黄金建仓助手 V3.5.13 —— 一键备份/恢复 · 日夜主题</span>
+      <span class="foot-t">黄金建仓助手 V3.5.14 —— 一键备份/恢复 · 日夜主题</span>
       <span class="foot-acts">
         <button class="foot-btn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高">✥ 编辑布局</button>
         <button class="foot-btn" id="btnResetLayout" type="button" title="恢复默认卡片布局">恢复默认布局</button>
       </span>
     </footer>
-  </div>
 
 
 </div>
@@ -1988,45 +1994,63 @@ function initRuleFolds(){
 /* ===== V3.2 卡片自由布局：拖拽摆放 + 放大缩小 ===== */
 var LAYOUT_KEY='jcj_layout_v2';
 
-var LAYOUT_IDS=['goldCard','tierCard','tpCard','opCard','ruleCard'];
-/* V3.5.13 桌面布局（顶部栏 + 2×2）：金价/操作同行、止盈/建仓同行、规则说明底部整行 */
+var LAYOUT_IDS=['goldCard','tierCard','tpCard','opCard','ruleCard','topBar'];
+var SWAP_IDS=['goldCard','tierCard','tpCard','opCard'];
+/* V3.5.14 桌面布局（flex 两列）：col 0=左列(金价/止盈)、1=右列(操作/建仓)；full=整行卡；lw=左列宽度比例 */
 var DEF_LAYOUT={
-  goldCard:{c:1,s:4,r:2,rs:1,h:0},
-  opCard:{c:5,s:8,r:2,rs:1,h:0},
-  tpCard:{c:1,s:4,r:3,rs:1,h:0},
-  tierCard:{c:5,s:8,r:3,rs:1,h:0},
-  ruleCard:{c:1,s:12,r:4,rs:1,h:0}
+  topBar:{full:1,h:0},
+  goldCard:{col:0,h:0},
+  tpCard:{col:0,h:0},
+  opCard:{col:1,h:0},
+  tierCard:{col:1,h:0},
+  ruleCard:{full:1,h:0},
+  lw:0.333
 };
 function layoutClone(o){ return JSON.parse(JSON.stringify(o)); }
 function layoutLoad(){
-  try{ var o=JSON.parse(localStorage.getItem(LAYOUT_KEY)); if(o && typeof o==='object') return o; }catch(e){}
+  try{
+    var o=JSON.parse(localStorage.getItem(LAYOUT_KEY));
+    if(o && typeof o==='object'){
+      if(o.goldCard && ('c' in o.goldCard)) return null; /* V3.5.12 及更早 grid 布局格式作废 */
+      return o;
+    }
+  }catch(e){}
   return null;
 }
 function layoutSave(l){
   try{ localStorage.setItem(LAYOUT_KEY, JSON.stringify(l)); }catch(e){}
 }
+function rebuildCols(def){
+  var lcol=document.getElementById('lcol'), rcol=document.getElementById('rcol');
+  if(!lcol||!rcol) return;
+  var L0=['goldCard','tpCard'], R0=['opCard','tierCard'];
+  L0.forEach(function(id){ var el=document.getElementById(id); if(el && el.parentNode!==lcol) lcol.appendChild(el); });
+  R0.forEach(function(id){ var el=document.getElementById(id); if(el && el.parentNode!==rcol) rcol.appendChild(el); });
+}
 function layoutApply(l){
-  var g=document.getElementById('layoutGrid');
-  if(!g) return;
+  if(!l) l=DEF_LAYOUT;
+  l.lw=Math.max(0.2, Math.min(0.45, parseFloat(l.lw)||0.333));
+  var lcol=document.getElementById('lcol'), rcol=document.getElementById('rcol');
+  if(lcol && rcol){
+    lcol.style.flexBasis=(l.lw*100).toFixed(1)+'%';
+    rcol.style.flexBasis=((1-l.lw)*100-2).toFixed(1)+'%';
+  }
   LAYOUT_IDS.forEach(function(id){
-    var el=document.getElementById(id), p=(l||{})[id]||DEF_LAYOUT[id];
-    if(!el||!p) return;
-    /* 越界保护：列/宽/行收敛到合法范围，防止卡片重叠或间距异常 */
-    p.c=Math.max(1, Math.min(12, Math.round(p.c||1)));
-    p.s=Math.max(1, Math.min(13-p.c, Math.round(p.s||1)));
-    p.r=Math.max(1, Math.round(p.r||1));
-    p.rs=Math.max(1, Math.round(p.rs||1));
-    /* 极端布局修复：单列卡无实用价值（表格会被压扁），恢复默认宽度；过矮卡片恢复自适应 */
-    if(p.s<2){ var _d=DEF_LAYOUT[id]||{}; p.s=Math.max(2, Math.round(_d.s||3)); if(p.c+_d.s<=13) p.c=_d.c||p.c; }
+    var el=document.getElementById(id), p=l[id]||DEF_LAYOUT[id]||{};
+    if(!el) return;
     if(p.h>0 && p.h<140){ p.h=0; }
-    el.style.gridColumn = p.c+' / '+(p.c+p.s);
-    el.style.gridRow = p.r+' / '+(p.r+p.rs);
     el.style.minHeight = (p.h>0) ? (p.h+'px') : '';
   });
 }
 function initLayout(){
   var g=document.getElementById('layoutGrid');
   if(!g) return;
+  /* V3.5.14：创建左右列容器并把卡片归位（goldCard/tpCard→左列，opCard/tierCard→右列） */
+  var lcol=document.createElement('div'); lcol.className='lcol'; lcol.id='lcol';
+  var rcol=document.createElement('div'); rcol.className='rcol'; rcol.id='rcol';
+  g.insertBefore(lcol, g.firstChild);
+  g.appendChild(rcol);
+  rebuildCols(true);
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
   var btnEdit=document.getElementById('btnEditLayout');
@@ -2039,34 +2063,40 @@ function initLayout(){
   var btnReset=document.getElementById('btnResetLayout');
   if(btnReset) btnReset.addEventListener('click', function(){
     if(!confirm('恢复默认卡片布局？当前自定义布局将被覆盖。')) return;
-    try{ localStorage.removeItem('jcj_layout_v2'); }catch(e){}
+    try{ localStorage.removeItem(LAYOUT_KEY); }catch(e){}
+    rebuildCols(true);
     layoutApply(layoutClone(DEF_LAYOUT));
     toast('已恢复默认布局');
   });
   LAYOUT_IDS.forEach(function(id){
     var el=document.getElementById(id); if(!el) return;
     if(el.querySelector('.cd-bar')) return;
+    var full = (id==='topBar'||id==='ruleCard');
     var bar=document.createElement('div'); bar.className='cd-bar';
-    var hd=document.createElement('span'); hd.className='cd-handle'; hd.title='拖动到其它卡片上可互换位置';
-    hd.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="6" cy="6" r="1.6"/><circle cx="12" cy="6" r="1.6"/><circle cx="18" cy="6" r="1.6"/><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/><circle cx="6" cy="18" r="1.6"/><circle cx="12" cy="18" r="1.6"/><circle cx="18" cy="18" r="1.6"/></svg>';
-    bar.appendChild(hd);
+    if(!full){
+      var hd=document.createElement('span'); hd.className='cd-handle'; hd.title='拖动到其它卡片上可互换位置';
+      hd.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="6" cy="6" r="1.6"/><circle cx="12" cy="6" r="1.6"/><circle cx="18" cy="6" r="1.6"/><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/><circle cx="6" cy="18" r="1.6"/><circle cx="12" cy="18" r="1.6"/><circle cx="18" cy="18" r="1.6"/></svg>';
+      bar.appendChild(hd);
+    }
     var rz=document.createElement('span'); rz.className='cd-resize'; rz.title='拖动调整大小';
     rz.innerHTML='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v6h-6M21 3l-9 9M15 21l6-6M3 9l9-9"/></svg>';
     var rze=document.createElement('span'); rze.className='cd-resize-e'; rze.title='拖动右边缘改列宽';
-    var rzs=document.createElement('span'); rzs.className='cd-resize-s'; rzs.title='拖动下边缘改行高';
-    el.appendChild(bar); el.appendChild(rze); el.appendChild(rzs); el.appendChild(rz);
+    var rzs=document.createElement('span'); rzs.className='cd-resize-s'; rzs.title='拖动下边缘改卡片高度';
+    el.appendChild(bar);
+    if(!full) el.appendChild(rze);
+    el.appendChild(rzs);
+    if(!full) el.appendChild(rz);
   });
   var drag=null;
   function onDown(e){
     if(window.innerWidth<=760 || !document.body.classList.contains('editing')) return;
     var hd=e.target.closest('.cd-handle'); if(!hd) return;
-    var card=hd.closest('.card, #goldCard'); if(!card) return;
+    var card=hd.closest('.card, #goldCard'); if(!card || !card.id) return;
+    if(card.id==='topBar' || card.id==='ruleCard') return;
     e.preventDefault();
-    var mr=g.getBoundingClientRect();
     drag={card:card,id:card.id,layout:layoutLoad()||layoutClone(DEF_LAYOUT),
-      mainRect:mr,colW:(mr.width-11*18)/12,startX:e.clientX,startY:e.clientY,cur:null};
+      startX:e.clientX,startY:e.clientY,cur:null};
     card.classList.add('cd-dragging');
-    window.__dbgDrag=1;
     document.body.style.userSelect='none'; document.body.style.webkitUserSelect='none';
   }
   function overlap(a,b){
@@ -2081,28 +2111,37 @@ function initLayout(){
     drag.card.style.transform='translate('+(dx/zoomV)+'px,'+(dy/zoomV)+'px)';
     var rect=drag.card.getBoundingClientRect();
     var best=null, bestA=0;
-    LAYOUT_IDS.forEach(function(id2){
+    SWAP_IDS.forEach(function(id2){
       if(id2===drag.id) return;
       var el2=document.getElementById(id2); if(!el2) return;
       var a=overlap(rect, el2.getBoundingClientRect());
       if(a>bestA){ bestA=a; best=el2; }
     });
-    document.querySelectorAll('.card.cd-target').forEach(function(c){ c.classList.remove('cd-target'); });
-    if(best){ best.classList.add('cd-target'); window.__dbgDrag=2; window.__dbgInfo={dx:dx,dy:dy,best:best.id}; }
+    document.querySelectorAll('.cd-target').forEach(function(c){ c.classList.remove('cd-target'); });
+    if(best){ best.classList.add('cd-target'); }
     drag.cur=best;
+  }
+  function swapCards(aId,bId){
+    var a=document.getElementById(aId), b=document.getElementById(bId);
+    if(!a||!b) return;
+    var pa=a.parentNode, pb=b.parentNode;
+    if(pa===pb){
+      if(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) pa.insertBefore(a, b);
+      else pa.insertBefore(b, a);
+    }else{
+      pb.appendChild(a); pa.appendChild(b);
+    }
   }
   function onUp(){
     if(!drag) return;
     drag.card.classList.remove('cd-dragging');
     drag.card.style.transform='';
-    document.querySelectorAll('.card.cd-target').forEach(function(c){ c.classList.remove('cd-target'); });
-    window.__dbgDrag=3;
+    document.querySelectorAll('.cd-target').forEach(function(c){ c.classList.remove('cd-target'); });
     if(drag.cur){
-      window.__dbgDrag=4;
-      var tId=drag.cur.id, l=drag.layout, a=l[drag.id], b=l[tId];
-      var tmp=layoutClone(a);
-      a.c=b.c; a.s=b.s; a.r=b.r; a.rs=b.rs;
-      b.c=tmp.c; b.s=tmp.s; b.r=tmp.r; b.rs=tmp.rs;
+      var tId=drag.cur.id, l=drag.layout, a=l[drag.id]||{}, b=l[tId]||{};
+      var ta=a.col, tb=b.col;
+      a.col=tb; b.col=ta;
+      swapCards(drag.id, tId);
       layoutApply(l); layoutSave(l);
       toast('布局已保存');
     }
@@ -2112,22 +2151,22 @@ function initLayout(){
   function onRzDown(e){
     if(window.innerWidth<=760 || !document.body.classList.contains('editing')) return;
     var rz=e.target.closest('.cd-resize, .cd-resize-e, .cd-resize-s'); if(!rz) return;
-    var card=rz.closest('.card, #goldCard'); if(!card) return;
+    var card=rz.closest('.card, #goldCard, .topbar'); if(!card || !card.id) return;
     e.preventDefault(); e.stopPropagation();
     var isE=rz.classList.contains('cd-resize-e'), isS=rz.classList.contains('cd-resize-s');
-    var mr=g.getBoundingClientRect();
-    var cw=(mr.width-11*18)/12;
+    var full = (card.id==='topBar' || card.id==='ruleCard');
     var l=layoutLoad()||layoutClone(DEF_LAYOUT);
-    var p=l[card.id]||layoutClone(DEF_LAYOUT[card.id]);
-    var sx=e.clientX, sy=e.clientY, ss=p.s, sh=card.getBoundingClientRect().height, sm=p.h>0?p.h:0;
+    var p=l[card.id]||layoutClone(DEF_LAYOUT[card.id]||{});
+    var sx=e.clientX, sy=e.clientY, slw=l.lw, sh=card.getBoundingClientRect().height, sm=p.h>0?p.h:0;
     function mv(ev){
       var dx=ev.clientX-sx, dy=ev.clientY-sy;
       var zoomV = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
-      if(!isS){  /* 角手柄或右边缘：改列宽 */
-        p.s=Math.max(1, Math.min(13-p.c, Math.round((ss*cw+dx)/(cw+18))));
-        card.style.gridColumn = p.c+' / '+(p.c+p.s);
+      if(!isS && !full){  /* 角手柄或右边缘：调整左右列宽度比例 */
+        var nlw = Math.max(0.2, Math.min(0.45, slw + dx/zoomV/g.offsetWidth));
+        l.lw = nlw;
+        layoutApply(l);
       }
-      if(!isE){  /* 角手柄或下边缘：改行高 */
+      if(!isE){  /* 角手柄或下边缘：改卡片高度 */
         p.h=Math.max(90, Math.round((sm>0?sm:sh)+dy/zoomV));
         card.style.minHeight = p.h+'px';
       }
@@ -2140,10 +2179,11 @@ function initLayout(){
   g.addEventListener('pointerdown', onDown);
   document.addEventListener('pointermove', onMove);
   document.addEventListener('pointerup', onUp);
-  g.addEventListener('pointerdown', onRzDown);
+  document.addEventListener('pointerdown', onRzDown);
   var rl=document.getElementById('btnLayoutReset');
   if(rl) rl.addEventListener('click', function(){
     try{ localStorage.removeItem(LAYOUT_KEY); }catch(e){}
+    rebuildCols(true);
     layoutApply(layoutClone(DEF_LAYOUT));
   });
   /* 一键清仓（当前方案）：清持仓勾选/实际成交/阶段高点与当前价/过高点回落记录，保留方案名、逻辑、持仓上限 */
@@ -2571,7 +2611,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.13 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.14 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

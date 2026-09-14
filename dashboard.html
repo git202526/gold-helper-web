@@ -150,7 +150,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.2</span>
+    <span class="ver" id="appVer">V1.3</span>
   </div>
   <div class="top-actions">
     <button class="btn" id="btnTheme" title="日夜切换">
@@ -417,13 +417,11 @@ function renderProfiles(cards){
     html += '<div class="pf-m"><div class="m1">持仓均价</div><div class="m2">'+(c.avg>0?num(c.avg,2):'--')+'</div></div>';
     html += '<div class="pf-m"><div class="m1">浮动盈亏</div><div class="m2 '+pnlClsN+'">'+(c.pnl!==0?(c.pnl>0?'+':'')+round2(c.pnl)+' 元':'--')+'</div></div>';
     html += '</div>';
-    html += '<div class="pf-chart" id="pfChart'+idx+'"></div>';
     if(!c.has){
       html += '<div class="pf-empty">该方案暂无买入记录<br><b>在黄金建仓助手中勾选档位买入</b>后自动同步</div>';
     }
     el.innerHTML=html;
     box.appendChild(el);
-    if(c.has) drawPfChart('pfChart'+idx, c);
   });
 }
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }

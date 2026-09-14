@@ -92,6 +92,16 @@ body{padding-top:66px}
 .pf-empty{color:var(--ink3);font-size:.8rem;text-align:center;padding:26px 0;line-height:1.8}
 .pf-empty b{color:var(--gold-soft)}
 /* ===== 汇总分析 ===== */
+.back-bar{display:flex;align-items:center;gap:10px;margin:14px 0 0;padding:12px 16px;border-radius:var(--r);
+  background:linear-gradient(90deg,var(--card2),var(--card));border:1px solid var(--line);border-left:3px solid var(--gold);
+  font-size:.78rem;color:var(--ink2)}
+.back-ic{width:18px;height:18px;color:var(--gold);flex:none}
+.back-t{font-weight:900;color:var(--gold-soft);white-space:nowrap}
+.back-msg{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.back-msg b.hit{color:var(--up);font-weight:900}
+.back-msg .sub{font-size:.68rem;color:var(--ink3)}
+.back-bar.hit{background:linear-gradient(90deg,rgba(242,85,90,.12),var(--card));border-left-color:var(--up)}
+.back-bar.hit .back-t{color:var(--up)}
 .ana-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .ana-card.wide{grid-column:1/-1}
 .tp-tip{font-size:.62rem;color:var(--ink3);font-weight:500;margin-left:8px}
@@ -166,7 +176,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.4</span>
+    <span class="ver" id="appVer">V1.5</span>
   </div>
   <div class="top-actions">
     <button class="btn" id="btnTheme" title="日夜切换">
@@ -204,6 +214,11 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <div class="h-val gold" id="ovCount">--</div>
         <div class="h-sub">个方案 · 含建仓逻辑</div>
       </div>
+    </div>
+    <div class="back-bar" id="backBar">
+      <svg viewBox="0 0 24 24" fill="none" class="back-ic"><path d="M12 3v10m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="back-t">回本提醒</span>
+      <span class="back-msg" id="backMsg">--</span>
     </div>
     <div class="price-strip">
       <div class="p-card"><div class="p-name">人民币金价</div><div class="p-val" id="pxCny">--</div><div class="p-unit">元/克</div></div>
@@ -417,6 +432,7 @@ function render(){
   renderProfiles(cards);
   if(any){ $('profilesSec').style.display=''; $('anaSec').style.display=''; $('detailSec').style.display=''; $('emptySec').style.display='none'; }
   else{ $('profilesSec').style.display='none'; $('anaSec').style.display='none'; $('detailSec').style.display='none'; $('emptySec').style.display=''; }
+  renderBack(cards);
   renderTp(cards);
   renderCharts();
   renderDetail(cards);
@@ -506,6 +522,27 @@ function drawPfChart(id, c){
   }
   chart.setOption(opt);
   g.charts['pf'+id]=chart;
+}
+
+/* 回本提醒：实时人民币金价 ≥ 持仓均价+10 元 → 该方案已回本 */
+function renderBack(cards){
+  var msg=$('backMsg'); if(!msg) return;
+  var px=g.px.cny||0;
+  var has=cards.filter(function(c){return c.has && c.avg>0});
+  if(!has.length){ msg.innerHTML='暂无持仓'; msg.className='back-msg'; return; }
+  var hit=has.filter(function(c){ return px>0 && px>=c.avg+10; });
+  if(hit.length){
+    msg.innerHTML = hit.map(function(c){
+      return '<b class="hit">'+esc(c.name)+' 已回本</b><span class="sub">当前 '+num(px,2)+' · 均价 '+num(c.avg,2)+' · 超 '+(px-c.avg).toFixed(2)+' 元</span>';
+    }).join('');
+    msg.className='back-msg hit';
+    $('backBar').className='back-bar hit';
+  } else {
+    var near=has.slice().sort(function(a,b){ return (a.avg+10-px)-(b.avg+10-px); })[0];
+    msg.innerHTML = '暂无方案已回本 <span class="sub">最近：'+esc(near.name)+' 还差 '+(near.avg+10-px>0?(near.avg+10-px).toFixed(2):'0.00')+' 元（均价 '+num(near.avg,2)+'）</span>';
+    msg.className='back-msg';
+    $('backBar').className='back-bar';
+  }
 }
 
 /* F 止盈目标测算（全部持仓合并，口径与主应用一致：4批止盈70% + 过高点+20搏高30% + 回1档清仓 + 过高点+40清仓） */

@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.11</title>
+<title>黄金建仓助手 V4.12</title>
 <style>
 /* ============================================================
-   V4.11 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.12 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -137,19 +137,17 @@ img{display:block;max-width:100%}
 .op-plan-line{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--ink-2)}
 .op-plan-line b{color:var(--gold-soft);font-size:1rem;letter-spacing:.3px}
 .op-tag{font-size:.64rem;color:var(--gold-deep);border:1px solid var(--line);border-radius:99px;padding:1px 8px}
-.op-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:transparent;
+.op-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:10px;background:transparent;
   border-radius:var(--r-card);margin:14px 18px 0}
-.op-ring-card{align-items:center;justify-content:center;text-align:center}
-.op-ring{position:relative;width:92px;height:92px;margin:2px auto 0;flex:none}
-.op-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:var(--line-2);stroke-width:9}
-.ring-fg{fill:none;stroke:url(#ringGrad);stroke-width:9;stroke-linecap:round;
-  stroke-dasharray:263.9;stroke-dashoffset:263.9;transition:stroke-dashoffset .6s var(--ease)}
-.op-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:1.18rem;font-weight:900;color:var(--gold-soft);font-variant-numeric:tabular-nums}
-.op-ring b.over{color:var(--up)}
-.op-item b.pct-sub{font-size:.68rem;color:var(--ink-3);font-weight:600}
-.op-item{background:linear-gradient(165deg,var(--card-3),var(--card-2));padding:13px 15px;display:flex;flex-direction:column;gap:4px;min-width:0;
+.op-item{min-height:104px}
+.op-bar-card{justify-content:center}
+.op-bar{position:relative;height:10px;border-radius:99px;background:var(--line-2);overflow:hidden;
+  margin:1px 0 2px;width:100%;flex:none}
+.op-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;width:0;
+  background:linear-gradient(90deg,var(--gold),var(--gold-deep));
+  box-shadow:0 0 10px rgba(233,185,73,.55);transition:width .6s var(--ease)}
+.op-bar i.over{background:linear-gradient(90deg,var(--up),#C0392B);box-shadow:0 0 10px rgba(242,85,90,.5)}
+.op-item{background:linear-gradient(165deg,var(--card-3),var(--card-2));padding:13px 15px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;
   border:1px solid var(--line-2);border-radius:var(--r-card);position:relative;overflow:hidden;
   transition:transform .22s var(--ease),border-color .22s,box-shadow .22s}
 .op-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
@@ -177,7 +175,7 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .alert-item.alert-profit{background:linear-gradient(90deg,var(--up-bg),transparent);border-color:rgba(242,85,90,.3)}
 .alert-item.alert-profit svg{fill:var(--up)}
 .alert-item.alert-profit b{color:var(--up)}
-.op-advice{display:flex;align-items:flex-start;gap:11px;margin:12px 18px 0;padding:13px 15px;
+.op-advice{display:flex;align-items:flex-start;gap:12px;margin:12px 0 0;padding:15px 18px;
   border-radius:var(--r-card);background:var(--card-3);border:1px solid var(--line);position:relative;overflow:hidden;
   animation:advicePulse 2.6s ease-in-out infinite, adviceShadow 2.6s ease-in-out infinite}
 .op-advice::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
@@ -200,10 +198,10 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 @keyframes adviceShadowClear{0%,100%{box-shadow:0 0 0 0 rgba(242,85,90,0)}50%{box-shadow:0 0 30px -6px rgba(242,85,90,.65)}}
 .op-advice.a-wait::after{background:radial-gradient(72% 95% at 50% 0%, rgba(233,185,73,.16), transparent 72%)}
 @media (prefers-reduced-motion:reduce){.op-advice,.op-advice::after{animation:none}}
-.op-advice .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:none;margin-top:5px;
-  box-shadow:0 0 10px rgba(233,185,73,.8)}
-.op-advice b{display:block;font-size:1.02rem;color:var(--ink);line-height:1.35}
-.op-advice .extra{font-size:.74rem;color:var(--ink-3);margin-top:3px;line-height:1.5}
+.op-advice .dot{width:11px;height:11px;border-radius:50%;background:var(--gold);flex:none;margin-top:6px;
+  box-shadow:0 0 12px rgba(233,185,73,.9)}
+.op-advice b{display:block;font-size:1.16rem;color:var(--ink);line-height:1.35;letter-spacing:.2px}
+.op-advice .extra{font-size:.8rem;color:var(--ink-2);margin-top:4px;line-height:1.55}
 .op-advice.a-wait{background:linear-gradient(90deg,rgba(233,185,73,.08),var(--card-3) 55%);border-color:var(--line)}
 .op-advice.a-wait::before{background:linear-gradient(var(--gold),transparent)}
 .op-advice.a-buy{background:linear-gradient(90deg,var(--down-bg),var(--card-3) 55%);border-color:rgba(52,211,153,.26)}
@@ -266,7 +264,7 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .cols-btn{margin-left:auto;font-size:.66rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);
   border-radius:99px;padding:3px 10px;font-family:inherit;white-space:nowrap}
 
-/* ===== 止盈计划（V4.11 视觉升级：与操作面板风格统一） ===== */
+/* ===== 止盈计划（V4.12 视觉升级：与操作面板风格统一） ===== */
 .tp-body{padding:0 18px 16px}
 .tp-profitbar{display:flex;gap:10px;margin:12px 18px 0;padding:0}
 .tpb-item{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;
@@ -534,10 +532,11 @@ html[data-theme="light"] .sb-avatar{color:#fff}
   .card,.top{border-radius:18px}
   .card h2,.top h2{padding:12px 14px 0}
   .op-grid{grid-template-columns:repeat(2,1fr);margin:11px 14px 0}
-  .op-item{padding:10px 12px}
+  .op-item{padding:10px 12px;min-height:92px}
   .op-item b{font-size:1.18rem}
-  .op-ring{width:76px;height:76px}
-  .op-ring b{font-size:1rem}
+  .op-advice{margin:11px 0 0;padding:13px 14px}
+  .op-advice b{font-size:1.05rem}
+  .op-advice .extra{font-size:.74rem}
   .tier-body{padding:10px 14px 13px}
   .tier-zone span{font-size:.62rem;padding:3px 9px}
   .tp-profitbar{flex-direction:column;margin:11px 14px 0}
@@ -710,7 +709,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.11</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.12</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -770,17 +769,9 @@ html[data-theme="light"] .sb-avatar{color:#fff}
       <div class="op-item"><span class="op-k">保本价</span><b id="opBreak" class="gold">--</b><span class="op-s">均价×1.004</span></div>
       <div class="op-item"><span class="op-k">浮动盈亏</span><b id="opPnL">--</b><span class="op-s" id="opPnLSub">按当前金价估算</span></div>
       <div class="op-item"><span class="op-k">下一档建仓</span><b id="opNext" class="gold">--</b><span class="op-s" id="opNextSub">--</span></div>
-      <div class="op-item op-ring-card"><span class="op-k">持仓占比</span>
-        <div class="op-ring">
-          <svg viewBox="0 0 100 100">
-            <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#F0C96A"/><stop offset="1" stop-color="#C9962E"/>
-            </linearGradient></defs>
-            <circle class="ring-bg" cx="50" cy="50" r="42"/>
-            <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="42"/>
-          </svg>
-          <b id="opPct">--</b>
-        </div>
+      <div class="op-item op-bar-card"><span class="op-k">持仓占比</span>
+        <b id="opPct">--</b>
+        <div class="op-bar"><i id="opBarFg"></i></div>
         <span class="op-s">占持仓上限</span>
       </div>
       <div class="op-item"><span class="op-k">开仓天数</span><b id="opDays" class="gold">--</b><span class="op-s">自首次买入</span></div>
@@ -901,7 +892,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.11 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.12 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -1271,7 +1262,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.11：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.12：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -1358,15 +1349,14 @@ function render(){
   }
   var opGrams=document.getElementById('opGrams');
   if(opGrams) opGrams.textContent = R.totalGrams>0 ? (R.totalGrams+' g') : '0 g';
-  /* 持仓占比圆环 */
-  var opPct=document.getElementById('opPct'), ringFg=document.getElementById('ringFg');
-  if(opPct && ringFg){
+  /* 持仓占比进度条 */
+  var opPct=document.getElementById('opPct'), opBar=document.getElementById('opBarFg');
+  if(opPct && opBar){
     var pctV = R.cap>0 ? (R.totalGrams/R.cap*100) : 0;
-    var pctShow = Math.min(pctV,100);
     opPct.textContent = (R.cap>0 && R.totalGrams>0) ? (round2(pctV)+'%') : '--';
-    ringFg.style.strokeDashoffset = 263.9*(1-pctShow/100);
     opPct.classList.toggle('over', pctV>100);
-    if(pctV>100) ringFg.style.stroke='var(--up)'; else ringFg.style.stroke='';
+    opBar.classList.toggle('over', pctV>100);
+    opBar.style.width = Math.min(pctV,100)+'%';
   }
   /* 开仓天数 */
   var opDays=document.getElementById('opDays');
@@ -2100,7 +2090,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.11 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.12 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2587,7 +2577,7 @@ setInterval(function(){
 }, 10000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.11 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.12 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2714,7 +2704,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.11 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.12 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2864,7 +2854,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.11').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.12').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

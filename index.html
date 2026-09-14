@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.6</title>
+<title>黄金建仓助手 V4.7</title>
 <style>
 /* ============================================================
-   V4.6 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.7 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -629,9 +629,12 @@ html[data-theme="light"] .sb-avatar{color:#fff}
             <span class="set-hint">元/克盈利</span>
           </div>
         </div>
-        <div class="set-row">
+        <div class="set-row" style="flex-wrap:wrap;gap:7px">
           <span class="set-label">卡片布局</span>
-          <button class="sb-actbtn" id="btnLayoutReset" type="button" title="恢复默认卡片位置与大小">恢复默认布局</button>
+          <div style="display:flex;gap:7px;flex:1;min-width:0">
+            <button class="sb-actbtn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高" style="flex:1">编辑布局</button>
+            <button class="sb-actbtn" id="btnLayoutReset" type="button" title="恢复默认卡片位置与大小" style="flex:1">恢复默认</button>
+          </div>
         </div>
         <div class="set-row">
           <span class="set-label">一键清仓</span>
@@ -657,7 +660,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.6</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.7</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -834,11 +837,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.6 · 一键备份 / 日夜主题 / 卡片布局</span>
-  <span class="foot-acts">
-    <button class="foot-btn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高">✥ 编辑布局</button>
-    <button class="foot-btn" id="btnResetLayout" type="button" title="恢复默认卡片布局">恢复默认布局</button>
-  </span>
+  <span class="foot-t">黄金建仓助手 V4.7 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -1206,7 +1205,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.6：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.7：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -2010,7 +2009,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.6 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.7 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2019,7 +2018,8 @@ function initLayout(){
     var editing=document.body.classList.toggle('editing');
     btnEdit.classList.toggle('on', editing);
     btnEdit.innerHTML = editing ? '✓ 完成布局' : '✥ 编辑布局';
-    toast(editing ? '进入布局编辑：拖动六点换位，拖边缘改宽高' : '布局已保存');
+    if(editing){ var _sbp=document.getElementById('sidebar'); if(_sbp) _sbp.classList.remove('open'); var _mk=document.getElementById('sbMask'); if(_mk) _mk.classList.remove('show'); }
+    toast(editing ? '进入布局编辑：拖动六点换位，拖边缘改宽高，完成后再次点击此按钮保存' : '布局已保存');
   });
   var btnReset=document.getElementById('btnResetLayout');
   if(btnReset) btnReset.addEventListener('click', function(){
@@ -2496,7 +2496,7 @@ setInterval(function(){
 }, 10000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.6 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.7 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2623,7 +2623,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.6 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.7 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2773,7 +2773,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.6').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.7').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.14</title>
+<title>黄金建仓助手 V3.5.15</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -96,8 +96,8 @@
   button:active{transform:translateY(1px);}
   input{font-family:inherit;}
 
-  /* ===== V3.5.13 悬浮菜单面板（顶栏头像触发） ===== */
-  .sidebar{position:fixed; left:20px; top:88px; z-index:400; width:322px; max-height:calc(100vh - 106px);
+  /* ===== V3.5.15 悬浮菜单面板：加宽铺满可用高度，一屏容下全部分组 ===== */
+  .sidebar{position:fixed; left:16px; top:16px; z-index:400; width:min(480px, 92vw); max-height:calc(100vh - 32px);
     display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:22px;
     box-shadow:var(--shadow-2), var(--glow); overflow:auto; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
     transform:translateX(-130%) scale(.96); opacity:0; pointer-events:none;
@@ -125,12 +125,18 @@
   .sb-panel-head .sb-close{position:static; display:inline-flex;}
   .sb-close{width:30px; height:30px; border-radius:9px; border:none; background:var(--gold-bg); color:var(--gold-deep);
     font-size:1.15rem; line-height:1; cursor:pointer; display:none; align-items:center; justify-content:center; font-family:inherit;}
-  .sb-scroll{flex:1; overflow-y:auto; padding:14px;}
-  .sb-sec{border:1px solid var(--line); border-radius:14px; background:var(--card-2); padding:12px; margin-bottom:14px;
+  .sb-scroll{flex:1; overflow-y:auto; padding:12px;}
+  .sb-scroll::-webkit-scrollbar{width:8px;}
+  .sb-scroll::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--gold) 55%, transparent); border-radius:99px;}
+  .sb-scroll::-webkit-scrollbar-track{background:transparent;}
+  .sb-body .field{margin-bottom:8px;}
+  .sb-body .field:last-child{margin-bottom:0;}
+  .sb-body .set-row:last-child{margin-bottom:0;}
+  .sb-sec{border:1px solid var(--line); border-radius:12px; background:var(--card-2); padding:10px; margin-bottom:10px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
   .sb-sec.collapsed .sb-body{display:none;}
   .sb-sec.collapsed .fold-btn .ar{transform:rotate(-90deg);}
-  .sb-title{font-size:.88rem; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:7px; margin-bottom:10px;}
+  .sb-title{font-size:.88rem; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:7px; margin-bottom:8px;}
   .sb-tic{display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px;
     background:var(--gold-bg); color:var(--gold-deep); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); flex:none;}
   .sb-title::before{content:''; width:4px; height:14px; border-radius:3px; background:var(--gold-grad); box-shadow:0 0 8px rgba(226,184,79,.5); flex:none;}
@@ -138,19 +144,19 @@
   .sb-title .fold-btn{margin-left:auto; display:inline-flex; align-items:center; gap:4px;
     border:1px solid var(--line); background:var(--card); border-radius:9px; font-size:.68rem; color:var(--ink-2); cursor:pointer; padding:3px 8px; font-family:inherit;}
   .sb-title .fold-btn .ar{display:inline-block; transition:transform .2s; color:var(--gold);}
-  .sb-user{font-size:.88rem; color:var(--ink); margin-bottom:8px;}
+  .sb-user{font-size:.85rem; color:var(--ink); margin-bottom:6px;}
   .sb-user b{color:var(--gold-deep);}
-  .sb-syncrow{margin-bottom:8px;}
+  .sb-syncrow{margin-bottom:6px;}
   .sync-dot.sb{display:inline-block; max-width:100%; overflow:hidden; text-overflow:ellipsis;}
   .btn-logout.sb{width:100%; display:flex; align-items:center; justify-content:center; gap:5px;
     background:transparent; color:var(--ink-2); border:1px solid var(--line); border-radius:10px;
     padding:8px 12px; font-size:.82rem; cursor:pointer; font-family:inherit;}
   .btn-logout.sb:hover{color:var(--danger); border-color:var(--danger);}
-  .sb-planbtn{width:100%; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px;
+  .sb-planbtn{width:100%; margin-top:7px; display:flex; align-items:center; justify-content:center; gap:6px;
     border:1.5px dashed var(--gold); color:var(--gold-deep); background:var(--gold-bg); border-radius:11px;
     padding:9px 12px; font-size:.82rem; font-weight:600; cursor:pointer; font-family:inherit;}
   .sb-planbtn:hover{box-shadow:var(--glow);}
-  .set-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:11px;}
+  .set-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
   .set-row:last-child{margin-bottom:0;}
   .set-label{font-size:.8rem; color:var(--ink-2); font-weight:600;}
   .set-alert{display:flex; align-items:center; gap:8px;}
@@ -318,14 +324,14 @@
   .sel{border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:.92rem; color:var(--ink); background:var(--sel-bg); font-family:inherit; max-width:190px;}
   .plan-btns{display:flex; gap:8px;}
   .btn-del{color:var(--danger);}
-  .logic-row{margin-top:12px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;}
+  .logic-row{margin-top:8px; display:flex; flex-wrap:wrap; align-items:center; gap:8px;}
   .logic-label{font-size:.8rem; color:var(--ink-2); font-weight:600;}
   .seg{display:flex; gap:8px; flex-wrap:wrap;}
   .seg button{border:1px solid var(--line); background:var(--card-2); color:var(--ink); border-radius:12px; padding:9px 15px; font-size:.82rem; line-height:1.35; cursor:pointer; font-family:inherit; transition:all .18s; text-align:left;}
   .seg button small{display:block; color:var(--ink-2); font-size:.7rem; margin-top:2px;}
   .seg button.on{background:var(--gold-bg); border-color:var(--gold); color:var(--gold-deep); box-shadow:0 0 0 1.5px var(--gold) inset, var(--glow);}
   .seg button.on small{color:var(--gold-deep);}
-  .plan-note{margin-top:12px; font-size:.8rem; color:var(--ink-2); line-height:1.6;}
+  .plan-note{margin-top:8px; font-size:.78rem; color:var(--ink-2); line-height:1.55;}
 
   /* ===== 参数区 ===== */
   .params{display:grid; grid-template-columns:1fr; gap:12px;}
@@ -474,10 +480,10 @@
 
   /* ===== 方案管理二级菜单（并入主侧边栏） ===== */
   .plan-sub{margin-top:10px; padding:10px; border:1px dashed rgba(226,184,79,.5); background:var(--card-2); border-radius:12px; box-shadow:var(--glow);}
-  .plan-sub-note{margin-bottom:9px; font-size:.72rem; color:var(--ink-2); line-height:1.55;}
+  .plan-sub-note{margin-bottom:6px; font-size:.72rem; color:var(--ink-2); line-height:1.5;}
   .plan-sub .plan-list{max-height:210px; overflow-y:auto;}
   .plan-list{list-style:none; margin:0; padding:0;}
-  .plan-list li{display:flex; align-items:center; gap:8px; padding:11px 10px; border:1px solid var(--line); border-radius:12px; margin-bottom:9px; cursor:pointer; background:var(--card-2); transition:border-color .15s, background .15s;}
+  .plan-list li{display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; margin-bottom:6px; cursor:pointer; background:var(--card-2); transition:border-color .15s, background .15s;}
   .plan-list li.on{border-color:var(--gold); background:var(--gold-bg); box-shadow:0 0 0 1px var(--gold) inset, var(--glow);}
   .plan-list .pname{flex:1; min-width:0; font-size:.9rem; color:var(--ink); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .plan-list .ptag{font-size:.62rem; color:var(--ink-2); border:1px solid var(--line); border-radius:20px; padding:1px 7px; white-space:nowrap;}
@@ -747,7 +753,7 @@
       <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="#171208"/></svg>
     </button>
     <div class="topbar-t">黄金建仓助手</div>
-    <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V3.5.14</span></div>
+    <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V3.5.15</span></div>
   </header>
 
   <!-- ===== 主区：首页 ===== -->
@@ -910,7 +916,7 @@
     </section>
 
     <footer class="foot">
-      <span class="foot-t">黄金建仓助手 V3.5.14 —— 一键备份/恢复 · 日夜主题</span>
+      <span class="foot-t">黄金建仓助手 V3.5.15 —— 一键备份/恢复 · 日夜主题</span>
       <span class="foot-acts">
         <button class="foot-btn" id="btnEditLayout" type="button" title="进入布局编辑：拖动手柄换位，拖边缘改宽高">✥ 编辑布局</button>
         <button class="foot-btn" id="btnResetLayout" type="button" title="恢复默认卡片布局">恢复默认布局</button>
@@ -1262,6 +1268,13 @@ function setFold(k, collapsed){
   var f = getFolds(); f[k] = !!collapsed;
   try{ localStorage.setItem(FOLD_KEY, JSON.stringify(f)); }catch(e){}
 }
+function syncFoldTxt(){
+  var list=document.querySelectorAll('#sbPanel .sb-sec');
+  for(var i=0;i<list.length;i++){
+    var f=list[i].querySelector('.fold-btn .ftxt');
+    if(f) f.textContent = list[i].classList.contains('collapsed') ? '展开' : '收起';
+  }
+}
 function applyFolds(){
   var f = getFolds();
   for(var k in FOLD_MAP){
@@ -1269,6 +1282,10 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
+  /* V3.5.15：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
+  if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
+  syncFoldTxt();
 }
 function fmt(n, d){ return (n==null||isNaN(n)) ? '--' : (d? n.toFixed(d) : String(n)); }
 function money(n){ return fmt(n,2); }
@@ -1541,12 +1558,14 @@ function bind(){
     var c = document.getElementById('sbParams');
     c.classList.toggle('collapsed');
     setFold('params', c.classList.contains('collapsed'));
+    syncFoldTxt();
   });
   var fl = document.getElementById('foldLogic');
   if(fl) fl.addEventListener('click', function(){
     var c = document.getElementById('sbLogic');
     c.classList.toggle('collapsed');
     setFold('logic', c.classList.contains('collapsed'));
+    syncFoldTxt();
   });
   var ft = document.getElementById('foldTier');
   if(ft) ft.addEventListener('click', function(){
@@ -1565,12 +1584,14 @@ function bind(){
     var c = document.getElementById('sbAccount');
     c.classList.toggle('collapsed');
     setFold('account', c.classList.contains('collapsed'));
+    syncFoldTxt();
   });
   var fset = document.getElementById('foldSettings');
   if(fset) fset.addEventListener('click', function(){
     var c = document.getElementById('sbSettings');
     c.classList.toggle('collapsed');
     setFold('settings', c.classList.contains('collapsed'));
+    syncFoldTxt();
   });
   /* 价格提醒：开关 + 盈利步长 */
   var at = document.getElementById('btnAlertToggle');
@@ -2611,7 +2632,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.14 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.15 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

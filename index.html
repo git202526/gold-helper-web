@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0d12">
 <link rel="manifest" href="manifest.json">
-<title>黄金建仓助手 V3.5.9</title>
+<title>黄金建仓助手 V3.5.10</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='8' width='18' height='11' rx='2' fill='%23b8860b'/%3E%3Crect x='5' y='10.5' width='14' height='6' rx='1' fill='%23f5d77e'/%3E%3Cpath d='M8 6h8l-1-3H9z' fill='%23b8860b'/%3E%3C/svg%3E">
 <style>
   /* ================= V3.1 黑金科技主题（亮/暗） ================= */
@@ -96,24 +96,21 @@
   button:active{transform:translateY(1px);}
   input{font-family:inherit;}
 
-  /* ===== V3.1 图标侧边栏（默认收起为图标条，点击图标展开对应分组） ===== */
-  .sidebar{width:64px; flex:none; position:sticky; top:18px; max-height:calc(100vh - 36px);
-    display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:24px;
-    box-shadow:var(--shadow-2), var(--glow); overflow:hidden; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
-    transition:width .28s cubic-bezier(.4,0,.2,1);}
-  .sidebar.open{width:300px;}
-  .sb-brand{display:flex; flex-direction:column; align-items:center; gap:7px; padding:16px 6px 13px; flex:none;
-    background:var(--head-bg); border-bottom:1px solid var(--line-2); color:var(--gold); position:relative; overflow:hidden;}
-  .sb-brand::after{content:''; position:absolute; top:-40%; right:-30%; width:120px; height:120px; border-radius:50%;
-    background:radial-gradient(circle,rgba(226,184,79,.2) 0%,transparent 65%); pointer-events:none;}
-  .sb-logo{width:38px; height:38px; border-radius:12px; background:var(--gold-grad); color:#171208; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 4px 16px -4px rgba(226,184,79,.65); flex:none;}
-  .sb-brand-t{font-size:.6rem; font-weight:700; color:#d8cbaa; letter-spacing:.5px; white-space:nowrap;}
-  .sb-icons{display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 0; flex:none;}
-  .sb-icon{width:44px; height:44px; border-radius:13px; border:1px solid transparent; background:transparent; color:var(--ink-2);
-    display:flex; align-items:center; justify-content:center; cursor:pointer; font-family:inherit; transition:all .18s;}
-  .sb-icon:hover{color:var(--gold); border-color:var(--line); background:var(--gold-bg); box-shadow:var(--glow);}
-  .sb-icon.on{color:var(--gold-deep); border-color:var(--gold); background:var(--gold-bg); box-shadow:0 0 0 1px var(--gold) inset, var(--glow);}
+  /* ===== V3.5.10 头像框侧边栏：折叠为左上角圆形头像，点击悬浮展开 ===== */
+  .sidebar{position:fixed; left:14px; top:14px; z-index:400; width:58px; height:58px; border-radius:50%;
+    display:flex; flex-direction:column; background:transparent; border:none; box-shadow:none; overflow:hidden;
+    transition:width .3s cubic-bezier(.4,0,.2,1), height .3s cubic-bezier(.4,0,.2,1), border-radius .3s;}
+  .sidebar.open{width:322px; height:auto; max-height:calc(100vh - 28px); border-radius:22px;
+    background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow-2), var(--glow);
+    overflow:auto; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);}
+  .sb-avatar{width:58px; height:58px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    background:var(--gold-grad); color:#171208; border:2px solid rgba(255,255,255,.28); cursor:pointer; font-family:inherit;
+    box-shadow:0 8px 26px -8px rgba(226,184,79,.8); transition:transform .18s; position:relative; overflow:hidden;}
+  .sb-avatar::after{content:''; position:absolute; top:-30%; right:-25%; width:70%; height:70%; border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.45) 0%,transparent 65%); pointer-events:none;}
+  .sb-avatar:hover{transform:scale(1.08);}
+  .sb-avatar:active{transform:scale(.96);}
+  .sidebar.open .sb-avatar{display:none;}
   .sb-panel{display:none; flex:1; min-height:0; flex-direction:column;}
   .sidebar.open .sb-panel{display:flex;}
   .sb-panel-head{display:flex; align-items:center; justify-content:space-between; padding:13px 16px 9px; border-bottom:1px solid var(--line-2); flex:none;}
@@ -127,6 +124,8 @@
   .sb-sec.collapsed .sb-body{display:none;}
   .sb-sec.collapsed .fold-btn .ar{transform:rotate(-90deg);}
   .sb-title{font-size:.88rem; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:7px; margin-bottom:10px;}
+  .sb-tic{display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px;
+    background:var(--gold-bg); color:var(--gold-deep); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); flex:none;}
   .sb-title::before{content:''; width:4px; height:14px; border-radius:3px; background:var(--gold-grad); box-shadow:0 0 8px rgba(226,184,79,.5); flex:none;}
   .sb-title .tag{font-size:.68rem; font-weight:400; color:var(--ink-2); background:var(--card); border:1px solid var(--line); padding:1px 8px; border-radius:99px;}
   .sb-title .fold-btn{margin-left:auto; display:inline-flex; align-items:center; gap:4px;
@@ -177,7 +176,7 @@
   .sb-actbtn:active{transform:scale(.97);}
   .sb-mask{display:none;}
   .main{flex:1; min-width:0; display:grid; grid-template-columns:repeat(12,1fr); grid-auto-rows:minmax(80px,auto);
-    grid-auto-flow:row; gap:18px; align-items:start; align-content:start;}
+    grid-auto-flow:row; gap:18px; align-items:start; align-content:start; padding-left:86px;}
   /* ===== V3.2 卡片自由布局：默认磁贴位置（可被自定义布局覆盖） ===== */
   #goldCard{grid-column:1 / 4; grid-row:1 / 2;}
   #stCard{grid-column:1 / 4; grid-row:2 / 3;}
@@ -198,9 +197,19 @@
   .cd-handle:active{cursor:grabbing;}
   .cd-resize{position:absolute; right:-5px; bottom:-5px; width:18px; height:18px; border-radius:6px;
     background:var(--card-2); border:1px solid var(--line); color:var(--ink-2); cursor:nwse-resize;
-    display:none; align-items:center; justify-content:center; font-size:.75rem; z-index:6;}
-  .card:hover .cd-resize, #goldCard:hover .cd-resize{display:flex;}
-  .cd-resize:hover{color:var(--gold-deep); border-color:var(--gold);}
+    display:flex; align-items:center; justify-content:center; font-size:.75rem; z-index:6; opacity:.28;}
+  .card:hover .cd-resize, #goldCard:hover .cd-resize{opacity:1;}
+  .cd-resize:hover{opacity:1; color:var(--gold-deep); border-color:var(--gold);}
+  .cd-resize-e{position:absolute; right:-4px; top:10px; bottom:10px; width:9px; border-radius:5px;
+    background:var(--gold-bg); cursor:ew-resize; z-index:6; display:block; opacity:.28;
+    border:1px solid color-mix(in srgb, var(--gold) 45%, transparent);}
+  .card:hover .cd-resize-e, #goldCard:hover .cd-resize-e{opacity:1;}
+  .cd-resize-e:hover{background:var(--gold-bg); border-color:var(--gold); box-shadow:var(--glow); opacity:1;}
+  .cd-resize-s{position:absolute; bottom:-4px; left:10px; right:10px; height:9px; border-radius:5px;
+    background:var(--gold-bg); cursor:ns-resize; z-index:6; display:block; opacity:.28;
+    border:1px solid color-mix(in srgb, var(--gold) 45%, transparent);}
+  .card:hover .cd-resize-s, #goldCard:hover .cd-resize-s{opacity:1;}
+  .cd-resize-s:hover{background:var(--gold-bg); border-color:var(--gold); box-shadow:var(--glow); opacity:1;}
   .cd-dragging{opacity:.55; z-index:50; box-shadow:0 24px 60px -18px rgba(0,0,0,.75), var(--glow);}
   .cd-src{outline:2px dashed color-mix(in srgb, var(--gold) 60%, transparent); outline-offset:2px;}
   .cd-target{outline:2px solid var(--gold); outline-offset:2px;}
@@ -502,14 +511,12 @@
     .op-btn{padding:7px 6px; font-size:.78rem;}
     .op-risk{font-size:.62rem; margin-top:5px; padding-top:4px;}
     .wrap{display:block; padding:8px 10px 50px;}
-    .main{display:block;}
-    .cd-bar,.cd-resize{display:none !important;}
+    .main{display:block; padding-left:0;}
+    .cd-bar,.cd-resize,.cd-resize-e,.cd-resize-s{display:none !important;}
     .sidebar{position:fixed; top:0; left:0; bottom:0; width:min(86vw,340px); max-height:none; border-radius:0;
       border-right:1px solid var(--line); z-index:400; transform:translateX(-102%); transition:transform .26s ease;}
     .sidebar.open{transform:translateX(0); box-shadow:var(--shadow-2); width:min(86vw,340px);}
-    .sb-brand{flex-direction:row; align-items:center; gap:11px; padding:13px 16px;}
-    .sb-logo{width:32px; height:32px; border-radius:10px;}
-    .sb-icons{display:none;}
+    .sb-avatar{display:none;}
     .sb-panel{display:flex;}
     .sb-panel-head{justify-content:flex-end; padding:10px 12px 6px;}
     .sb-panel-head b{display:none;}
@@ -576,25 +583,18 @@
 <body>
 <div class="wrap">
 
-  <!-- ===== 左侧边栏：账号同步 / 建仓逻辑 / 行情参数 ===== -->
+  <!-- ===== 侧边栏：折叠为头像框，点击悬浮展开（账号同步 / 建仓逻辑 / 行情参数 / 设置） ===== -->
   <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-      <div class="sb-logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5L8 13.8 2 9.2h7.6z"/></svg></div>
-      <span class="sb-brand-t">黄金助手</span>
-    </div>
-    <div class="sb-icons" id="sbIcons">
-      <button class="sb-icon" data-sb="account" type="button" title="账号与同步"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
-      <button class="sb-icon" data-sb="logic" type="button" title="建仓逻辑与方案"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
-      <button class="sb-icon" data-sb="params" type="button" title="行情参数"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></button>
-      <button class="sb-icon" data-sb="settings" type="button" title="设置"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-    </div>
+    <button class="sb-avatar" id="sbAvatar" type="button" title="黄金建仓助手菜单">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="#171208"/></svg>
+    </button>
     <div class="sb-panel" id="sbPanel">
-      <div class="sb-panel-head"><b id="sbPanelTitle">账号与同步</b><button class="sb-close" id="btnSbClose" type="button" title="收起菜单">×</button></div>
+      <div class="sb-panel-head"><b id="sbPanelTitle">菜单</b><button class="sb-close" id="btnSbClose" type="button" title="收起菜单">×</button></div>
       <div class="sb-scroll">
 
       <!-- 账号与同步 -->
       <div class="sb-sec" id="sbAccount">
-        <div class="sb-title">账号与同步
+        <div class="sb-title"><span class="sb-tic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>账号与同步
           <button class="fold-btn" id="foldAccount" type="button" title="收起/展开账号"><span class="ar">▾</span><span class="ftxt">收起</span></button>
         </div>
         <div class="sb-body">
@@ -622,7 +622,7 @@
 
       <!-- 建仓逻辑 -->
       <div class="sb-sec" id="sbLogic">
-        <div class="sb-title">建仓逻辑 <span class="tag" id="planLogicTxt">逻辑1 · 原版</span>
+        <div class="sb-title"><span class="sb-tic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>建仓逻辑 <span class="tag" id="planLogicTxt">逻辑1 · 原版</span>
           <button class="fold-btn" id="foldLogic" type="button" title="收起/展开建仓逻辑"><span class="ar">▾</span><span class="ftxt">收起</span></button>
         </div>
         <div class="sb-body" id="logicBox">
@@ -647,7 +647,7 @@
 
       <!-- 行情参数 -->
       <div class="sb-sec" id="sbParams">
-        <div class="sb-title">行情参数 <span class="tag">输入后全表联动</span>
+        <div class="sb-title"><span class="sb-tic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>行情参数 <span class="tag">输入后全表联动</span>
           <button class="fold-btn" id="foldParams" type="button" title="收起/展开参数"><span class="ar">▾</span><span class="ftxt">收起</span></button>
         </div>
         <div class="sb-body" id="paramsBox">
@@ -670,7 +670,7 @@
 
       <!-- 设置 -->
       <div class="sb-sec" id="sbSettings">
-        <div class="sb-title">设置
+        <div class="sb-title"><span class="sb-tic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>设置
           <button class="fold-btn" id="foldSettings" type="button" title="收起/展开设置"><span class="ar">▾</span><span class="ftxt">收起</span></button>
         </div>
         <div class="sb-body">
@@ -876,7 +876,7 @@
       </div>
     </section>
 
-    <footer class="foot">黄金建仓助手 V3.5.9 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
+    <footer class="foot">黄金建仓助手 V3.5.10 —— 一键备份/恢复 · 6列铺满 · 日夜主题</footer>
   </div>
 
 
@@ -1976,6 +1976,11 @@ function layoutApply(l){
   LAYOUT_IDS.forEach(function(id){
     var el=document.getElementById(id), p=(l||{})[id]||DEF_LAYOUT[id];
     if(!el||!p) return;
+    /* 越界保护：列/宽/行收敛到合法范围，防止卡片重叠或间距异常 */
+    p.c=Math.max(1, Math.min(12, Math.round(p.c||1)));
+    p.s=Math.max(1, Math.min(13-p.c, Math.round(p.s||1)));
+    p.r=Math.max(1, Math.round(p.r||1));
+    p.rs=Math.max(1, Math.round(p.rs||1));
     el.style.gridColumn = p.c+' / '+(p.c+p.s);
     el.style.gridRow = p.r+' / '+(p.r+p.rs);
     el.style.minHeight = (p.h>0) ? (p.h+'px') : '';
@@ -1995,7 +2000,9 @@ function initLayout(){
     bar.appendChild(hd);
     var rz=document.createElement('span'); rz.className='cd-resize'; rz.title='拖动调整大小';
     rz.innerHTML='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v6h-6M21 3l-9 9M15 21l6-6M3 9l9-9"/></svg>';
-    el.appendChild(bar); el.appendChild(rz);
+    var rze=document.createElement('span'); rze.className='cd-resize-e'; rze.title='拖动右边缘改列宽';
+    var rzs=document.createElement('span'); rzs.className='cd-resize-s'; rzs.title='拖动下边缘改行高';
+    el.appendChild(bar); el.appendChild(rze); el.appendChild(rzs); el.appendChild(rz);
   });
   var drag=null;
   function onDown(e){
@@ -2051,9 +2058,10 @@ function initLayout(){
   }
   function onRzDown(e){
     if(window.innerWidth<=760) return;
-    var rz=e.target.closest('.cd-resize'); if(!rz) return;
+    var rz=e.target.closest('.cd-resize, .cd-resize-e, .cd-resize-s'); if(!rz) return;
     var card=rz.closest('.card, #goldCard'); if(!card) return;
     e.preventDefault(); e.stopPropagation();
+    var isE=rz.classList.contains('cd-resize-e'), isS=rz.classList.contains('cd-resize-s');
     var mr=g.getBoundingClientRect();
     var cw=(mr.width-11*18)/12;
     var l=layoutLoad()||layoutClone(DEF_LAYOUT);
@@ -2062,10 +2070,14 @@ function initLayout(){
     function mv(ev){
       var dx=ev.clientX-sx, dy=ev.clientY-sy;
       var zoomV = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
-      p.s=Math.max(1, Math.min(13-p.c, Math.round((ss*cw+dx)/(cw+18))));
-      p.h=Math.max(90, Math.round((sm>0?sm:sh)+dy/zoomV));
-      card.style.gridColumn = p.c+' / '+(p.c+p.s);
-      card.style.minHeight = p.h+'px';
+      if(!isS){  /* 角手柄或右边缘：改列宽 */
+        p.s=Math.max(1, Math.min(13-p.c, Math.round((ss*cw+dx)/(cw+18))));
+        card.style.gridColumn = p.c+' / '+(p.c+p.s);
+      }
+      if(!isE){  /* 角手柄或下边缘：改行高 */
+        p.h=Math.max(90, Math.round((sm>0?sm:sh)+dy/zoomV));
+        card.style.minHeight = p.h+'px';
+      }
       layoutSave(l);
     }
     function up(){ document.removeEventListener('pointermove',mv); document.removeEventListener('pointerup',up); }
@@ -2107,15 +2119,12 @@ function initSidebar(){
   function showSec(key){
     activeKey=key;
     var title=document.getElementById('sbPanelTitle');
-    var mob=isMobile();
-    if(title) title.textContent = mob ? '' : (SECTIONS[key] || '');
+    if(title) title.textContent='菜单';
+    /* 悬浮面板与移动端抽屉统一展示全部分组，滚动查看 */
     var list=document.querySelectorAll('#sbPanel .sb-sec');
     for(var i=0;i<list.length;i++){
-      list[i].style.display = (mob || list[i].id.toLowerCase()==='sb'+key) ? '' : 'none';
+      list[i].style.display='';
     }
-    document.querySelectorAll('.sb-icon').forEach(function(b){
-      b.classList.toggle('on', b.getAttribute('data-sb')===key);
-    });
   }
   function openSb(){
     if(!sb) return;
@@ -2128,19 +2137,12 @@ function initSidebar(){
     if(mask) mask.classList.remove('show');
   }
   function isMobile(){ return window.innerWidth <= 760; }
-  document.querySelectorAll('.sb-icon').forEach(function(b){
-    b.addEventListener('click', function(){
-      var key=this.getAttribute('data-sb');
-      var sec=document.getElementById('sb'+key.charAt(0).toUpperCase()+key.slice(1));
-      if(sb && sb.classList.contains('open') && sec && sec.style.display!=='none'){
-        closeSb();
-      } else {
-        showSec(key);
-        openSb();
-      }
-    });
+  var avatar=document.getElementById('sbAvatar');
+  if(avatar) avatar.addEventListener('click', function(){
+    if(sb && sb.classList.contains('open')){ closeSb(); }
+    else { showSec(activeKey||'account'); openSb(); }
   });
-  if(open) open.addEventListener('click', openSb);
+  if(open) open.addEventListener('click', function(){ showSec(activeKey||'account'); openSb(); });
   if(close) close.addEventListener('click', closeSb);
   if(mask) mask.addEventListener('click', closeSb);
   /* 侧边栏展开时点击面板外空白不关闭；默认展示账号分组内容 */
@@ -2516,7 +2518,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.9 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V3.5.10 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */

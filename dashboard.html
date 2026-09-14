@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>黄金持仓信息中心</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+:root{
+  --canvas:#0C0905; --card:#16110A; --card2:#1C150B; --card3:#231A0E;
+  --gold:#E9B949; --gold-deep:#C9962E; --gold-soft:#F2D894; --gold-bg:rgba(233,185,73,.09);
+  --up:#F2555A; --down:#34D399; --ink:#F4EBD8; --ink2:#C9BDA3; --ink3:#8A7A55;
+  --line:rgba(233,185,73,.16); --glow:0 0 24px rgba(233,185,73,.14);
+  --r:16px;
+}
+html[data-theme="light"]{
+  --canvas:#F7F3E7; --card:#FDFAF2; --card2:#F6EFDD; --card3:#EFE6CE;
+  --gold:#B07F1F; --gold-deep:#8F6514; --gold-soft:#6E520F; --gold-bg:rgba(176,127,31,.08);
+  --ink:#33291A; --ink2:#6B5D41; --ink3:#8A7A55;
+  --line:rgba(176,127,31,.22); --glow:0 0 20px rgba(176,127,31,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--canvas);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+body{min-height:100vh;padding-bottom:40px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+/* ===== 顶栏 ===== */
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;background:linear-gradient(180deg,var(--card),rgba(22,17,10,.92));backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-badge{width:36px;height:36px;border-radius:11px;background:radial-gradient(circle at 32% 30%,var(--gold-soft),var(--gold) 55%,var(--gold-deep));
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--glow)}
+.logo-badge svg{width:20px;height:20px}
+.logo b{font-size:1.05rem;letter-spacing:1px}
+.logo .ver{font-size:.66rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);
+  border-radius:6px;padding:2px 7px;font-weight:700}
+.top-actions{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--gold-bg);
+  color:var(--gold-soft);border-radius:10px;padding:8px 14px;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--glow)}
+.btn:active{transform:scale(.96)}
+/* ===== 总览 ===== */
+.hero{margin-top:18px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.h-card{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 18px;position:relative;overflow:hidden;transition:.25s}
+.h-card:hover{transform:translateY(-3px);box-shadow:var(--glow)}
+.h-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+.h-card.gold::before{background:var(--gold)}
+.h-card.red::before{background:var(--up)}
+.h-card.green::before{background:var(--down)}
+.h-label{font-size:.72rem;color:var(--ink3);letter-spacing:.8px;display:flex;align-items:center;gap:6px}
+.h-val{font-size:1.55rem;font-weight:900;margin-top:7px;font-variant-numeric:tabular-nums;letter-spacing:.3px}
+.h-val.gold{color:var(--gold-soft);text-shadow:0 0 18px rgba(233,185,73,.25)}
+.h-val.red{color:var(--up);text-shadow:0 0 18px rgba(242,85,90,.3)}
+.h-val.green{color:var(--down);text-shadow:0 0 18px rgba(52,211,153,.3)}
+.h-sub{font-size:.66rem;color:var(--ink3);margin-top:5px}
+/* 金价横条 */
+.price-strip{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;margin-top:12px}
+.p-card{display:flex;flex-direction:column;justify-content:center;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:10px 14px}
+.p-name{font-size:.66rem;color:var(--ink3);letter-spacing:.5px}
+.p-val{font-size:1.25rem;font-weight:900;color:var(--gold-soft);font-variant-numeric:tabular-nums;margin-top:2px}
+.p-unit{font-size:.62rem;color:var(--ink3)}
+.p-time{font-size:.66rem;color:var(--ink3);align-self:center;text-align:right;line-height:1.6}
+/* ===== 区块标题 ===== */
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-h .bar{width:4px;height:18px;border-radius:2px;background:linear-gradient(180deg,var(--gold-soft),var(--gold-deep))}
+.sec-h h2{font-size:1.02rem;letter-spacing:1px}
+.sec-h .tip{font-size:.68rem;color:var(--ink3);margin-left:auto}
+/* ===== 方案卡片 ===== */
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.pf-card{background:linear-gradient(165deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);
+  padding:16px;position:relative;overflow:hidden;transition:.25s}
+.pf-card:hover{transform:translateY(-3px);box-shadow:var(--glow);border-color:var(--gold)}
+.pf-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pf-name{font-size:.95rem;font-weight:800;letter-spacing:.5px}
+.pf-tag{font-size:.62rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);
+  border-radius:6px;padding:2px 8px;font-weight:700}
+.pf-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;margin-bottom:12px}
+.pf-m .m1{font-size:.62rem;color:var(--ink3)}
+.pf-m .m2{font-size:1.12rem;font-weight:900;margin-top:1px;font-variant-numeric:tabular-nums}
+.pf-m .m2.gold{color:var(--gold-soft)}
+.pf-m .m2.red{color:var(--up)}
+.pf-m .m2.green{color:var(--down)}
+.pf-chart{height:150px;margin-bottom:8px}
+.pf-detail{width:100%;border-collapse:collapse;font-size:.68rem}
+.pf-detail th{color:var(--ink3);font-weight:700;text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.pf-detail td{padding:5px 6px;border-bottom:1px solid rgba(233,185,73,.07);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pf-detail tr:last-child td{border-bottom:none}
+.pf-detail .up{color:var(--up)}
+.pf-detail .down{color:var(--down)}
+.pf-empty{color:var(--ink3);font-size:.8rem;text-align:center;padding:26px 0;line-height:1.8}
+.pf-empty b{color:var(--gold-soft)}
+/* ===== 汇总分析 ===== */
+.ana-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ana-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.ana-title{font-size:.82rem;font-weight:800;color:var(--gold-soft);letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ana-title svg{width:15px;height:15px}
+.chart-box{height:250px}
+/* ===== 明细表 ===== */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow-x:auto}
+table.data{width:100%;border-collapse:collapse;font-size:.74rem;min-width:640px}
+table.data th{background:var(--card2);color:var(--gold-soft);font-weight:700;text-align:left;padding:10px 12px;
+  border-bottom:1px solid var(--line);white-space:nowrap;letter-spacing:.5px}
+table.data td{padding:9px 12px;border-bottom:1px solid rgba(233,185,73,.07);font-variant-numeric:tabular-nums;white-space:nowrap}
+table.data tr:hover td{background:var(--gold-bg)}
+table.data .up{color:var(--up);font-weight:800}
+table.data .down{color:var(--down);font-weight:800}
+table.data .gold{color:var(--gold-soft);font-weight:800}
+/* ===== 空态 ===== */
+.empty-state{background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:60px 20px;text-align:center}
+.empty-state .ico{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;background:var(--gold-bg);
+  display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
+.empty-state h3{font-size:1rem;color:var(--gold-soft);margin-bottom:8px}
+.empty-state p{font-size:.8rem;color:var(--ink3);line-height:1.9}
+.empty-state .goto{margin-top:16px}
+/* toast */
+#toast{position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(20px);background:var(--card3);
+  border:1px solid var(--gold);color:var(--gold-soft);padding:10px 20px;border-radius:12px;font-size:.8rem;
+  opacity:0;transition:.3s;z-index:99;box-shadow:var(--glow);pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.fade-in{animation:fadeIn .5s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* ===== 响应式 ===== */
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:repeat(2,1fr)}
+  .ana-grid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .wrap{padding:0 10px}
+  .topbar{padding:12px 14px}
+  .logo b{font-size:.92rem}
+  .logo-badge{width:32px;height:32px}
+  .btn{padding:7px 11px;font-size:.74rem}
+  .price-strip{grid-template-columns:1fr 1fr}
+  .p-time{grid-column:1/-1;text-align:left}
+  .h-val{font-size:1.3rem}
+  .profile-grid{grid-template-columns:1fr}
+  .pf-card{padding:13px}
+  .chart-box{height:210px}
+  .pf-chart{height:130px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-badge">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <b>黄金持仓信息中心</b>
+    <span class="ver" id="appVer">V1.0</span>
+  </div>
+  <div class="top-actions">
+    <button class="btn" id="btnTheme" title="日夜切换">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span id="themeTxt">夜间</span>
+    </button>
+    <button class="btn" id="btnRefresh">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      刷新
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- 总览 -->
+  <section class="hero fade-in" id="heroSec">
+    <div class="hero-grid">
+      <div class="h-card gold">
+        <div class="h-label">总资金投入</div>
+        <div class="h-val gold" id="ovTotal">--</div>
+        <div class="h-sub">全部方案累计买入金额</div>
+      </div>
+      <div class="h-card gold">
+        <div class="h-label">总持仓重量</div>
+        <div class="h-val gold" id="ovGrams">--</div>
+        <div class="h-sub">全部方案合计克重</div>
+      </div>
+      <div class="h-card red" id="ovPnlCard">
+        <div class="h-label">总浮动盈亏</div>
+        <div class="h-val red" id="ovPnl">--</div>
+        <div class="h-sub" id="ovPnlSub">--</div>
+      </div>
+      <div class="h-card">
+        <div class="h-label">持仓方案</div>
+        <div class="h-val gold" id="ovCount">--</div>
+        <div class="h-sub">个方案 · 含建仓逻辑</div>
+      </div>
+    </div>
+    <div class="price-strip">
+      <div class="p-card"><div class="p-name">人民币金价</div><div class="p-val" id="pxCny">--</div><div class="p-unit">元/克</div></div>
+      <div class="p-card"><div class="p-name">伦敦金现货</div><div class="p-val" id="pxUsd">--</div><div class="p-unit">美元/盎司</div></div>
+      <div class="p-card"><div class="p-name">汇率参考</div><div class="p-val" id="pxRate">--</div><div class="p-unit">USD→CNY</div></div>
+      <div class="p-time" id="pxTime">更新时间 --</div>
+    </div>
+  </section>
+
+  <!-- 方案卡片 -->
+  <section class="sec fade-in" id="profilesSec">
+    <div class="sec-h"><span class="bar"></span><h2>持仓方案分析</h2><span class="tip" id="pfTip">--</span></div>
+    <div class="profile-grid" id="profileGrid"></div>
+  </section>
+
+  <!-- 汇总分析 -->
+  <section class="sec fade-in" id="anaSec">
+    <div class="sec-h"><span class="bar"></span><h2>汇总可视化分析</h2><span class="tip">浮盈红 · 浮亏绿 · 实时金价估算</span></div>
+    <div class="ana-grid">
+      <div class="ana-card">
+        <div class="ana-title">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16M6 20V10M12 20V4M18 20v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          各方案浮动盈亏对比
+        </div>
+        <div class="chart-box" id="chartPnl"></div>
+      </div>
+      <div class="ana-card">
+        <div class="ana-title">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18V3z" fill="currentColor"/></svg>
+          各方案资金投入占比
+        </div>
+        <div class="chart-box" id="chartShare"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 明细 -->
+  <section class="sec fade-in" id="detailSec">
+    <div class="sec-h"><span class="bar"></span><h2>全部持仓明细</h2><span class="tip">按方案 · 逻辑 · 档位</span></div>
+    <div class="tbl-wrap">
+      <table class="data">
+        <thead><tr>
+          <th>方案</th><th>逻辑</th><th>档位</th><th>参考价</th><th>成交价</th>
+          <th>重量(g)</th><th>投入(元)</th><th>当前价</th><th>浮盈(元)</th>
+        </tr></thead>
+        <tbody id="detailBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 空态（数据为空时显示） -->
+  <section class="sec" id="emptySec" style="display:none">
+    <div class="empty-state">
+      <div class="ico">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M3 17l5-6 4 4 4-5 5 6" stroke="#E9B949" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 21h18" stroke="#E9B949" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <h3>暂无持仓数据</h3>
+      <p>信息中心自动读取「黄金建仓助手」保存的持仓方案。<br>请先在黄金建仓助手中填写高点、金价、上限并勾选买入档位，<br>返回本页点击刷新即可同步展示。</p>
+      <button class="btn goto" id="btnGoMain">前往黄金建仓助手</button>
+    </div>
+  </section>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============ 常量与状态 ============ */
+var KEY = 'jcj_helper_local_v2';
+var REF = [1010,1000,990,980,970,960,950,940,930,920,910,900,890]; // 参考价兜底（0-12档）
+var g = { profiles:[], px:{cny:null,usd:null,rate:null}, charts:{}, theme:localStorage.getItem('jcj_info_theme')||'dark' };
+
+/* ============ 工具 ============ */
+function $(id){return document.getElementById(id)}
+function money(v){return (v<0?'-':'')+'¥'+Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function num(v,d){return (v==null||isNaN(v))?'--':Number(v).toFixed(d==null?2:d)}
+function round2(v){return Math.round(v*100)/100}
+function cls(ok){return ok?'up':'down'}
+function pnlCls(v){return v>=0?'up':'down'}
+function fmtTime(t){var d=new Date(t);function p(n){return n<10?'0'+n:n}return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
+function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('show')},2200)}
+
+/* ============ 主题 ============ */
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', g.theme);
+  $('themeTxt').textContent = g.theme==='dark'?'夜间':'日间';
+  Object.keys(g.charts).forEach(function(k){ if(g.charts[k]) g.charts[k].dispose() });
+  g.charts={};
+}
+$('btnTheme').onclick=function(){ g.theme = g.theme==='dark'?'light':'dark'; localStorage.setItem('jcj_info_theme',g.theme); applyTheme(); renderCharts(); };
+
+/* ============ 数据读取 ============ */
+function loadData(){
+  var raw=null;
+  try{ raw = localStorage.getItem(KEY); }catch(e){}
+  if(!raw) return [];
+  var obj=null;
+  try{ obj=JSON.parse(raw); }catch(e){ return []; }
+  if(!obj || !obj.profiles || !obj.profiles.length) return [];
+  return obj.profiles;
+}
+
+/* 方案名（与主应用一致） */
+function profileName(pr,i){
+  if(pr && pr.name) return pr.name;
+  return '方案'+(i+1);
+}
+
+/* 计算一个方案的全部持仓（逻辑1+逻辑2 合并） */
+function calcProfile(pr, px, idx){
+  if(!px || isNaN(px) || px<=0) px = (+pr.price)||0;   /* 实时金价缺失时回退方案保存价格 */
+  var logicData=[];
+  var total=0, grams=0;
+  [1,2].forEach(function(lg){
+    var pos=(pr.pos&&pr.pos[lg])||{checked:[],actPrice:[],actGrams:[]};
+    var rows=[];
+    var lgTotal=0, lgGrams=0;
+    for(var i=0;i<13;i++){
+      var checked=!!(pos.checked&&pos.checked[i]);
+      var actP=pos.actPrice&&pos.actPrice[i];
+      var actG=pos.actGrams&&pos.actGrams[i];
+      var price = (actP!=null&&!isNaN(+actP)&&+actP>0)? +actP : (REF[i]||0);
+      var w = (checked&&actG!=null&&!isNaN(+actG)&&+actG>0)? +actG : 0;
+      if(w>0){
+        var invest=w*price;
+        lgTotal+=invest; lgGrams+=w;
+        rows.push({tier:i, ref:REF[i], price:price, grams:w, invest:invest});
+      }
+    }
+    var lgAvg = lgGrams>0? lgTotal/lgGrams : 0;
+    var lgPnl = lgGrams>0? (px-lgAvg)*lgGrams : 0;
+    logicData.push({logic:lg, rows:rows, total:lgTotal, grams:lgGrams, avg:lgAvg, pnl:lgPnl});
+    total+=lgTotal; grams+=lgGrams;
+  });
+  var avg = grams>0? total/grams : 0;
+  var pnl = grams>0? (px-avg)*grams : 0;
+  return {name:profileName(pr,idx==null?0:idx), high:pr.high, cap:pr.cap, firstBuyTs:pr.firstBuyTs,
+    total:total, grams:grams, avg:avg, pnl:pnl, logic:logicData, has:grams>0};
+}
+
+/* ============ 金价 ============ */
+function fetchJson(url, timeout){
+  var ctrl = (typeof AbortController!=='undefined')? new AbortController() : null;
+  var t = ctrl? setTimeout(function(){ctrl.abort()}, timeout||8000) : null;
+  return fetch(url, ctrl?{signal:ctrl.signal}:undefined)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(j){ if(t) clearTimeout(t); return j; })
+    .catch(function(e){ if(t) clearTimeout(t); throw e; });
+}
+function loadPrice(){
+  var p1 = fetchJson('https://api.gold-api.com/price/XAU/CNY').then(function(j){ return {cny: parseFloat(j.price)/31.1034768}; }).catch(function(){ return {}; });
+  var p2 = fetchJson('https://api.gold-api.com/price/XAU').then(function(j){ return {usd: parseFloat(j.price)}; }).catch(function(){ return {}; });
+  var p3 = fetchJson('https://open.er-api.com/v6/latest/USD').then(function(j){ return {rate: parseFloat(j.rates&&j.rates.CNY)}; }).catch(function(){ return {}; });
+  return Promise.all([p1,p2,p3]).then(function(rs){
+    var out={};
+    rs.forEach(function(r){ Object.keys(r).forEach(function(k){ out[k]=r[k] }); });
+    return out;
+  });
+}
+function renderPrice(){
+  $('pxCny').textContent = g.px.cny? num(g.px.cny,2) : '--';
+  $('pxUsd').textContent = g.px.usd? num(g.px.usd,2) : '--';
+  $('pxRate').textContent = g.px.rate? num(g.px.rate,4) : '--';
+  $('pxTime').textContent = '更新时间 '+fmtTime(Date.now());
+}
+
+/* ============ 主渲染 ============ */
+function render(){
+  g.profiles = loadData();
+  var px = g.px.cny || 0;
+  var cards = g.profiles.map(function(pr,i){ return calcProfile(pr, px, i); });
+  var any = cards.some(function(c){ return c.has; });
+  renderOverview(cards);
+  renderProfiles(cards);
+  if(any){ $('profilesSec').style.display=''; $('anaSec').style.display=''; $('detailSec').style.display=''; $('emptySec').style.display='none'; }
+  else{ $('profilesSec').style.display='none'; $('anaSec').style.display='none'; $('detailSec').style.display='none'; $('emptySec').style.display=''; }
+  renderCharts();
+  renderDetail(cards);
+}
+
+function renderOverview(cards){
+  var tot=0, gr=0, pnl=0, cnt=0;
+  cards.forEach(function(c){ tot+=c.total; gr+=c.grams; pnl+=c.pnl; if(c.has) cnt++; });
+  $('ovTotal').textContent = tot>0? money(tot) : '--';
+  $('ovGrams').textContent = gr>0? round2(gr)+' g' : '--';
+  $('ovPnl').textContent = pnl!==0? (pnl>0?'+':'')+round2(pnl)+' 元' : '--';
+  var card=$('ovPnlCard');
+  if(pnl>0){ card.className='h-card red'; $('ovPnl').className='h-val red'; }
+  else if(pnl<0){ card.className='h-card green'; $('ovPnl').className='h-val green'; }
+  else{ card.className='h-card'; $('ovPnl').className='h-val'; }
+  $('ovPnlSub').textContent = gr>0? ('按当前金价 '+num(px(),0)+' 元/克估算') : '暂无持仓';
+  $('ovCount').textContent = cnt;
+  $('pfTip').textContent = cnt+' 个方案含持仓';
+  function px(){ return g.px.cny||0 }
+}
+
+function renderProfiles(cards){
+  var box=$('profileGrid'); box.innerHTML='';
+  cards.forEach(function(c,idx){
+    var el=document.createElement('div'); el.className='pf-card fade-in';
+    var pnlClsN = c.pnl>0?'red':(c.pnl<0?'green':'');
+    var html = '<div class="pf-head"><span class="pf-name">'+esc(c.name)+'</span><span class="pf-tag">'+(c.has?'持仓中':'空仓')+'</span></div>';
+    html += '<div class="pf-metrics">';
+    html += '<div class="pf-m"><div class="m1">总投入</div><div class="m2 gold">'+(c.total>0?money(c.total):'--')+'</div></div>';
+    html += '<div class="pf-m"><div class="m1">总重量</div><div class="m2 gold">'+(c.grams>0?round2(c.grams)+' g':'--')+'</div></div>';
+    html += '<div class="pf-m"><div class="m1">持仓均价</div><div class="m2">'+(c.avg>0?num(c.avg,2):'--')+'</div></div>';
+    html += '<div class="pf-m"><div class="m1">浮动盈亏</div><div class="m2 '+pnlClsN+'">'+(c.pnl!==0?(c.pnl>0?'+':'')+round2(c.pnl)+' 元':'--')+'</div></div>';
+    html += '</div>';
+    html += '<div class="pf-chart" id="pfChart'+idx+'"></div>';
+    // 明细
+    if(c.has){
+      html += '<table class="pf-detail"><thead><tr><th>逻辑</th><th>档位</th><th>参考价</th><th>成交价</th><th>重量</th><th>投入</th></tr></thead><tbody>';
+      c.logic.forEach(function(lg){
+        if(!lg.rows.length) return;
+        lg.rows.forEach(function(r,ri){
+          html += '<tr><td>逻辑'+lg.logic+'</td><td>'+r.tier+'档</td><td>'+num(r.ref,2)+'</td><td>'+num(r.price,2)+'</td><td>'+round2(r.grams)+'</td><td>'+money(r.invest)+'</td></tr>';
+        });
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<div class="pf-empty">该方案暂无买入记录<br><b>在黄金建仓助手中勾选档位买入</b>后自动同步</div>';
+    }
+    el.innerHTML=html;
+    box.appendChild(el);
+    if(c.has) drawPfChart('pfChart'+idx, c);
+  });
+}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+/* ============ 图表 ============ */
+function hasEcharts(){ return typeof echarts!=='undefined' }
+function baseOpt(){ return {
+  textStyle:{color:'#C9BDA3',fontSize:11},
+  legend:{textStyle:{color:'#C9BDA3',fontSize:11},itemWidth:10,itemHeight:10},
+  tooltip:{backgroundColor:'rgba(28,21,11,.95)',borderColor:'rgba(233,185,73,.4)',textStyle:{color:'#F2D894',fontSize:12},axisPointer:{type:'shadow'}}
+};}
+function drawPfChart(id, c){
+  if(!hasEcharts()) return;
+  var el=document.getElementById(id); if(!el) return;
+  var chart=echarts.init(el);
+  var rows=c.logic.filter(function(l){return l.grams>0});
+  var series=[];
+  if(rows.length){
+    series=[{type:'pie',radius:['58%','78%'],center:['38%','50%'],
+      data:rows.map(function(l){return {name:'逻辑'+l.logic, value:Math.round(l.total*100)/100}}),
+      label:{show:false}, labelLine:{show:false}, itemStyle:{borderColor:'#16110A',borderWidth:2},
+      color:['#E9B949','#C9962E']}];
+  }
+  var opt=baseOpt();
+  opt.series=series;
+  if(rows.length){
+    var lg=rows[0];
+    opt.graphic=[{type:'text',left:'62%',top:'middle',style:{text:round2(lg.total)+' 元',fill:'#F2D894',fontSize:12,fontWeight:800,textAlign:'center'}},
+      {type:'text',left:'62%',top:'62%',style:{text:'逻辑'+lg.logic,fill:'#8A7A55',fontSize:10,textAlign:'center'}}];
+  }
+  chart.setOption(opt);
+  g.charts['pf'+id]=chart;
+}
+
+function renderCharts(){
+  var cards=g.profiles.map(function(pr,i){return calcProfile(pr, g.px.cny||0, i)}).filter(function(c){return c.has});
+  if(!hasEcharts() || !cards.length){ ['chartPnl','chartShare'].forEach(function(id){var el=$(id); if(el) el.innerHTML='<div style="text-align:center;color:#8A7A55;font-size:.8rem;padding-top:90px">暂无数据</div>';}); return; }
+  // 浮盈条形
+  var pnlEl=$('chartPnl'); if(!pnlEl) return;
+  var c1=echarts.init(pnlEl);
+  var names=cards.map(function(c){return c.name});
+  var vals=cards.map(function(c){return Math.round(c.pnl*100)/100});
+  c1.setOption(Object.assign(baseOpt(),{
+    grid:{left:8,right:16,top:20,bottom:8,containLabel:true},
+    xAxis:{type:'value',axisLabel:{color:'#8A7A55'},splitLine:{lineStyle:{color:'rgba(233,185,73,.08)'}}},
+    yAxis:{type:'category',data:names,axisLabel:{color:'#C9BDA3',fontSize:11},axisLine:{lineStyle:{color:'rgba(233,185,73,.2)'}}},
+    series:[{type:'bar',barWidth:16,data:vals.map(function(v){return {value:v,itemStyle:{color:v>=0?'#F2555A':'#34D399',borderRadius:4}}}),
+      label:{show:true,position:'right',color:'#F2D894',fontSize:11,fontWeight:700,
+        formatter:function(p){return (p.value>0?'+':'')+p.value.toFixed(0)} }}]
+  }));
+  g.charts.chartPnl=c1;
+  // 资金占比环形
+  var shareEl=$('chartShare'); if(!shareEl) return;
+  var c2=echarts.init(shareEl);
+  var shares=cards.map(function(c){return {name:c.name, value:Math.round(c.total*100)/100}});
+  c2.setOption(Object.assign(baseOpt(),{
+    series:[{type:'pie',radius:['48%','72%'],center:['50%','50%'],
+      data:shares, label:{color:'#C9BDA3',fontSize:11,formatter:'{b}\n{d}%'}, labelLine:{lineStyle:{color:'rgba(233,185,73,.3)'}},
+      itemStyle:{borderColor:'#16110A',borderWidth:2}}]
+  }));
+  g.charts.chartShare=c2;
+}
+
+/* ============ 明细表 ============ */
+function renderDetail(cards){
+  var body=$('detailBody'); body.innerHTML='';
+  var px=g.px.cny||0;
+  var n=0;
+  cards.forEach(function(c){
+    if(!c.has) return;
+    c.logic.forEach(function(lg){
+      lg.rows.forEach(function(r){
+        var pnl=(px-r.price)*r.grams;
+        var tr=document.createElement('tr');
+        tr.innerHTML='<td class="gold">'+esc(c.name)+'</td><td>逻辑'+lg.logic+'</td><td>'+r.tier+'档</td>'
+          +'<td>'+num(r.ref,2)+'</td><td>'+num(r.price,2)+'</td><td>'+round2(r.grams)+'</td>'
+          +'<td>'+money(r.invest)+'</td><td>'+num(px,2)+'</td>'
+          +'<td class="'+pnlCls(pnl)+'">'+(pnl>0?'+':'')+round2(pnl)+'</td>';
+        body.appendChild(tr); n++;
+      });
+    });
+  });
+  if(!n) body.innerHTML='<tr><td colspan="9" style="text-align:center;color:#8A7A55;padding:24px">暂无持仓明细</td></tr>';
+}
+
+/* ============ 刷新 ============ */
+var loading=false;
+function refresh(){
+  if(loading) return; loading=true;
+  $('btnRefresh').style.opacity=.6;
+  toast('正在刷新数据…');
+  loadPrice().then(function(rs){
+    g.px=rs;
+    renderPrice();
+    render();
+    loading=false;
+    $('btnRefresh').style.opacity=1;
+    toast('刷新完成');
+  }).catch(function(){
+    render();
+    loading=false;
+    $('btnRefresh').style.opacity=1;
+    toast('金价获取失败，已用方案保存价格估算');
+  });
+}
+$('btnRefresh').onclick=refresh;
+$('btnGoMain').onclick=function(){ try{ window.location.href='./'; }catch(e){} };
+
+/* ============ 启动 ============ */
+applyTheme();
+refresh();
+setInterval(function(){ if(!document.hidden) refresh(); }, 120000);
+</script>
+</body>
+</html>

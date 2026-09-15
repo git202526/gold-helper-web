@@ -375,7 +375,7 @@ td,th{font-size:10px;padding:6px 4px}
         <div class="set-row"><b>字体大小</b><span class="r" style="display:flex;align-items:center;gap:6px"><button class="pbtn" id="sFontMinus" style="width:26px;height:26px">A−</button><input id="sFont" type="range" min="80" max="120" step="5" style="width:90px;accent-color:#E8B34B"><button class="pbtn" id="sFontPlus" style="width:26px;height:26px">A+</button></span></div>
         <div class="set-row"><b>价格提醒</b><span class="r" style="font-size:9px;color:var(--ink3)">保本 / 每克盈利</span><span class="sw on" id="sRemind"></span></div>
         <div class="set-row"><b>每克盈利步长</b><input id="sStep" type="number" value="40" min="1" step="1" style="width:64px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:12px;font-weight:700;padding:6px 8px;text-align:center"><span class="r">元/克</span></div>
-        <div class="set-row"><b>版本</b><span class="r">V5.4 · M3 分析增强</span></div>
+        <div class="set-row"><b>版本</b><span class="r">V5.4 · M4 云同步</span></div>
       </div>
     </div>
     <input type="file" id="sRestoreFile" accept=".json" class="hide">
@@ -440,6 +440,7 @@ function posAgg(p){
 function blankState(){ return {plans:{},trades:[],settings:{profitStep:40,remindOn:true,theme:'dark',syncOn:true,gitToken:''}}; }
 function loadState(user){
   var raw=localStorage.getItem('jcj_v54_'+user);
+  firstRun=!raw;
   var st;
   try{ st=raw?JSON.parse(raw):blankState(); }catch(e){ st=blankState(); }
   if(!st.plans){ st.plans={}; }
@@ -460,6 +461,7 @@ function loadState(user){
 }
 function saveState(user,st,noMark){ localStorage.setItem('jcj_v54_'+user,JSON.stringify(st)); if(!noMark){ markSync(); } }
 /* ================= 云同步（GitHub 私有数据仓 · 账号隔离） ================= */
+var firstRun=false;
 var syncDirty=false;
 function markSync(){
   if(!state()||state().settings.syncOn===false) return;
@@ -501,10 +503,11 @@ async function syncNow(manual){
   try{
     var fn='jcj_v54_'+curUser+'.json';
     var r=await apiGithub(fn);
+    var isFirst=firstRun; firstRun=false;
     if(r.status===200){
       var j=await r.json(), remote=b64dec(j.content);
       var rTs=new Date(j.updated_at).getTime(), localTs=st._t||0;
-      if(remote&&rTs>localTs){
+      if(remote&&(rTs>localTs||isFirst)){
         try{
           var rs=JSON.parse(remote);
           rs.settings=rs.settings||{};

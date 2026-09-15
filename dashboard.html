@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>黄金持仓信息中心 V1.11</title>
+<title>黄金持仓信息中心 V1.12</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 :root{
@@ -229,7 +229,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.11</span>
+    <span class="ver" id="appVer">V1.12</span>
   </div>
 </header>
 
@@ -335,7 +335,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <b>持仓信息中心</b>
-      <span class="ver">V1.11</span>
+      <span class="ver">V1.12</span>
     </div>
     <div class="sm-group">
       <div class="sm-item" id="smDb">
@@ -432,7 +432,30 @@ function loadData(){
       if(p && p.id && !map[p.id]){ map[p.id]=p; order.push(p); }
     });
   });
-  return order;
+  if(order.length) return order;
+  return g.cloudProfiles||[];   /* V1.12：本机无数据时用云端账号数据（APK/多设备场景） */
+}
+
+/* V1.12：云端账号文件合并（admin/uesr/main），本机空数据时兜底 */
+function loadCloudMerge(){
+  return new Promise(function(res){
+    var sync=getCloudSync();
+    if(!sync){ g.cloudProfiles=[]; return res(); }
+    Promise.all(['admin.json','uesr.json','main.json'].map(function(file){ return cloudGet(file); }))
+      .then(function(files){
+        var map={}, order=[];
+        (files||[]).forEach(function(f){
+          var body=cloudBody(f);
+          if(!body || !Array.isArray(body.profiles)) return;
+          body.profiles.forEach(function(p){
+            if(p && p.id && !map[p.id]){ map[p.id]=p; order.push(p); }
+          });
+        });
+        g.cloudProfiles=order;
+        res();
+      })
+      .catch(function(){ g.cloudProfiles=[]; res(); });
+  });
 }
 
 /* 方案名（与主应用一致） */
@@ -794,14 +817,19 @@ function delLocalProfile(key, pid){
   try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(e){}
   return true;
 }
+function cloudBody(o){
+  /* 云端文件结构：{..., data:{profiles, activeId}}，统一解包 */
+  return (o && o.data && o.data.data && typeof o.data.data==='object') ? o.data.data : (o ? o.data : null);
+}
 function delCloudProfile(file, pid){
   return cloudGet(file).then(function(o){
-    if(!o || !o.data || !Array.isArray(o.data.profiles)) return false;
-    var before=o.data.profiles.length;
-    o.data.profiles=o.data.profiles.filter(function(p){ return p.id!==pid; });
-    if(o.data.profiles.length===before) return false;
-    if(o.data.activeId===pid) o.data.activeId = o.data.profiles.length? o.data.profiles[0].id : null;
-    o.updatedAt=new Date().toISOString();
+    var body=cloudBody(o);
+    if(!body || !Array.isArray(body.profiles)) return false;
+    var before=body.profiles.length;
+    body.profiles=body.profiles.filter(function(p){ return p.id!==pid; });
+    if(body.profiles.length===before) return false;
+    if(body.activeId===pid) body.activeId = body.profiles.length? body.profiles[0].id : null;
+    o.data.updatedAt=new Date().toISOString();
     return ghFetch('/contents/'+file,'PUT',{message:'V1.6 数据管理删除方案', content:b64enc(JSON.stringify(o)), sha:o.sha})
       .then(function(r){ return r.ok; });
   });
@@ -817,7 +845,8 @@ function openDb(){
   if(sync){
     ['admin.json','uesr.json','main.json'].forEach(function(file){
       cloudP.push(cloudGet(file).then(function(o){
-        return {file:file, profiles:(o&&o.data&&Array.isArray(o.data.profiles))?o.data.profiles:[], o:o};
+        var body=cloudBody(o);
+        return {file:file, profiles:(body&&Array.isArray(body.profiles))?body.profiles:[], o:o};
       }).catch(function(){ return null; }));
     });
   }
@@ -910,7 +939,9 @@ var loading=false;
 function refresh(silent){
   if(loading) return; loading=true;
   if(!silent){ var _b=$('btnRefresh'); if(_b) _b.style.opacity=.6; toast('正在刷新数据…'); }
-  loadPrice().then(function(rs){
+  loadCloudMerge().then(function(){
+    return loadPrice();
+  }).then(function(rs){
     g.px=rs;
     renderPrice();
     render();

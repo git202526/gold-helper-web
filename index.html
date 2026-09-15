@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.24</title>
+<title>黄金建仓助手 V4.25</title>
 <style>
 /* ============================================================
    V4.19 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
@@ -630,40 +630,9 @@ html[data-theme="light"] .sb-avatar{color:#fff}
   .card,.top{box-shadow:none!important;break-inside:avoid}
   .sidebar,.sb-mask,.foot-acts{display:none!important}
 }
-
-/* ===== V4.24 登录门禁 ===== */
-#loginGate{ position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center;
-  background:var(--bg,#0f0d0a); }
-#loginGate .gate-card{ width:min(340px,88vw); padding:34px 28px 26px; border-radius:20px; text-align:center;
-  background:var(--card,#1a1712); border:1px solid var(--bd,#32291c); box-shadow:0 18px 60px rgba(0,0,0,.45); }
-#loginGate .gate-logo{ font-size:24px; font-weight:800; letter-spacing:1px;
-  background:linear-gradient(135deg,#f6c453,#d9a441); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-#loginGate .gate-ver{ margin:6px 0 20px; font-size:12px; opacity:.55; letter-spacing:2px; }
-#loginGate input{ width:100%; box-sizing:border-box; margin:8px 0; padding:12px 14px; border-radius:12px;
-  border:1px solid var(--bd,#3a3021); background:var(--bg2,#12100c); color:var(--fg,#e8ddc8); font-size:15px; outline:none; }
-#loginGate input:focus{ border-color:#d9a441; }
-#loginGate .gate-rm{ display:block; text-align:left; margin:6px 2px 14px; font-size:13px; opacity:.8; cursor:pointer; }
-#loginGate .gate-btn{ width:100%; padding:13px 0; border:none; border-radius:12px; cursor:pointer; font-size:16px; font-weight:700;
-  color:#1c1506; background:linear-gradient(135deg,#f6c453,#d9a441); }
-#loginGate .gate-btn:active{ transform:scale(.97); }
-#loginGate .gate-msg{ min-height:18px; margin-top:8px; font-size:13px; color:#f2555a; }
-#loginGate .gate-tip{ margin-top:12px; font-size:12px; line-height:1.7; opacity:.6; }
 </style>
 </head>
 <body>
-<!-- ===== V4.24 登录门禁（分账号） ===== -->
-<div id="loginGate" style="display:none">
-  <div class="gate-card">
-    <div class="gate-logo">黄金建仓助手</div>
-    <div class="gate-ver" id="gateVer">V4.24</div>
-    <input id="gateUser" type="text" autocomplete="username" placeholder="账号">
-    <input id="gatePass" type="password" autocomplete="current-password" placeholder="密码">
-    <label class="gate-rm"><input type="checkbox" id="gateRemember" checked> 记住登录（本机免输入）</label>
-    <button class="gate-btn" id="gateBtn" type="button">登 录</button>
-    <div class="gate-msg" id="gateMsg"></div>
-    <div class="gate-tip">内置账号：admin / uesr · 密码：admin123<br>数据分账号存储，登录后自动云端同步</div>
-  </div>
-</div>
 <div class="wrap">
 
 <!-- ===== 悬浮菜单面板 ===== -->
@@ -678,17 +647,25 @@ html[data-theme="light"] .sb-avatar{color:#fff}
         <button class="fold-btn" id="foldAccount" type="button" title="收起/展开账号"><span class="ar">▾</span><span class="ftxt">收起</span></button>
       </div>
       <div class="sb-body">
-      <div id="sbLoginForm" style="display:none">
+      <!-- 未登录：登录表单 -->
+      <div id="sbLoginBox">
+        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><input id="loginUser" type="text" autocomplete="username" placeholder="账号"></div>
+        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="loginPass" type="password" autocomplete="current-password" placeholder="密码"></div>
+        <button class="btn-login" id="btnLogin" type="button">登 录</button>
+        <label class="login-remember"><input type="checkbox" id="loginRemember" checked> 记住登录</label>
+        <div class="login-msg" id="loginMsg"></div>
+      </div>
+      <!-- 已登录 -->
+      <div id="sbUserBox" style="display:none">
         <div class="sb-user">已登录：<b id="loginUserTag">--</b></div>
         <div class="sb-syncrow"><span class="sync-dot" id="syncDot"></span></div>
         <details class="rule" id="tokenFold">
-          <summary>同步 Token 设置（仅首次填写一次）</summary>
-          <div class="login-field" style="margin-top:8px"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="loginToken" type="password" autocomplete="off" placeholder="GitHub Token（ghp_…）"></div>
+          <summary>同步 Token 设置</summary>
+          <div class="login-field" style="margin-top:8px"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="loginToken" type="password" autocomplete="off" placeholder="GitHub Token"></div>
           <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span><input id="loginRepo" type="text" autocomplete="off" placeholder="仓库 owner/repo" value="git202526/gold-sync"></div>
-          <button class="btn-login" id="btnTokenSave" type="button">保存 Token 并同步</button>
+          <button class="btn-login" id="btnTokenSave" type="button">保存 Token</button>
           <div class="login-msg" id="tokenMsg"></div>
         </details>
-        <div class="login-tip">Token 仅首次填写一次并自动记住，之后打开页面自动同步。Token 只存本机浏览器，不写入网页。请勿外传页面链接。</div>
         <button class="btn-logout" id="btnLogout" type="button">退出登录</button>
       </div>
       </div>
@@ -803,7 +780,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.24</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.25</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -1015,7 +992,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.24 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.25 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -1617,9 +1594,8 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.19：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置；已登录用户账号区默认展开 */
+  /* V4.25：账号区默认展开（登录入口在菜单内，须可见） */
   var _acct = (window.__jcjAcct && window.__jcjAcct.account);
-  if(!f.account && !_acct){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
 }
@@ -2393,21 +2369,20 @@ window.__syncPushDelayed = function(){
   _cloud.timer=setTimeout(function(){ cloudPush(true); }, 2000);
 };
 function doLogin(){
-  var u=(document.getElementById('gateUser').value||'').trim();
-  var p=document.getElementById('gatePass').value||'';
-  var msg=document.getElementById('gateMsg');
+  var u=(document.getElementById('loginUser').value||'').trim();
+  var p=document.getElementById('loginPass').value||'';
+  var msg=document.getElementById('loginMsg');
   if(!u || !p){ if(msg) msg.textContent='请输入账号和密码'; return; }
   if(!acct.ACCOUNTS[u] || acct.ACCOUNTS[u]!==p){ if(msg) msg.textContent='账号或密码错误'; return; }
   acct.account=u;
   try{
-    var rm=document.getElementById('gateRemember');
+    var rm=document.getElementById('loginRemember');
     if(rm && rm.checked) localStorage.setItem(acct.KEY_LOGIN, JSON.stringify({account:u}));
     else localStorage.removeItem(acct.KEY_LOGIN);
   }catch(e){}
   if(msg) msg.textContent='';
   setAuthUI(true);
   document.getElementById('loginUserTag').textContent=u;
-  showLoginGate(false);
   _cloud.user=u;
   /* 加载该账号本地数据并渲染 */
   core.load();
@@ -2445,20 +2420,17 @@ function doLogout(){
   try{ localStorage.removeItem(acct.KEY_LOGIN); }catch(e){}
   _cloud.user=''; _cloud.ready=false; _cloud.updatedAt='';
   document.getElementById('loginUserTag').textContent='--';
+  document.getElementById('loginPass').value='';
   setAuthUI(false);
   setSyncUI('', false);
-  showLoginGate(true);
-  toast('已退出登录，数据保留在云端');
-}
-function showLoginGate(show){
-  var g=document.getElementById('loginGate');
-  if(g) g.style.display = show ? 'flex' : 'none';
-  var w=document.querySelector('.wrap');
-  if(w) w.style.pointerEvents = show ? 'none' : '';
+  core.load();
+  core.render();
+  toast('已退出登录');
 }
 function setAuthUI(logged){
-  var f=document.getElementById('sbLoginForm');
-  if(f) f.style.display = logged ? '' : 'none';
+  var lb=document.getElementById('sbLoginBox'), ub=document.getElementById('sbUserBox');
+  if(lb) lb.style.display = logged ? 'none' : '';
+  if(ub) ub.style.display = logged ? '' : 'none';
   if(logged){
     var acc=document.getElementById('sbAccount');
     if(acc) acc.classList.remove('collapsed');
@@ -2837,12 +2809,11 @@ function initAuth(){
   } else {
     acct.account=null;
     setAuthUI(false);
-    showLoginGate(true);
   }
   /* 事件绑定 */
-  var gb=document.getElementById('gateBtn');
+  var gb=document.getElementById('btnLogin');
   if(gb) gb.addEventListener('click', doLogin);
-  var gu=document.getElementById('gateUser'), gp=document.getElementById('gatePass');
+  var gu=document.getElementById('loginUser'), gp=document.getElementById('loginPass');
   if(gu) gu.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
   if(gp) gp.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
   var ts=document.getElementById('btnTokenSave');
@@ -3338,7 +3309,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.24').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.25').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

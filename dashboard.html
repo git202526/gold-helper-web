@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>黄金持仓信息中心 V1.10</title>
+<title>黄金持仓信息中心 V1.11</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 :root{
@@ -229,7 +229,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.10</span>
+    <span class="ver" id="appVer">V1.11</span>
   </div>
 </header>
 
@@ -335,7 +335,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <b>持仓信息中心</b>
-      <span class="ver">V1.10</span>
+      <span class="ver">V1.11</span>
     </div>
     <div class="sm-group">
       <div class="sm-item" id="smDb">
@@ -538,7 +538,7 @@ function renderOverview(cards){
   var ovP=$('ovPnl'), pnlCard=$('pnlCard'), ovSub=$('ovPnlSub');
   if(ovP){
     ovP.textContent = pnl!==0? (pnl>0?'+':'')+round2(pnl)+' 元' : '--';
-    pnlCard.className = 'h-card'+(pnl>0?' red glow-red':(pnl<0?' green glow-green':''));
+    pnlCard.className = 'h-card'+(pnl>0?' red':(pnl<0?' green':''));
     ovP.className = 'h-val'+(pnl>0?' red':(pnl<0?' green':''));
     ovSub.textContent = gr>0? ('按当前金价 '+num(px(),0)+' 元/克估算') : '暂无持仓';
   }

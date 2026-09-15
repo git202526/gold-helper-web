@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>黄金持仓信息中心 V1.8</title>
+<title>黄金持仓信息中心 V1.9</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 :root{
@@ -216,6 +216,9 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
 #backBar .bk-stat{font-size:.7rem;color:var(--ink3);background:var(--card3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-weight:800;white-space:nowrap}
 #backBar.glow-red .bk-stat{color:var(--up);border-color:rgba(242,85,90,.4)}
 #backBar.glow-green .bk-stat{color:var(--down);border-color:rgba(52,211,153,.4)}
+
+.h-card.glow-green{animation:glowGreen 1.6s ease-in-out infinite;border-color:rgba(52,211,153,.45)}
+.h-card.glow-red{animation:glowRed 1.6s ease-in-out infinite;border-color:rgba(242,85,90,.45)}
 </style>
 </head>
 <body>
@@ -226,7 +229,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.8</span>
+    <span class="ver" id="appVer">V1.9</span>
   </div>
 </header>
 
@@ -249,10 +252,10 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <div class="h-val" id="ovDelta">--</div>
         <div class="h-sub" id="ovDeltaSub">--</div>
       </div>
-      <div class="h-card">
-        <div class="h-label">持仓方案</div>
-        <div class="h-val gold" id="ovCount">--</div>
-        <div class="h-sub">个方案 · 含建仓逻辑</div>
+      <div class="h-card" id="pnlCard">
+        <div class="h-label">总浮动盈亏</div>
+        <div class="h-val" id="ovPnl">--</div>
+        <div class="h-sub" id="ovPnlSub">--</div>
       </div>
     </div>
     <div class="back-bar" id="backBar">
@@ -263,7 +266,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
     <div class="price-strip">
       <div class="p-card"><div class="p-name">人民币金价</div><div class="p-val" id="pxCny">--</div><div class="p-unit">元/克</div></div>
       <div class="p-card"><div class="p-name">伦敦金现货</div><div class="p-val" id="pxUsd">--</div><div class="p-unit" id="pxUsdSub">美元/盎司 · 汇率 --</div></div>
-      <div class="p-card" id="pnl2Card"><div class="p-name">总浮动盈亏</div><div class="p-val" id="pnl2">--</div><div class="p-unit" id="pnl2Sub">按当前金价估算</div></div>
+      <div class="p-card" id="count2Card"><div class="p-name">持仓方案</div><div class="p-val" id="count2">--</div><div class="p-unit" id="count2Sub">个方案 · 含建仓逻辑</div></div>
       <div class="p-time" id="pxTime">更新时间 --</div>
     </div>
   </section>
@@ -331,7 +334,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <b>持仓信息中心</b>
-      <span class="ver">V1.8</span>
+      <span class="ver">V1.9</span>
     </div>
     <div class="sm-group">
       <div class="sm-item" id="smDb">
@@ -530,12 +533,19 @@ function renderOverview(cards){
   cards.forEach(function(c){ tot+=c.total; gr+=c.grams; pnl+=c.pnl; if(c.has) cnt++; });
   $('ovTotal').textContent = tot>0? money(tot)+' 元' : '--';
   $('ovGrams').textContent = gr>0? round2(gr)+' g' : '--';
-  /* 价格条第3格：总浮动盈亏（红盈绿亏 + 氛围灯） */
-  var pnl2=$('pnl2'), pnl2Card=$('pnl2Card'), pnl2Sub=$('pnl2Sub');
-  if(pnl2){
-    pnl2.textContent = pnl!==0? (pnl>0?'+':'')+round2(pnl)+' 元' : '--';
-    pnl2Card.className = 'p-card'+(pnl>0?' glow-red':(pnl<0?' glow-green':''));
-    pnl2Sub.textContent = gr>0? ('按金价 '+num(px(),0)+' 估算') : '暂无持仓';
+  /* hero 总浮动盈亏卡（红盈绿亏 + 氛围灯） */
+  var ovP=$('ovPnl'), pnlCard=$('pnlCard'), ovSub=$('ovPnlSub');
+  if(ovP){
+    ovP.textContent = pnl!==0? (pnl>0?'+':'')+round2(pnl)+' 元' : '--';
+    pnlCard.className = 'h-card'+(pnl>0?' red glow-red':(pnl<0?' green glow-green':''));
+    ovP.className = 'h-val'+(pnl>0?' red':(pnl<0?' green':''));
+    ovSub.textContent = gr>0? ('按当前金价 '+num(px(),0)+' 元/克估算') : '暂无持仓';
+  }
+  /* 价格条第3格：持仓方案 */
+  var c2=$('count2');
+  if(c2){
+    c2.textContent = cnt>0? cnt : '--';
+    $('count2Sub').textContent = cnt>0? (cnt+' 个方案 · 含建仓逻辑') : '暂无方案';
   }
   /* 总涨跌幅度：当前金价 vs 持仓加权高点 */
   var d=null, wHigh=0, wg=0;
@@ -554,7 +564,6 @@ function renderOverview(cards){
     if(d>0){ dc.className='h-card red'; dv.className='h-val red'; }
     else{ dc.className='h-card green'; dv.className='h-val green'; }
   }
-  $('ovCount').textContent = cnt;
   $('pfTip').textContent = cnt+' 个方案含持仓';
   function px(){ return g.px.cny||0 }
 }

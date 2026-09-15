@@ -758,7 +758,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.20</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.21</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -964,7 +964,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.20 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.21 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -2067,7 +2067,7 @@ function bind(){
     });
   });
 }
-window.__jcjCore = { state:state, calc:calc, render:render, save:save, round2:round2, money:money, toNum:toNum, bind:bind, load:load, judge:judge, cur:cur, isBuyTier:isBuyTier, normalizeProfile:normalizeProfile, applyFolds:applyFolds, setFold:setFold, getFolds:getFolds, sellBatch:sellBatch, emptySold:emptySold, manualSell:manualSell, deleteSellLog:deleteSellLog, pushSellLog:pushSellLog, refundSellLog:refundSellLog };
+window.__jcjCore = { state:state, calc:calc, render:render, save:save, round2:round2, money:money, toNum:toNum, bind:bind, load:load, judge:judge, cur:cur, isBuyTier:isBuyTier, normalizeProfile:normalizeProfile, applyFolds:applyFolds, setFold:setFold, getFolds:getFolds, setHitHigh:setHitHigh, setFirstBuy:setFirstBuy, sellBatch:sellBatch, emptySold:emptySold, manualSell:manualSell, deleteSellLog:deleteSellLog, pushSellLog:pushSellLog, refundSellLog:refundSellLog };
 })();
 
 </script>
@@ -2607,7 +2607,7 @@ function initLayout(){
     var P = core.cur();
     if(!window.confirm('将清空当前方案「'+P.name+'」的：\n· 持仓勾选与实际成交\n· 阶段高点与当前金价\n· 到过高点 / 回落记录\n（保留方案名称、建仓逻辑、持仓上限）\n\n确定继续？')) return;
     P.high = null; P.price = null; P.priceManual = false;
-    setHitHigh(P,false); setFirstBuy(P,null);   /* 按逻辑重置过高点/开仓记录 */
+    core.setHitHigh(P,false); core.setFirstBuy(P,null);   /* 按逻辑重置过高点/开仓记录 */
     for(var lg=1; lg<=2; lg++){
       var pos = P.pos[lg];
       for(var i=0;i<13;i++){ pos.checked[i]=false; pos.actPrice[i]=null; pos.actGrams[i]=null; }
@@ -3186,7 +3186,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.20').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.21').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

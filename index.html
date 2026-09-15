@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.25</title>
+<title>黄金建仓助手 V4.26</title>
 <style>
 /* ============================================================
    V4.19 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
@@ -780,7 +780,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.25</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.26</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -992,7 +992,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.25 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.26 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -2978,9 +2978,11 @@ function fetchGoldPrice(manual){
           var usdEl=document.getElementById('goldUsdVal');
           if(usdEl) usdEl.textContent='--';
           if(auto){
-            val.textContent='--';
-            if(meta) meta.textContent='获取失败，10秒后自动重试';
-            if(!window.__goldFailShown){ toast('实时金价获取失败，已切换为手动输入'); window.__goldFailShown=true; }  // 失败只提示一次，避免10s重复打扰
+            if(!CP.price){ val.textContent='--'; }   /* 无旧值时清空，有旧值保留展示 */
+            if(meta) meta.textContent='获取失败，将自动重试';
+            clearTimeout(retryTimer);
+            retryTimer = setTimeout(function(){ fetchGoldPrice(false); }, 5000);  /* 失败后 5s 快速重试 */
+            if(!window.__goldFailShown){ toast('实时金价获取失败，已切换为手动输入'); window.__goldFailShown=true; }  // 失败只提示一次，避免重复打扰
           } else {
             if(meta) meta.textContent='手动输入中';
           }
@@ -3016,11 +3018,11 @@ initTheme();
 initRuleFolds();
 initLayout();
 document.getElementById('btnRefresh').addEventListener('click', function(){ fetchGoldPrice(true); });
-/* 每 10 秒自动刷新一次实时金价（手动输入模式不覆盖，最快 10s 一次避免接口限流） */
+/* 每 30 秒自动刷新一次实时金价（手动输入模式不覆盖；30s 一次避免免费接口限流） */
 setInterval(function(){
   var CP = core.cur ? core.cur() : state.profiles[0];
   if(!CP.priceManual){ fetchGoldPrice(false); }
-}, 10000);
+}, 30000);
 /* 每 60 秒静默拉取云端一次（已登录且空闲时），多端改动及时回传（#4 竞态修复） */
 setInterval(function(){
   if(acct.account && _cloud.token && !_cloud.busy && document.visibilityState!=='hidden') cloudPull(true);
@@ -3309,7 +3311,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.25').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.26').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

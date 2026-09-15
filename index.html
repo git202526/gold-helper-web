@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.20</title>
+<title>黄金建仓助手 V4.23</title>
 <style>
 /* ============================================================
    V4.19 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
@@ -648,13 +648,13 @@ html[data-theme="light"] .sb-avatar{color:#fff}
       </div>
       <div class="sb-body">
       <div id="sbLoginForm">
-        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="loginToken" type="password" autocomplete="off" placeholder="GitHub Token（ghp_…）"></div>
-        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span><input id="loginRepo" type="text" autocomplete="off" placeholder="仓库 owner/repo（默认 git202526/gold-sync）"></div>
-        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><input id="loginName" type="text" autocomplete="username" placeholder="同步标识（默认 main，决定云端文件名）"></div>
-        <button class="btn-login" id="btnLogin" type="button">连 接</button>
-        <label class="login-remember"><input type="checkbox" id="loginRemember"> 记住同步设置（不保存 Token）</label>
+        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="loginToken" type="password" autocomplete="off" placeholder="GitHub Token（ghp_…，仅首次填写）"></div>
+        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></span><input id="loginRepo" type="text" autocomplete="off" placeholder="仓库 owner/repo（默认 git202526/gold-sync）" value="git202526/gold-sync"></div>
+        <div class="login-field"><span class="ic"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><input id="loginName" type="text" autocomplete="username" placeholder="同步标识（默认 main，决定云端文件名）" value="main"></div>
+        <button class="btn-login" id="btnLogin" type="button">保存并同步</button>
+        <label class="login-remember"><input type="checkbox" id="loginRemember" checked> 记住同步设置（Token 保存到本机）</label>
         <div class="login-msg" id="loginMsg"></div>
-        <div class="login-tip">用你自己的 GitHub Token 同步：GitHub → Settings → Developer settings → Personal access tokens，勾选 repo 权限。Token 仅保存在本机本次会话，关标签即失效。</div>
+        <div class="login-tip">GitHub 自动同步：Token 只需首次填写一次并勾选记住，之后打开页面自动同步，无需再输入。Token 仅保存在本机浏览器，不写入网页。请勿把页面链接外传。</div>
       </div>
       <div id="sbUserInfo" style="display:none">
         <div class="sb-user">已登录：<b id="loginUserTag">--</b></div>
@@ -773,7 +773,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.22</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.23</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -985,7 +985,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.22 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.23 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -2145,8 +2145,10 @@ function toast(msg){
 
 /* ===== V4.19 账号云同步：使用用户自己的 GitHub Token（Settings→Developer settings→Personal access tokens，勾选 repo 权限）。
    凭据仅存于 sessionStorage（关标签即失效），不再内嵌任何账号/密码/加密令牌；"记住"仅保存同步标识与仓库名，不保存 Token。 ===== */
+/* ===== V4.23 云同步：GitHub 仓库存储（个人记账工具，Token 只填一次，自动记住自动同步）=====
+   凭据保存在 localStorage（jcj_sync_v1），打开页面自动拉取、保存后自动推送；不再需要每次输入 Token。 ===== */
 var KEY_SESSION='jcj_session_v1';
-var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'', sha:null, updatedAt:'', timer:null, busy:false, ready:false };
+var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'main', sha:null, updatedAt:'', timer:null, busy:false, ready:false };
 function setSyncUI(t, ok){
   var el=document.getElementById('syncDot');
   if(!el) return;
@@ -2244,6 +2246,7 @@ function cloudPull(silent){
   setSyncUI('同步中…', true);
   return cloudApi('/repos/'+_cloud.owner+'/'+_cloud.repo+'/contents/'+cloudFile()).then(function(r){
     if(r.status===404){ setSyncUI('首次使用，数据将自动上传', true); return false; }
+    if(r.status===401) throw new Error('GitHub Token 失效');
     if(r.status!==200) throw new Error('HTTP '+r.status);
     return r.json().then(function(d){
       _cloud.sha=d.sha;
@@ -2305,7 +2308,6 @@ function cloudPush(silent){
               _cloud.updatedAt=pl.updatedAt;
               var dd=pl.data;
               if(dd && Array.isArray(dd.profiles) && dd.profiles.length>0){
-                /* 云端较新：合并本地独有方案，避免覆盖丢失 */
                 var localCnt2=core.state.profiles.length;
                 var cloudCnt2=dd.profiles.length;
                 if(localCnt2>cloudCnt2){
@@ -2327,9 +2329,9 @@ function cloudPush(silent){
       }
       return r;
     }).then(function(r){
-      if(r && r.merged) return true;   /* 409 冲突已合并，无需再次上传 */
+      if(r && r.merged) return true;
       if(!r || !r.ok){
-        if(r && r.status===401) throw new Error('同步凭据失效');
+        if(r && r.status===401) throw new Error('GitHub Token 失效');
         throw new Error('上传失败('+(r?r.status:'?')+')');
       }
       return r.json().then(function(d){
@@ -2361,27 +2363,25 @@ function doAuth(){
   if(parts.length!==2 || !/^[A-Za-z0-9_.-]+$/.test(parts[0]) || !/^[A-Za-z0-9_.-]+$/.test(parts[1])){ msg.textContent='仓库格式应为 owner/repo'; return; }
   if(!/^[A-Za-z0-9_-]{1,40}$/.test(nm)){ msg.textContent='同步标识仅限字母数字与连字符（≤40）'; return; }
   _cloud.owner=parts[0]; _cloud.repo=parts[1]; _cloud.token=tk; _cloud.user=nm; _cloud.ready=false; _cloud.sha=null; _cloud.updatedAt='';
-  try{ sessionStorage.setItem(KEY_SESSION, JSON.stringify({token:tk, user:nm, owner:parts[0], repo:parts[1]})); }catch(e){}
   setAuthUI(true);
   document.getElementById('loginUserTag').textContent=nm+' @'+parts[0]+'/'+parts[1];
   msg.textContent='';
   try{
     var _rm=document.getElementById('loginRemember');
-    if(_rm && _rm.checked){ localStorage.setItem('gold_rmb', JSON.stringify({u:nm, owner:parts[0], repo:parts[1]})); }
-    else{ localStorage.removeItem('gold_rmb'); }
+    if(_rm && _rm.checked){ localStorage.setItem('jcj_sync_v1', JSON.stringify({token:tk, user:nm, owner:parts[0], repo:parts[1]})); }
+    else{ localStorage.removeItem('jcj_sync_v1'); }
   }catch(e){}
-  toast('已连接云端：'+nm);
+  toast('已保存同步设置，开始同步');
   setSyncUI('同步中…', true);
   cloudPull(false);
 }
 function doLogout(){
   _cloud.token=''; _cloud.user=''; _cloud.sha=null; _cloud.updatedAt=''; _cloud.ready=false;
-  try{ sessionStorage.removeItem(KEY_SESSION); }catch(e){}
+  try{ localStorage.removeItem('jcj_sync_v1'); }catch(e){}
   document.getElementById('loginUserTag').textContent='--';
   document.getElementById('loginMsg').textContent='';
   document.getElementById('loginToken').value='';
   try{
-    localStorage.removeItem('gold_rmb');
     var _rk=document.getElementById('loginRemember'); if(_rk) _rk.checked=false;
   }catch(e){}
   setAuthUI(false);
@@ -2738,7 +2738,7 @@ function initSidebar(){
 }
 function initAuth(){
   var sess=null;
-  try{ var raw=sessionStorage.getItem(KEY_SESSION); if(raw) sess=JSON.parse(raw); }catch(e){}
+  try{ var raw=localStorage.getItem('jcj_sync_v1'); if(raw) sess=JSON.parse(raw); }catch(e){}
   if(sess && sess.token && sess.user && sess.owner && sess.repo){
     _cloud.token=sess.token; _cloud.user=sess.user; _cloud.owner=sess.owner; _cloud.repo=sess.repo; _cloud.ready=false; _cloud.sha=null;
     setAuthUI(true);
@@ -2750,20 +2750,22 @@ function initAuth(){
   document.getElementById('loginToken').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
   document.getElementById('loginName').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
   document.getElementById('loginRepo').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
+  
   /* 侧边栏标题跟随版本号 */
   try{
     var _vt=(document.title.match(/V[\d.]+/)||[''])[0];
     var _bt=document.querySelector('.sb-brand-t');
     if(_bt && _vt) _bt.textContent='黄金建仓助手 '+_vt;
   }catch(e){}
-  /* 记住同步设置：自动填充字段（不保存 Token，需手动登录） */
+  /* 记住的同步设置：回填输入框（Token 已保存，无需手动输入） */
   try{
-    var _rmb=localStorage.getItem('gold_rmb');
+    var _rmb=localStorage.getItem('jcj_sync_v1');
     if(_rmb){
       var _rd=JSON.parse(_rmb);
-      if(_rd && _rd.u){
-        document.getElementById('loginName').value=_rd.u||'';
-        document.getElementById('loginRepo').value=(_rd.owner?_rd.owner:'git202526')+'/'+(_rd.repo||'gold-sync');
+      if(_rd && _rd.token){
+        var _li=document.getElementById('loginToken'); if(_li) _li.value=_rd.token||'';
+        var _ln=document.getElementById('loginName'); if(_ln) _ln.value=_rd.user||'main';
+        var _lr=document.getElementById('loginRepo'); if(_lr) _lr.value=(_rd.owner?_rd.owner:'git202526')+'/'+(_rd.repo||'gold-sync');
         var _rk=document.getElementById('loginRemember'); if(_rk) _rk.checked=true;
       }
     }
@@ -3243,7 +3245,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.22').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.23').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

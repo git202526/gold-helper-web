@@ -1,4 +1,4 @@
-/* 黄金建仓助手 V4.24 —— Service Worker：离线缓存 */
+/* 黄金建仓助手 V4.25 —— Service Worker：离线缓存（网络优先，保证 dashboard 等页面始终最新） */
 var CACHE = 'gold-assistant-v4.25-'+Date.now();
 var ASSETS = [
   './',
@@ -29,15 +29,18 @@ self.addEventListener('activate', function(e){
 
 self.addEventListener('fetch', function(e){
   if(e.request.method!=='GET') return;
+  if(e.request.url.indexOf('api.github.com')>=0 || e.request.url.indexOf('gold-api.com')>=0 || e.request.url.indexOf('er-api.com')>=0) return;
   e.respondWith(
-    caches.match(e.request).then(function(resp){
-      return resp || fetch(e.request).then(function(r){
-        if(r && r.status===200 && e.request.url.indexOf('api.github.com')<0){
-          var cp = r.clone();
-          caches.open(CACHE).then(function(c){ c.put(e.request, cp); });
-        }
-        return r;
+    fetch(e.request).then(function(r){
+      if(r && r.status===200){
+        var cp = r.clone();
+        caches.open(CACHE).then(function(c){ c.put(e.request, cp); });
+      }
+      return r;
+    }).catch(function(){
+      return caches.match(e.request).then(function(m){
+        return m || caches.match('./index.html');
       });
-    }).catch(function(){ return caches.match('./index.html'); })
+    })
   );
 });

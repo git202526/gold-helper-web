@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>黄金持仓信息中心</title>
+<title>黄金持仓信息中心 V1.6</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 :root{
@@ -166,6 +166,26 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
   .chart-box{height:210px}
   .pf-chart{height:130px}
 }
+
+/* ===== V1.6 数据管理 ===== */
+#dbMask{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.db-panel{width:min(560px,96vw);max-height:84vh;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden}
+.db-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;font-weight:800;letter-spacing:1px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,var(--card2),var(--card))}
+.db-close{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--card3);color:var(--ink);font-size:15px;cursor:pointer;line-height:1}
+.db-tip{font-size:.68rem;color:var(--ink3);padding:10px 18px 0;line-height:1.6}
+.db-msg{font-size:.72rem;color:var(--ink3);padding:8px 18px 0;min-height:16px}
+.db-msg.err{color:var(--up)}
+.db-list{overflow:auto;padding:12px 16px 18px}
+.db-src{margin-bottom:12px}
+.db-src-t{display:flex;align-items:center;gap:8px;font-size:.74rem;font-weight:800;color:var(--gold-soft);letter-spacing:.5px;margin-bottom:6px}
+.db-src-t .n{font-size:.62rem;color:var(--ink3);font-weight:600;margin-left:auto}
+.db-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:6px;font-size:.8rem}
+.db-row:last-child{margin-bottom:0}
+.db-row .nm{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.db-row .st{font-size:.64rem;color:var(--ink3);padding:2px 7px;border-radius:5px;background:var(--card3)}
+.db-del{border:1px solid rgba(242,85,90,.4);background:rgba(242,85,90,.08);color:var(--up);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer}
+.db-del:hover{background:rgba(242,85,90,.18)}
+.db-empty{text-align:center;color:var(--ink3);font-size:.78rem;padding:26px 0;line-height:1.8}
 </style>
 </head>
 <body>
@@ -176,9 +196,13 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.5</span>
+    <span class="ver" id="appVer">V1.6</span>
   </div>
   <div class="top-actions">
+    <button class="btn" id="btnDb" title="数据库管理">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" stroke-width="1.8"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="currentColor" stroke-width="1.8"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span>数据管理</span>
+    </button>
     <button class="btn" id="btnTheme" title="日夜切换">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span id="themeTxt">夜间</span>
@@ -298,6 +322,16 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
 
 <div id="toast"></div>
 
+<!-- ===== V1.6 数据管理弹层 ===== -->
+<div id="dbMask" style="display:none">
+  <div class="db-panel">
+    <div class="db-head">数据库管理<button class="db-close" id="dbClose" type="button">×</button></div>
+    <div class="db-tip">扫描主应用本地与云端账号文件中的全部方案，可删除多余方案原始数据（含云端）。删除后持仓中心立即生效。</div>
+    <div class="db-msg" id="dbMsg"></div>
+    <div class="db-list" id="dbList"></div>
+  </div>
+</div>
+
 <script>
 /* ============ 常量与状态 ============ */
 var KEY = 'jcj_helper_local_v2';
@@ -333,15 +367,22 @@ $('btnTheme').onclick=function(){
   applyTheme();
 };
 
-/* ============ 数据读取 ============ */
+/* ============ 数据读取（V1.6：合并基础+账号 key，按 id 去重） ============ */
+var DB_KEYS=['jcj_helper_local_v2','jcj_helper_local_v2_admin','jcj_helper_local_v2_uesr'];
 function loadData(){
-  var raw=null;
-  try{ raw = localStorage.getItem(KEY); }catch(e){}
-  if(!raw) return [];
-  var obj=null;
-  try{ obj=JSON.parse(raw); }catch(e){ return []; }
-  if(!obj || !obj.profiles || !obj.profiles.length) return [];
-  return obj.profiles;
+  var map={}, order=[];
+  DB_KEYS.forEach(function(key){
+    var raw=null;
+    try{ raw = localStorage.getItem(key); }catch(e){}
+    if(!raw) return;
+    var obj=null;
+    try{ obj=JSON.parse(raw); }catch(e){ return; }
+    if(!obj || !Array.isArray(obj.profiles)) return;
+    obj.profiles.forEach(function(p){
+      if(p && p.id && !map[p.id]){ map[p.id]=p; order.push(p); }
+    });
+  });
+  return order;
 }
 
 /* 方案名（与主应用一致） */
@@ -639,6 +680,144 @@ function renderDetail(cards){
   });
   if(!n) body.innerHTML='<tr><td colspan="9" style="text-align:center;color:#8A7A55;padding:24px">暂无持仓明细</td></tr>';
 }
+
+/* ============ V1.6 数据库管理 ============ */
+function getCloudSync(){
+  try{
+    var s=JSON.parse(localStorage.getItem('jcj_sync_v1'));
+    if(s && s.token && s.owner && s.repo) return s;
+  }catch(e){}
+  return null;
+}
+function b64enc(s){ try{ return btoa(unescape(encodeURIComponent(s))); }catch(e){ return btoa(s); } }
+function b64dec(s){ s=String(s).replace(/\s/g,''); try{ return decodeURIComponent(escape(atob(s))); }catch(e){ return atob(s); } }
+function ghFetch(path, method, body){
+  var sync=getCloudSync();
+  if(!sync) return Promise.reject(new Error('未配置同步 Token'));
+  var opt={method:method||'GET', headers:{'Authorization':'Bearer '+sync.token,'Accept':'application/vnd.github+json'}};
+  if(body){ opt.headers['Content-Type']='application/json'; opt.body=JSON.stringify(body); }
+  return fetch('https://api.github.com/repos/'+sync.owner+'/'+sync.repo+path, opt);
+}
+function cloudGet(file){
+  return ghFetch('/contents/'+file).then(function(r){
+    if(r.status===404) return null;
+    return r.json().then(function(d){
+      if(!d || !d.content) return null;
+      var obj=null; try{ obj=JSON.parse(b64dec(d.content)); }catch(e){}
+      return {sha:d.sha, data:obj};
+    });
+  });
+}
+function delLocalProfile(key, pid){
+  var raw=null; try{ raw=localStorage.getItem(key); }catch(e){}
+  if(!raw) return false;
+  var obj=null; try{ obj=JSON.parse(raw); }catch(e){ return false; }
+  if(!obj || !Array.isArray(obj.profiles)) return false;
+  var before=obj.profiles.length;
+  obj.profiles=obj.profiles.filter(function(p){ return p.id!==pid; });
+  if(obj.profiles.length===before) return false;
+  if(obj.activeId===pid) obj.activeId = obj.profiles.length? obj.profiles[0].id : null;
+  try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(e){}
+  return true;
+}
+function delCloudProfile(file, pid){
+  return cloudGet(file).then(function(o){
+    if(!o || !o.data || !Array.isArray(o.data.profiles)) return false;
+    var before=o.data.profiles.length;
+    o.data.profiles=o.data.profiles.filter(function(p){ return p.id!==pid; });
+    if(o.data.profiles.length===before) return false;
+    if(o.data.activeId===pid) o.data.activeId = o.data.profiles.length? o.data.profiles[0].id : null;
+    o.updatedAt=new Date().toISOString();
+    return ghFetch('/contents/'+file,'PUT',{message:'V1.6 数据管理删除方案', content:b64enc(JSON.stringify(o)), sha:o.sha})
+      .then(function(r){ return r.ok; });
+  });
+}
+function openDb(){
+  $('dbMask').style.display='flex';
+  var list=$('dbList'), msg=$('dbMsg');
+  list.innerHTML='<div class="db-empty">正在扫描本地与云端数据…</div>';
+  msg.textContent='';
+  var groups=scanDb();
+  var sync=getCloudSync();
+  var cloudP=[];
+  if(sync){
+    ['admin.json','uesr.json','main.json'].forEach(function(file){
+      cloudP.push(cloudGet(file).then(function(o){
+        return {file:file, profiles:(o&&o.data&&Array.isArray(o.data.profiles))?o.data.profiles:[], o:o};
+      }).catch(function(){ return null; }));
+    });
+  }
+  Promise.all(cloudP).then(function(cgs){
+    var html='';
+    var has=false;
+    groups.forEach(function(g){
+      if(!g.profiles.length) return;
+      has=true;
+      html+='<div class="db-src"><div class="db-src-t">'+g.label+'<span class="n">'+g.profiles.length+' 个方案</span></div>';
+      g.profiles.forEach(function(p){
+        html+='<div class="db-row" data-type="local" data-src="'+esc(g.key)+'" data-id="'+esc(p.id)+'">'
+          +'<span class="nm">'+esc(p.name||'未命名')+'</span><span class="st">本机</span><button class="db-del">删除</button></div>';
+      });
+      html+='</div>';
+    });
+    (cgs||[]).forEach(function(g){
+      if(!g || !g.profiles.length) return;
+      has=true;
+      html+='<div class="db-src"><div class="db-src-t">云端文件 '+g.file+'<span class="n">'+g.profiles.length+' 个方案</span></div>';
+      g.profiles.forEach(function(p){
+        html+='<div class="db-row" data-type="cloud" data-src="'+esc(g.file)+'" data-id="'+esc(p.id)+'">'
+          +'<span class="nm">'+esc(p.name||'未命名')+'</span><span class="st">云端</span><button class="db-del">删除</button></div>';
+      });
+      html+='</div>';
+    });
+    if(!has){
+      html='<div class="db-empty">未发现可管理的方案数据</div>';
+      if(!sync) html='<div class="db-empty">未配置同步 Token，仅展示本机数据<br>同步 Token 请在黄金建仓助手侧边栏设置</div>';
+    }
+    list.innerHTML=html;
+    msg.textContent = sync? '已连接云端，删除将同步生效' : '本机模式：删除仅影响本机数据';
+  }).catch(function(e){
+    msg.textContent='云端读取失败：'+(e&&e.message?e.message:'网络错误');
+    msg.className='db-msg err';
+  });
+}
+function scanDb(){
+  var labelMap={'jcj_helper_local_v2':'本机数据（默认）','jcj_helper_local_v2_admin':'本机数据（账号 admin）','jcj_helper_local_v2_uesr':'本机数据（账号 uesr）'};
+  return DB_KEYS.map(function(key){
+    var raw=null; try{ raw=localStorage.getItem(key); }catch(e){}
+    var profiles=[];
+    if(raw){ try{ var obj=JSON.parse(raw); if(obj&&Array.isArray(obj.profiles)) profiles=obj.profiles; }catch(e){} }
+    return {key:key, label:labelMap[key]||key, profiles:profiles};
+  });
+}
+function delDbRow(el){
+  var type=el.getAttribute('data-type'), src=el.getAttribute('data-src'), id=el.getAttribute('data-id');
+  var name=el.querySelector('.nm')?el.querySelector('.nm').textContent:'';
+  if(!id) return;
+  if(!window.confirm('确认删除方案「'+name+'」？\n'+(type==='cloud'?'将同时从云端文件 '+src+' 中删除该方案原始数据':'将从本机 '+src+' 中删除该方案原始数据'))) return;
+  var msg=$('dbMsg');
+  if(type==='cloud'){
+    msg.textContent='正在删除云端数据…';
+    delCloudProfile(src, id).then(function(ok){
+      if(ok){ toast('已删除云端方案「'+name+'」'); delLocalProfile('jcj_helper_local_v2_'+src.replace('.json',''), id); openDb(); refresh(true); }
+      else{ msg.textContent='云端删除失败：文件不存在或已变更'; msg.className='db-msg err'; }
+    }).catch(function(e){
+      msg.textContent='云端删除失败：'+(e&&e.message?e.message:'网络错误');
+      msg.className='db-msg err';
+    });
+  } else {
+    var ok=delLocalProfile(src, id);
+    if(ok){ toast('已删除本机方案「'+name+'」'); openDb(); refresh(true); }
+    else{ msg.textContent='本机删除失败：数据未找到'; msg.className='db-msg err'; }
+  }
+}
+$('btnDb').onclick=function(){ openDb(); };
+$('dbClose').onclick=function(){ $('dbMask').style.display='none'; };
+$('dbMask').addEventListener('click', function(e){ if(e.target===$('dbMask')) $('dbMask').style.display='none'; });
+$('dbList').addEventListener('click', function(e){
+  var b=e.target.closest?e.target.closest('.db-del'):null;
+  if(b){ var row=b.closest('.db-row'); if(row) delDbRow(row); }
+});
 
 /* ============ 刷新 ============ */
 var loading=false;

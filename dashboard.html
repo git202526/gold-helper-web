@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>黄金持仓信息中心 V1.9</title>
+<title>黄金持仓信息中心 V1.10</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 :root{
@@ -65,7 +65,7 @@ body{min-height:100vh;padding-bottom:40px}
 .p-name{font-size:.66rem;color:var(--ink3);letter-spacing:.5px}
 .p-val{font-size:1.25rem;font-weight:900;color:var(--gold-soft);font-variant-numeric:tabular-nums;margin-top:2px}
 .p-unit{font-size:.62rem;color:var(--ink3)}
-.p-time{font-size:.66rem;color:var(--ink3);align-self:center;text-align:right;line-height:1.6}
+.p-time{font-size:.66rem;color:var(--ink3);grid-column:1/-1;align-self:center;text-align:right;line-height:1.6;padding:0 2px}
 /* ===== 区块标题 ===== */
 .sec{margin-top:24px}
 .sec-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -229,7 +229,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.9</span>
+    <span class="ver" id="appVer">V1.10</span>
   </div>
 </header>
 
@@ -265,7 +265,8 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
     </div>
     <div class="price-strip">
       <div class="p-card"><div class="p-name">人民币金价</div><div class="p-val" id="pxCny">--</div><div class="p-unit">元/克</div></div>
-      <div class="p-card"><div class="p-name">伦敦金现货</div><div class="p-val" id="pxUsd">--</div><div class="p-unit" id="pxUsdSub">美元/盎司 · 汇率 --</div></div>
+      <div class="p-card"><div class="p-name">伦敦金现货</div><div class="p-val" id="pxUsd">--</div><div class="p-unit">美元/盎司</div></div>
+      <div class="p-card" id="rateCard"><div class="p-name">汇率参考</div><div class="p-val" id="pxRate">--</div><div class="p-unit">USD→CNY</div></div>
       <div class="p-card" id="count2Card"><div class="p-name">持仓方案</div><div class="p-val" id="count2">--</div><div class="p-unit" id="count2Sub">个方案 · 含建仓逻辑</div></div>
       <div class="p-time" id="pxTime">更新时间 --</div>
     </div>
@@ -334,7 +335,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <b>持仓信息中心</b>
-      <span class="ver">V1.9</span>
+      <span class="ver">V1.10</span>
     </div>
     <div class="sm-group">
       <div class="sm-item" id="smDb">
@@ -508,7 +509,7 @@ function loadPrice(){
 function renderPrice(){
   $('pxCny').textContent = g.px.cny? num(g.px.cny,2) : '--';
   $('pxUsd').textContent = g.px.usd? num(g.px.usd,2) : '--';
-  $('pxUsdSub').textContent = '美元/盎司 · 汇率 '+(g.px.rate?num(g.px.rate,4):'--');
+  $('pxRate').textContent = g.px.rate? num(g.px.rate,4) : '--';
   $('pxTime').textContent = '更新时间 '+fmtTime(Date.now());
 }
 

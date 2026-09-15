@@ -841,6 +841,21 @@ function refresh(silent){
 $('btnRefresh').onclick=function(){ refresh(false) };
 $('btnGoMain').onclick=function(){ try{ window.location.href='./'; }catch(e){} };
 
+/* ============ V1.6 Service Worker 自动更新：SW 换新后自动刷新取最新页面 ============ */
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+  try{
+    navigator.serviceWorker.register('./sw.js?v=4.25').then(function(reg){
+      if(reg.update) reg.update();
+    }).catch(function(){});
+    var reloaded=false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(reloaded) return; reloaded=true;
+      try{ window.location.reload(); }catch(e){}
+    });
+  }catch(e){}
+})();
+
 /* ============ 启动 ============ */
 applyTheme();
 refresh();

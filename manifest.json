@@ -1,25 +1,12 @@
 {
-  "name": "黄金建仓助手 V4.27",
-  "short_name": "黄金建仓",
-  "description": "日夜主题·卡片自由布局·黑金视觉·多方案·双逻辑·云同步",
-  "start_url": "./index.html",
-  "scope": "./",
+  "name": "黄金智能助手",
+  "short_name": "黄金助手",
+  "start_url": "./",
   "display": "standalone",
-  "orientation": "any",
-  "background_color": "#f6f3ec",
-  "theme_color": "#32291c",
+  "background_color": "#0B0E14",
+  "theme_color": "#0B0E14",
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

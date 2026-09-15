@@ -1,5 +1,5 @@
 /* 黄金建仓助手 V4.25 —— Service Worker：离线缓存（网络优先，保证 dashboard 等页面始终最新） */
-var CACHE = 'gold-assistant-v4.25-'+Date.now();
+var CACHE = 'gold-assistant-v4.26-'+Date.now();
 var ASSETS = [
   './',
   './index.html',

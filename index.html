@@ -51,6 +51,8 @@ input,select{font-family:inherit}
 .panel h3::before{content:'';width:3px;height:12px;border-radius:3px;background:linear-gradient(var(--gold),var(--gold2))}
 .panel h3 .r{margin-left:auto;font-size:9.5px;color:var(--ink3);font-weight:500}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-scroll table{min-width:560px}
 th{font-size:9px;color:var(--ink3);font-weight:600;text-align:right;padding:6px 7px;border-bottom:1px solid var(--line);white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
 td{font-size:11px;padding:7px;text-align:right;border-bottom:1px solid rgba(36,48,73,.35);color:var(--ink2);white-space:nowrap}
@@ -324,8 +326,8 @@ td,th{font-size:10px;padding:6px 4px}
 
   <!-- 仓位 -->
   <div id="view-position" class="hide">
-    <div class="panel"><h3>仓位列表 <span class="r">分方案 × 逻辑 · 买卖直接加减</span></h3><table id="pTable"></table></div>
-    <div class="panel"><h3>买卖记录 <span class="r">全量流水</span></h3><table id="pTrades"></table></div>
+    <div class="panel"><h3>仓位列表 <span class="r">分方案 × 逻辑 · 买卖直接加减</span></h3><div class="tbl-scroll"><table id="pTable"></table></div></div>
+    <div class="panel"><h3>买卖记录 <span class="r">全量流水</span></h3><div class="tbl-scroll"><table id="pTrades"></table></div></div>
   </div>
 
   <!-- 计划 -->

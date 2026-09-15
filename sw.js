@@ -1,5 +1,5 @@
-/* 黄金建仓助手 V4.16 —— Service Worker：离线缓存 */
-var CACHE = 'gold-assistant-v4.22-1789443876';
+/* 黄金建仓助手 V4.23 —— Service Worker：离线缓存 */
+var CACHE = 'gold-assistant-v4.23-'+Date.now();
 var ASSETS = [
   './',
   './index.html',
@@ -28,25 +28,16 @@ self.addEventListener('activate', function(e){
 });
 
 self.addEventListener('fetch', function(e){
-  var req = e.request;
-  if(req.method !== 'GET') return;
-  // 只处理同源页面/静态资源；跨域行情接口（gold-api 等）直接放行
-  if(req.url.indexOf(self.location.origin) !== 0) return;
-  // 网络优先：先请求最新内容（线上更新即时生效），失败才回退缓存
+  if(e.request.method!=='GET') return;
   e.respondWith(
-    fetch(req)
-      .then(function(res){
-        if(res && res.status === 200){
-          var copy = res.clone();
-          caches.open(CACHE).then(function(c){ c.put(req, copy); });
+    caches.match(e.request).then(function(resp){
+      return resp || fetch(e.request).then(function(r){
+        if(r && r.status===200 && e.request.url.indexOf('api.github.com')<0){
+          var cp = r.clone();
+          caches.open(CACHE).then(function(c){ c.put(e.request, cp); });
         }
-        return res;
-      })
-      .catch(function(){
-        return caches.match(req).then(function(cached){
-          if(cached) return cached;
-          return caches.match('./index.html');
-        });
-      })
+        return r;
+      });
+    }).catch(function(){ return caches.match('./index.html'); })
   );
 });

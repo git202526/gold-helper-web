@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>黄金持仓信息中心 V1.7</title>
+<title>黄金持仓信息中心 V1.8</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 :root{
@@ -204,6 +204,18 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
 .sm-item:hover{background:var(--card3);border-color:var(--gold)}
 .sm-item:active{transform:scale(.97)}
 .sm-item svg{color:var(--gold-soft);flex:none}
+
+/* ===== V1.8 氛围灯与动效 ===== */
+@keyframes glowGreen{0%,100%{box-shadow:0 0 8px rgba(52,211,153,.22)}50%{box-shadow:0 0 26px rgba(52,211,153,.62)}}
+@keyframes glowRed{0%,100%{box-shadow:0 0 8px rgba(242,85,90,.22)}50%{box-shadow:0 0 26px rgba(242,85,90,.62)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.p-card.glow-green{animation:glowGreen 1.6s ease-in-out infinite;border-color:rgba(52,211,153,.55)}
+.p-card.glow-red{animation:glowRed 1.6s ease-in-out infinite;border-color:rgba(242,85,90,.55)}
+#backBar.glow-green{animation:glowGreen 1.6s ease-in-out infinite, floatY 3.4s ease-in-out infinite;border-left-color:var(--down);background:linear-gradient(90deg,rgba(52,211,153,.1),var(--card))}
+#backBar.glow-red{animation:glowRed 1.6s ease-in-out infinite, floatY 3.4s ease-in-out infinite;border-left-color:var(--up);background:linear-gradient(90deg,rgba(242,85,90,.14),var(--card))}
+#backBar .bk-stat{font-size:.7rem;color:var(--ink3);background:var(--card3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-weight:800;white-space:nowrap}
+#backBar.glow-red .bk-stat{color:var(--up);border-color:rgba(242,85,90,.4)}
+#backBar.glow-green .bk-stat{color:var(--down);border-color:rgba(52,211,153,.4)}
 </style>
 </head>
 <body>
@@ -214,7 +226,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.7</span>
+    <span class="ver" id="appVer">V1.8</span>
   </div>
 </header>
 
@@ -232,10 +244,10 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <div class="h-val gold" id="ovGrams">--</div>
         <div class="h-sub">全部方案合计克重</div>
       </div>
-      <div class="h-card red" id="ovPnlCard">
-        <div class="h-label">总浮动盈亏</div>
-        <div class="h-val red" id="ovPnl">--</div>
-        <div class="h-sub" id="ovPnlSub">--</div>
+      <div class="h-card" id="ovDeltaCard">
+        <div class="h-label">总涨跌幅度</div>
+        <div class="h-val" id="ovDelta">--</div>
+        <div class="h-sub" id="ovDeltaSub">--</div>
       </div>
       <div class="h-card">
         <div class="h-label">持仓方案</div>
@@ -250,8 +262,8 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
     </div>
     <div class="price-strip">
       <div class="p-card"><div class="p-name">人民币金价</div><div class="p-val" id="pxCny">--</div><div class="p-unit">元/克</div></div>
-      <div class="p-card"><div class="p-name">伦敦金现货</div><div class="p-val" id="pxUsd">--</div><div class="p-unit">美元/盎司</div></div>
-      <div class="p-card"><div class="p-name">汇率参考</div><div class="p-val" id="pxRate">--</div><div class="p-unit">USD→CNY</div></div>
+      <div class="p-card"><div class="p-name">伦敦金现货</div><div class="p-val" id="pxUsd">--</div><div class="p-unit" id="pxUsdSub">美元/盎司 · 汇率 --</div></div>
+      <div class="p-card" id="pnl2Card"><div class="p-name">总浮动盈亏</div><div class="p-val" id="pnl2">--</div><div class="p-unit" id="pnl2Sub">按当前金价估算</div></div>
       <div class="p-time" id="pxTime">更新时间 --</div>
     </div>
   </section>
@@ -319,7 +331,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <b>持仓信息中心</b>
-      <span class="ver">V1.7</span>
+      <span class="ver">V1.8</span>
     </div>
     <div class="sm-group">
       <div class="sm-item" id="smDb">
@@ -493,7 +505,7 @@ function loadPrice(){
 function renderPrice(){
   $('pxCny').textContent = g.px.cny? num(g.px.cny,2) : '--';
   $('pxUsd').textContent = g.px.usd? num(g.px.usd,2) : '--';
-  $('pxRate').textContent = g.px.rate? num(g.px.rate,4) : '--';
+  $('pxUsdSub').textContent = '美元/盎司 · 汇率 '+(g.px.rate?num(g.px.rate,4):'--');
   $('pxTime').textContent = '更新时间 '+fmtTime(Date.now());
 }
 
@@ -518,12 +530,30 @@ function renderOverview(cards){
   cards.forEach(function(c){ tot+=c.total; gr+=c.grams; pnl+=c.pnl; if(c.has) cnt++; });
   $('ovTotal').textContent = tot>0? money(tot)+' 元' : '--';
   $('ovGrams').textContent = gr>0? round2(gr)+' g' : '--';
-  $('ovPnl').textContent = pnl!==0? (pnl>0?'+':'')+round2(pnl)+' 元' : '--';
-  var card=$('ovPnlCard');
-  if(pnl>0){ card.className='h-card red'; $('ovPnl').className='h-val red'; }
-  else if(pnl<0){ card.className='h-card green'; $('ovPnl').className='h-val green'; }
-  else{ card.className='h-card'; $('ovPnl').className='h-val'; }
-  $('ovPnlSub').textContent = gr>0? ('按当前金价 '+num(px(),0)+' 元/克估算') : '暂无持仓';
+  /* 价格条第3格：总浮动盈亏（红盈绿亏 + 氛围灯） */
+  var pnl2=$('pnl2'), pnl2Card=$('pnl2Card'), pnl2Sub=$('pnl2Sub');
+  if(pnl2){
+    pnl2.textContent = pnl!==0? (pnl>0?'+':'')+round2(pnl)+' 元' : '--';
+    pnl2Card.className = 'p-card'+(pnl>0?' glow-red':(pnl<0?' glow-green':''));
+    pnl2Sub.textContent = gr>0? ('按金价 '+num(px(),0)+' 估算') : '暂无持仓';
+  }
+  /* 总涨跌幅度：当前金价 vs 持仓加权高点 */
+  var d=null, wHigh=0, wg=0;
+  cards.forEach(function(c){
+    if(c.grams>0 && c.high){ wg+=c.grams; wHigh+=c.high*c.grams; }
+  });
+  var wAvg = wg>0? wHigh/wg : 0;
+  var pxNow=px();
+  if(wAvg>0 && pxNow>0) d = (pxNow-wAvg)/wAvg*100;
+  var dc=$('ovDeltaCard'), dv=$('ovDelta'), ds=$('ovDeltaSub');
+  if(d==null){ dv.textContent='--'; ds.textContent='暂无高点参考'; dc.className='h-card'; dv.className='h-val'; }
+  else{
+    var sign = d>0?'+':'';
+    dv.textContent = sign+d.toFixed(2)+'%';
+    ds.textContent = '加权高点 '+num(wAvg,2)+' 元';
+    if(d>0){ dc.className='h-card red'; dv.className='h-val red'; }
+    else{ dc.className='h-card green'; dv.className='h-val green'; }
+  }
   $('ovCount').textContent = cnt;
   $('pfTip').textContent = cnt+' 个方案含持仓';
   function px(){ return g.px.cny||0 }
@@ -601,22 +631,22 @@ function drawPfChart(id, c){
 
 /* 回本提醒：实时人民币金价 ≥ 持仓均价+10 元 → 该方案已回本 */
 function renderBack(cards){
-  var msg=$('backMsg'); if(!msg) return;
+  var msg=$('backMsg'), bar=$('backBar'); if(!msg||!bar) return;
   var px=g.px.cny||0;
   var has=cards.filter(function(c){return c.has && c.avg>0});
-  if(!has.length){ msg.innerHTML='暂无持仓'; msg.className='back-msg'; return; }
+  if(!has.length){ msg.innerHTML='暂无持仓'; bar.className='back-bar'; return; }
   var hit=has.filter(function(c){ return px>0 && px>=c.avg+10; });
+  var stat='<b class="bk-stat">'+has.length+' 个方案 · 已回本 '+hit.length+'</b>';
   if(hit.length){
-    msg.innerHTML = hit.map(function(c){
-      return '<b class="hit">'+esc(c.name)+' 已回本</b><span class="sub">当前 '+num(px,2)+' · 均价 '+num(c.avg,2)+' · 超 '+(px-c.avg).toFixed(2)+' 元</span>';
-    }).join('');
+    var first=hit.slice().sort(function(a,b){ return (px-a.avg)-(px-b.avg); })[0];
+    msg.innerHTML = stat+'<b class="hit">'+esc(first.name)+' 已回本</b><span class="sub">当前 '+num(px,2)+' · 均价 '+num(first.avg,2)+' · 超 '+(px-first.avg).toFixed(2)+' 元</span>';
     msg.className='back-msg hit';
-    $('backBar').className='back-bar hit';
+    bar.className='back-bar glow-red';
   } else {
     var near=has.slice().sort(function(a,b){ return (a.avg+10-px)-(b.avg+10-px); })[0];
-    msg.innerHTML = '暂无方案已回本 <span class="sub">最近：'+esc(near.name)+' 还差 '+(near.avg+10-px>0?(near.avg+10-px).toFixed(2):'0.00')+' 元（均价 '+num(near.avg,2)+'）</span>';
+    msg.innerHTML = stat+'<span class="sub">最近：'+esc(near.name)+' 还差 '+(near.avg+10-px>0?(near.avg+10-px).toFixed(2):'0.00')+' 元（均价 '+num(near.avg,2)+'）</span>';
     msg.className='back-msg';
-    $('backBar').className='back-bar';
+    bar.className='back-bar glow-green';
   }
 }
 

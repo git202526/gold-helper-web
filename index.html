@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.26</title>
+<title>黄金建仓助手 V4.27</title>
 <style>
 /* ============================================================
    V4.19 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
@@ -67,7 +67,7 @@ img{display:block;max-width:100%}
 @keyframes glowPulse{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 20px 50px -22px rgba(0,0,0,.7), 0 0 0 1px rgba(233,185,73,.12)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 20px 50px -22px rgba(0,0,0,.7), 0 0 0 1px rgba(233,185,73,.34), var(--glow)}}
 
 /* ===== 顶栏 ===== */
-.topbar{display:flex;align-items:center;gap:12px;padding:10px 18px;border-radius:var(--r-shell);
+.topbar{flex:1 1 100%;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:10px 18px;border-radius:var(--r-shell);
   background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-card);backdrop-filter:blur(14px)}
 .sb-avatar{width:42px;height:42px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,#F0C96A,#C9962E 65%,#A67B1E);color:#171007;border:1px solid rgba(255,255,255,.3);
@@ -84,7 +84,7 @@ img{display:block;max-width:100%}
 
 /* ===== 主区 ===== */
 .wrap{max-width:1720px;margin:0 auto;padding:14px;display:flex;flex-wrap:wrap;gap:14px}
-.main{flex:1 1 100%;display:flex;gap:14px;align-items:flex-start}
+.main{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
 .lcol{flex:1 1 33.3%;min-width:0;display:flex;flex-direction:column;gap:14px}
 .rcol{flex:1 1 64.7%;min-width:0;display:flex;flex-direction:column;gap:14px}
 .card,.top{background:var(--card);border:1px solid var(--line);border-radius:var(--r-shell);
@@ -102,8 +102,8 @@ img{display:block;max-width:100%}
 /* 卡片折叠：隐藏标题以外的内容（保留布局编辑手柄） */
 .card.collapsed > h2 ~ *:not(.cd-bar){display:none}
 
-/* ===== 金价卡（主角，大数字） ===== */
-#goldCard{overflow:hidden}
+/* ===== 金价卡（主角，大数字；全宽顶行） ===== */
+#goldCard{overflow:hidden;flex:1 1 100%;width:100%;box-sizing:border-box}
 .price-bar{padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px}
 #goldCard::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(520px 200px at 20% -10%, rgba(233,185,73,.14), transparent 65%)}
@@ -127,9 +127,6 @@ img{display:block;max-width:100%}
 .btn-gold:active{transform:scale(.96)}
 .btn-sm{font-size:.8rem;padding:8px 20px}
 .price-void{flex:1}
-.btn-sb-open{width:38px;height:38px;border-radius:12px;background:var(--card-2);border:1px solid var(--line);
-  color:var(--gold);font-size:1.05rem;display:inline-flex;align-items:center;justify-content:center;transition:border-color .2s}
-.btn-sb-open:hover{border-color:var(--gold)}
 
 /* ===== 操作面板 ===== */
 .op-panel{display:flex;flex-direction:column}
@@ -780,7 +777,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.26</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.27</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -821,8 +818,6 @@ html[data-theme="light"] .sb-avatar{color:#fff}
       </div>
       <div class="price-actions">
         <button class="btn-gold btn-sm" id="btnRefresh">刷新</button>
-        <span class="price-void"></span>
-        <button class="btn-sb-open" id="btnSbOpen" type="button" title="打开菜单">☰</button>
       </div>
     </div>
   </header>
@@ -992,7 +987,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.26 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.27 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -2453,11 +2448,11 @@ function initRuleFolds(){
 var LAYOUT_KEY='jcj_layout_v2';
 
 var LAYOUT_IDS=['goldCard','tierCard','tpCard','opCard','ruleCard','topBar'];
-var SWAP_IDS=['goldCard','tierCard','tpCard','opCard','ruleCard'];
+var SWAP_IDS=['tierCard','tpCard','opCard','ruleCard'];
 /* V3.5.14 桌面布局（flex 两列）：col 0=左列(金价/止盈)、1=右列(操作/建仓)；full=整行卡；lw=左列宽度比例 */
 var DEF_LAYOUT={
   topBar:{full:1,h:0},
-  goldCard:{col:0,ord:0,h:0},
+  goldCard:{full:1,h:0},
   tpCard:{col:0,ord:2,h:0},
   opCard:{col:1,ord:1,h:0},
   tierCard:{col:1,ord:3,h:0},
@@ -2481,7 +2476,7 @@ function layoutSave(l){
 function rebuildCols(reset){
   var lcol=document.getElementById('lcol'), rcol=document.getElementById('rcol');
   if(!lcol||!rcol) return;
-  var L0=['goldCard','tpCard','ruleCard'], R0=['opCard','tierCard'];
+  var L0=['tpCard','ruleCard'], R0=['opCard','tierCard'];
   /* V3.6.0 修复：非重置时按已保存布局的 col 归位，刷新后换位不再丢失 */
   var l = reset ? null : layoutLoad();
   function target(id, defCol){
@@ -2490,6 +2485,9 @@ function rebuildCols(reset){
   }
   L0.forEach(function(id){ var el=document.getElementById(id); if(el){ var t=target(id,0); if(el.parentNode!==t) t.appendChild(el); } });
   R0.forEach(function(id){ var el=document.getElementById(id); if(el){ var t=target(id,1); if(el.parentNode!==t) t.appendChild(el); } });
+  /* V4.27：金价卡固定为全宽顶行（layoutGrid 直接子项，始终位于左列之前） */
+  var gc=document.getElementById('goldCard'), gg=document.getElementById('layoutGrid');
+  if(gc && gg && lcol){ gg.insertBefore(gc, lcol); }
 }
 function layoutApply(l){
   if(!l) l=DEF_LAYOUT;
@@ -2504,6 +2502,7 @@ function layoutApply(l){
     if(!el) return;
     if(p.h>0 && p.h<90){ p.h=0; }   /* 与拖拽最小高度 90px 对齐，避免 90-139px 高度被丢（#14） */
     el.style.minHeight = (p.h>0) ? (p.h+'px') : '';
+    if(p.full){ el.style.order=''; return; }  /* V4.27：整行卡（金价/标题）固定顺序 */
     if(p.ord!=null) el.style.order = p.ord; else el.style.order = '';
   });
 }
@@ -2581,7 +2580,7 @@ function initLayout(){
     if(!document.body.classList.contains('editing')) return;
     var hd=e.target.closest('.cd-handle'); if(!hd) return;
     var card=hd.closest('.card, #goldCard'); if(!card || !card.id) return;
-    if(card.id==='topBar') return;
+    if(card.id==='topBar' || card.id==='goldCard') return;
     e.preventDefault();
     drag={card:card,id:card.id,layout:layoutLoad()||layoutClone(DEF_LAYOUT),
       startX:e.clientX,startY:e.clientY,cur:null,colTarget:null};
@@ -2668,7 +2667,7 @@ function initLayout(){
     var card=rz.closest('.card, #goldCard, .topbar'); if(!card || !card.id) return;
     e.preventDefault(); e.stopPropagation();
     var isE=rz.classList.contains('cd-resize-e'), isS=rz.classList.contains('cd-resize-s');
-    var full = (card.id==='topBar' || card.id==='ruleCard');
+    var full = (card.id==='topBar' || card.id==='goldCard' || card.id==='ruleCard');
     var l=layoutLoad()||layoutClone(DEF_LAYOUT);
     var p=l[card.id]||layoutClone(DEF_LAYOUT[card.id]||{});
     var sx=e.clientX, sy=e.clientY, slw=l.lw, sh=card.getBoundingClientRect().height, sm=p.h>0?p.h:0;

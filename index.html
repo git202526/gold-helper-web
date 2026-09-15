@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.18</title>
+<title>黄金建仓助手 V4.19</title>
 <style>
 /* ============================================================
-   V4.18 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
+   V4.19 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
    ============================================================ */
 :root{
   --canvas:#0C0905;            /* 暖炭黑底 */
@@ -272,7 +272,7 @@ html[data-theme="light"] .op-item b.pnl-down{text-shadow:none}
 .cols-btn{margin-left:auto;font-size:.66rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);
   border-radius:99px;padding:3px 10px;font-family:inherit;white-space:nowrap}
 
-/* ===== 止盈计划（V4.18 视觉升级：与操作面板风格统一） ===== */
+/* ===== 止盈计划（V4.19 视觉升级：与操作面板风格统一） ===== */
 .tp-body{padding:0 18px 16px}
 .tp-profitbar{display:flex;gap:10px;margin:12px 18px 0;padding:0}
 .tpb-item{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;
@@ -318,6 +318,35 @@ html[data-theme="light"] .tpb-v.down{text-shadow:none}
 .tp .badge{position:absolute;top:10px;right:10px;font-size:.62rem;font-weight:800;color:#171007;
   background:linear-gradient(135deg,#F0C96A,#C9962E);border-radius:99px;padding:3px 9px;
   box-shadow:0 4px 14px -4px rgba(233,185,73,.55)}
+/* ===== 卖出功能（V4.19）：自定义卖出 + 卖出记录 ===== */
+.tp-sell-sec{margin:0 18px 16px;background:linear-gradient(165deg,var(--card-3),var(--card-2));
+  border:1px solid var(--line-2);border-radius:var(--r-card);padding:13px 15px}
+.tps-head{font-size:.8rem;font-weight:800;color:var(--gold-soft);letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.tps-head::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold-deep);flex:none}
+.tps-count{font-size:.66rem;color:var(--ink-3);font-weight:700}
+.tps-form{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.tps-in{flex:1;min-width:110px;background:var(--card-3);border:1px solid var(--line-2);border-radius:9px;
+  color:var(--gold-soft);font-size:.8rem;padding:8px 10px;font-family:inherit;font-variant-numeric:tabular-nums}
+.tps-in:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(233,185,73,.13)}
+.tps-total{font-size:.78rem;font-weight:800;color:var(--gold);min-width:120px;font-variant-numeric:tabular-nums}
+.tps-btn{font-size:.76rem;font-weight:800;color:#171007;background:linear-gradient(135deg,#F0C96A,#C9962E);
+  border:0;border-radius:99px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 14px -4px rgba(233,185,73,.55)}
+.tps-btn:active{transform:scale(.96)}
+.tps-list{margin-top:4px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto}
+.sl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card-3);
+  border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;font-size:.74rem}
+.sl-tag{font-size:.62rem;font-weight:800;border-radius:99px;padding:2px 8px;flex:none}
+.sl-tag.sl-batch{color:#171007;background:linear-gradient(135deg,#F0C96A,#C9962E)}
+.sl-tag.sl-manual{color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line)}
+.sl-info{color:var(--ink);font-weight:700;white-space:nowrap}
+.sl-info b{color:var(--gold-soft)}
+.sl-total{color:var(--up);font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;margin-left:auto}
+.sl-time{font-size:.62rem;color:var(--ink-3);white-space:nowrap}
+.sl-del{width:24px;height:24px;border-radius:8px;border:1px solid var(--line-2);background:var(--card-2);
+  color:var(--down);font-size:.68rem;cursor:pointer;line-height:1;flex:none}
+.sl-del:active{transform:scale(.92)}
+.tps-empty{font-size:.7rem;color:var(--ink-3);text-align:center;padding:10px 0 4px}
 .tp.wide{grid-column:1/-1;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:14px;
   background:linear-gradient(100deg,var(--gold-bg),var(--card-2) 55%);border-color:rgba(233,185,73,.35);
   padding:14px 16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
@@ -729,7 +758,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.18</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.19</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -877,6 +906,19 @@ html[data-theme="light"] .sb-avatar{color:#fff}
       </div>
     </div>
     <div class="tp-grid" id="tpGrid"></div>
+    <!-- 卖出功能（V4.19）：自定义卖出 + 手动/批量卖出记录 -->
+    <div class="tp-sell-sec" id="tpSellSec">
+      <div class="tps-head">自定义卖出</div>
+      <div class="tps-form">
+        <input class="tps-in" id="msPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="卖出价 元/克">
+        <input class="tps-in" id="msGrams" type="number" min="0" step="0.01" inputmode="decimal" placeholder="重量 g">
+        <span class="tps-total" id="msTotal">总价：--</span>
+        <button class="tps-btn" id="msBtn" type="button">确认卖出</button>
+      </div>
+      <div class="tps-head">卖出记录 <span class="tps-count" id="slCount"></span></div>
+      <div class="tps-list" id="sellLogList"></div>
+      <div class="tps-empty" id="sellLogEmpty">暂无卖出记录</div>
+    </div>
   </section>
 
 </div>
@@ -922,7 +964,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.18 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.19 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -963,6 +1005,7 @@ function defaultProfile(){
     hitHigh: {1:false, 2:false},   /* 按逻辑隔离：该逻辑是否反弹到过阶段高点 */
     firstBuyTs: {1:null, 2:null},  /* 按逻辑隔离：该逻辑首次开仓时间戳（开仓天数用） */
     sold: {1:emptySold(), 2:emptySold()},  /* 按逻辑隔离：各批止盈已执行卖出克重（#6） */
+    sellLogs: [],  /* 卖出记录流水（手动+批量，V4.19）：{id,t,mode:'manual'|'batch',logic,batch?,price,grams,total} */
     pos: { 1: emptyPos(), 2: emptyPos() }   /* 逻辑1/逻辑2 各自独立持仓 */
   };
 }
@@ -1021,6 +1064,23 @@ function normalizeProfile(p){
   d.sold = (p.sold && typeof p.sold==='object')
     ? {1:normSold(p.sold[1]), 2:normSold(p.sold[2])}
     : {1:emptySold(), 2:emptySold()};
+  /* 卖出记录流水（V4.19）：兼容旧数据无此字段；只保留合法条目，限 200 条防体积膨胀 */
+  d.sellLogs = Array.isArray(p.sellLogs)
+    ? p.sellLogs.filter(function(l){
+        return l && typeof l==='object' && typeof l.id==='string'
+          && typeof l.grams==='number' && isFinite(l.grams) && l.grams>0
+          && typeof l.price==='number' && isFinite(l.price) && l.price>0;
+      }).map(function(l){
+        return {
+          id: l.id, t: (typeof l.t==='number'&&l.t>0)?l.t:Date.now(),
+          mode: (l.mode==='manual'||l.mode==='batch')?l.mode:'manual',
+          logic: (l.logic===2)?2:1,
+          batch: (l.batch>=1&&l.batch<=5)?l.batch:null,
+          price: l.price, grams: round2(l.grams),
+          total: (typeof l.total==='number'&&isFinite(l.total))?l.total:round2(l.price*l.grams)
+        };
+      }).slice(-200)
+    : [];
   if(p.pos && typeof p.pos==='object'){
     for(var lg=1;lg<=2;lg++){
       var s = p.pos[lg];
@@ -1273,11 +1333,115 @@ function sellBatch(P, b){
   var soldActual = round2(remain-left);
   if(soldActual>0){
     soldObj['b'+b] = round2((soldB||0)+soldActual);
+    /* 自动登记该笔批量卖出记录（V4.19）：卖出价取当前金价，无则取当前档参考价 */
+    var priceNow = (P.price!=null && P.price>0) ? P.price
+      : (R.valid && R.tierPrice && R.tier>=1 && R.tier<=13 ? (R.tierPrice[R.tier-1]||0) : 0);
+    if(priceNow>0) pushSellLog(P, { mode:'batch', logic:P.logic, batch:b, price:round2(priceNow), grams:soldActual, total:round2(priceNow*soldActual) });
     save(); render();
     toast('第'+b+'批止盈已执行：卖出 '+soldActual+' g');
   } else {
     toast('持仓不足，未执行卖出');
   }
+}
+
+/* ===== 卖出记录（V4.19）：手动/批量卖出流水，删除可回滚持仓 ===== */
+function pushSellLog(P, log){
+  if(!Array.isArray(P.sellLogs)) P.sellLogs=[];
+  log.id = 'sl'+Date.now()+'_'+Math.floor(Math.random()*1e6);
+  log.t = Date.now();
+  P.sellLogs.push(log);
+  if(P.sellLogs.length>200) P.sellLogs.splice(0, P.sellLogs.length-200);
+  return log;
+}
+/* 把卖出记录的克重退回持仓：优先补回已勾选档（从最低位起），全部补满后从未勾选最低档重新开仓 */
+function refundSellLog(P, log){
+  var pos = P.pos[log.logic];
+  var left = round2(log.grams);
+  if(!(left>0)) return 0;
+  for(var i=0;i<13 && left>0.005;i++){
+    if(!pos.checked[i]) continue;
+    pos.actGrams[i] = round2((pos.actGrams[i]!=null?pos.actGrams[i]:0) + left);
+    left = 0;
+  }
+  if(left>0.005){
+    for(var j=0;j<13 && left>0.005;j++){
+      if(pos.checked[j] || !isBuyTier(j)) continue;
+      pos.checked[j]=true;
+      pos.actGrams[j]=round2(left);
+      left=0;
+    }
+  }
+  return round2(log.grams - left);
+}
+/* 手动自定义卖出：填价格+重量 → 扣减持仓（优先从低位已勾选档扣）→ 登记记录 */
+function manualSell(P, price, grams){
+  var R = calc();
+  var pos = P.pos[P.logic];
+  var total = R.totalGrams||0;   /* 与止盈计划同口径：勾选未填克重档按参考克重计 */
+  if(!(total>0)){ toast('当前持仓为 0，无法卖出'); return false; }
+  if(grams>total+0.005){ toast('持仓不足：当前可卖 '+total+' g'); return false; }
+  if(!window.confirm('确认手动卖出 '+round2(grams)+' g @ '+money(price)+' 元/克？\n（优先从低位筹码扣除持仓勾选）')) return false;
+  var left = round2(grams);
+  for(var j=0;j<13 && left>0.005;j++){
+    if(!pos.checked[j]) continue;
+    var cur = pos.actGrams[j]!=null ? pos.actGrams[j] : (R.effGrams[j]||0);   /* 与 sellBatch 同兜底 */
+    if(!(cur>0)) continue;
+    if(cur<=left){ left = round2(left-cur); pos.checked[j]=false; pos.actGrams[j]=null; }
+    else{ pos.actGrams[j]=round2(cur-left); left=0; }
+  }
+  var soldActual = round2(grams-left);
+  if(soldActual>0){
+    pushSellLog(P, { mode:'manual', logic:P.logic, price:round2(price), grams:soldActual, total:round2(price*soldActual) });
+    save(); render();
+    toast('已手动卖出 '+soldActual+' g，总价 '+money(round2(price*soldActual))+' 元');
+    return true;
+  }
+  toast('持仓不足，未执行卖出');
+  return false;
+}
+/* 删除单笔卖出记录：克重退回持仓；批量记录同步回滚对应批次已执行量 */
+function deleteSellLog(P, id){
+  var logs = P.sellLogs||[], idx=-1, log=null;
+  for(var i=0;i<logs.length;i++) if(logs[i].id===id){ idx=i; log=logs[i]; break; }
+  if(!log){ toast('记录不存在或已删除'); return; }
+  if(!window.confirm('删除该笔卖出记录？\n· '+round2(log.grams)+' g 将退回持仓'+(log.mode==='batch'?'\n· 第'+log.batch+'批已执行量同步回滚':''))) return;
+  var refunded = refundSellLog(P, log);
+  if(log.mode==='batch' && log.batch>=1 && log.batch<=5 && P.sold && P.sold[log.logic]){
+    var k='b'+log.batch;
+    P.sold[log.logic][k] = Math.max(0, round2((P.sold[log.logic][k]||0) - log.grams));
+  }
+  logs.splice(idx,1);
+  save(); render();
+  toast('已删除记录，退回 '+refunded+' g 到持仓');
+}
+/* 记录时间格式化：MM-DD HH:MM */
+function fmtTime(t){
+  try{
+    var d = new Date(t);
+    var p=function(n){ return (n<10?'0':'')+n; };
+    return (p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()));
+  }catch(e){ return ''; }
+}
+/* 渲染卖出记录列表（最新在前） */
+function renderSellLogs(){
+  var P = cur();
+  var logs = (P.sellLogs||[]).slice().reverse();
+  var list = document.getElementById('sellLogList');
+  var empty = document.getElementById('sellLogEmpty');
+  var count = document.getElementById('slCount');
+  if(list) list.innerHTML = logs.map(function(l){
+    var modeTxt = (l.mode==='batch') ? ('批量·第'+l.batch+'批') : '手动';
+    var tagCls = (l.mode==='batch') ? 'sl-batch' : 'sl-manual';
+    return '<div class="sl-row">'
+      + '<span class="sl-tag '+tagCls+'">'+escHtml(modeTxt)+'</span>'
+      + '<span class="sl-info"><b>'+round2(l.grams)+' g</b> @ '+money(l.price)+' 元/克</span>'
+      + '<span class="sl-total">'+money(l.total)+' 元</span>'
+      + '<span class="sl-time">'+fmtTime(l.t)+'</span>'
+      + '<button type="button" class="sl-del" data-id="'+escHtml(l.id)+'" title="删除并退回重量">✕</button>'
+      + '</div>';
+  }).join('');
+  if(count) count.textContent = logs.length ? '('+logs.length+')' : '';
+  if(empty) empty.style.display = logs.length ? 'none' : '';
 }
 
 /* ===== 渲染 ===== */
@@ -1346,7 +1510,7 @@ function applyFolds(){
   }
   /* V3.5.12：规则说明默认收起（未手动设置过时），保持主区 2×2 干净 */
   if(!f.rule){ var rl=document.getElementById('ruleCard'); if(rl) rl.classList.add('collapsed'); }
-  /* V4.18：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
+  /* V4.19：菜单面板默认折叠低频分组（账号/行情参数），展开面板一屏容下逻辑+设置 */
   if(!f.account){ var acc=document.getElementById('sbAccount'); if(acc) acc.classList.add('collapsed'); }
   if(!f.params){ var pr=document.getElementById('sbParams'); if(pr) pr.classList.add('collapsed'); }
   syncFoldTxt();
@@ -1656,6 +1820,7 @@ function render(){
       +'</div>';
   }
   tp.innerHTML = tpHtml;
+  renderSellLogs();   /* 卖出记录列表（V4.19） */
 
   /* ---- 金价条 ---- */
   var gv=document.getElementById('goldVal'), gm=document.getElementById('goldMeta');
@@ -1787,6 +1952,30 @@ function bind(){
       if(idx>=1 && idx<=5) sellBatch(cur(), idx);
     }
   });
+  /* 自定义卖出：实时总价 + 确认卖出（V4.19） */
+  var msP=document.getElementById('msPrice'), msG=document.getElementById('msGrams'), msT=document.getElementById('msTotal');
+  function updMsTotal(){
+    var p=toNum(msP?msP.value:null), g=toNum(msG?msG.value:null);
+    if(msT) msT.textContent = (p!=null && g!=null && p>0 && g>0) ? ('总价：'+money(round2(p*g))+' 元') : '总价：--';
+  }
+  if(msP) msP.addEventListener('input', updMsTotal);
+  if(msG) msG.addEventListener('input', updMsTotal);
+  var msB=document.getElementById('msBtn');
+  if(msB) msB.addEventListener('click', function(){
+    var P=cur();
+    var p=toNum(msP?msP.value:null), g=toNum(msG?msG.value:null);
+    if(p==null || p<=0){ toast('请填写卖出价'); return; }
+    if(g==null || g<=0){ toast('请填写卖出重量'); return; }
+    if(manualSell(P,p,g) && msP && msG){ msP.value=''; msG.value=''; updMsTotal(); }
+  });
+  /* 卖出记录删除（V4.19）：删除后克重退回持仓 */
+  var sll=document.getElementById('sellLogList');
+  if(sll) sll.addEventListener('click', function(ev){
+    var b=ev.target;
+    if(b && b.classList && b.classList.contains('sl-del')){
+      deleteSellLog(cur(), b.getAttribute('data-id'));
+    }
+  });
   /* ---- 方案管理（二级菜单） ---- */
   var po = document.getElementById('btnPlanOpen');
   if(po) po.addEventListener('click', toggleDrawer);
@@ -1863,7 +2052,7 @@ function bind(){
     });
   });
 }
-window.__jcjCore = { state:state, calc:calc, render:render, save:save, round2:round2, money:money, toNum:toNum, bind:bind, load:load, judge:judge, cur:cur, isBuyTier:isBuyTier, normalizeProfile:normalizeProfile, applyFolds:applyFolds, setFold:setFold, getFolds:getFolds, sellBatch:sellBatch, emptySold:emptySold };
+window.__jcjCore = { state:state, calc:calc, render:render, save:save, round2:round2, money:money, toNum:toNum, bind:bind, load:load, judge:judge, cur:cur, isBuyTier:isBuyTier, normalizeProfile:normalizeProfile, applyFolds:applyFolds, setFold:setFold, getFolds:getFolds, sellBatch:sellBatch, emptySold:emptySold, manualSell:manualSell, deleteSellLog:deleteSellLog, pushSellLog:pushSellLog, refundSellLog:refundSellLog };
 })();
 
 </script>
@@ -1882,7 +2071,7 @@ function toast(msg){
   toast._t=setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
-/* ===== V4.18 账号云同步：使用用户自己的 GitHub Token（Settings→Developer settings→Personal access tokens，勾选 repo 权限）。
+/* ===== V4.19 账号云同步：使用用户自己的 GitHub Token（Settings→Developer settings→Personal access tokens，勾选 repo 权限）。
    凭据仅存于 sessionStorage（关标签即失效），不再内嵌任何账号/密码/加密令牌；"记住"仅保存同步标识与仓库名，不保存 Token。 ===== */
 var KEY_SESSION='jcj_session_v1';
 var _cloud = { owner:'git202526', repo:'gold-sync', token:'', user:'', sha:null, updatedAt:'', timer:null, busy:false, ready:false };
@@ -2214,7 +2403,7 @@ function initLayout(){
   var slotR=document.createElement('div'); slotR.className='cd-slot'; slotR.title='拖卡片到这里追加到本列末尾';
   slotL.style.order='999'; slotR.style.order='999';
   lcol.appendChild(slotL); rcol.appendChild(slotR);
-  /* V4.18 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
+  /* V4.19 修复：有已保存布局时按布局归位，刷新后换位不丢失；无布局时用默认 */
   rebuildCols(!layoutLoad());
   var l0 = layoutLoad() || layoutClone(DEF_LAYOUT);
   layoutApply(l0);
@@ -2705,7 +2894,7 @@ setInterval(function(){
 }, 60000);
 
 /* ===== 纯 JS xlsx 生成器（零依赖） ===== */
-/* 黄金建仓助手 V4.18 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
+/* 黄金建仓助手 V4.19 —— 纯 JS xlsx 生成器（零依赖，STORE 无压缩 zip） */
 function escX(v){
   return String(v===null||v===undefined?'':v)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2832,7 +3021,7 @@ function buildXlsx(R, P){
     ['总持仓(克)', m(R.totalGrams), '持仓均价', m(R.avgPrice), '保本价(均价×1.004)', m(R.breakeven)],
     ['浮动盈亏(元)', m(R.pnl), '盈亏比例(%)', m(R.pnlPct), '当前档位', tierTxt]
   ];
-  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.18 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
+  files.push({name:'xl/worksheets/sheet1.xml', data:utf8(sheetXml('黄金建仓助手 V4.19 · 状态汇总', ['项目','数值','项目','数值','项目','数值'], s1rows, [22,14,22,14,22,14]))});
   /* sheet2 档位明细 */
   var s2rows=[];
   var DD=[0,10,20,30,40,50,60,70,80,90,100,110,120];  /* 生成器自包含，勿依赖外部 DRAWDOWN */
@@ -2982,7 +3171,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.18').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.19').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

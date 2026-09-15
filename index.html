@@ -325,6 +325,21 @@ html[data-theme="light"] .tpb-v.down{text-shadow:none}
   display:flex;align-items:center;gap:6px;margin-bottom:9px}
 .tps-head::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold-deep);flex:none}
 .tps-count{font-size:.66rem;color:var(--ink-3);font-weight:700}
+.tps-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:11px}
+.tps-stat{background:linear-gradient(165deg,var(--card-3),var(--card-2));border:1px solid var(--line-2);
+  border-radius:var(--r-card);padding:10px 12px;display:flex;flex-direction:column;gap:3px;min-width:0;position:relative;overflow:hidden}
+.tps-stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(var(--gold),transparent);opacity:.6}
+.tps-stat .tps-k{font-size:.64rem;color:var(--ink-3);letter-spacing:.6px;font-weight:700;white-space:nowrap}
+.tps-stat .ss-v{font-size:1.08rem;font-weight:900;color:var(--gold-soft);font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 16px rgba(233,185,73,.25)}
+.tps-stat .ss-v.pnl-up{color:var(--up);text-shadow:0 0 16px rgba(242,85,90,.3)}
+.tps-stat .ss-v.pnl-down{color:var(--down);text-shadow:0 0 16px rgba(52,211,153,.3)}
+html[data-theme="light"] .tps-stat .ss-v{text-shadow:none}
+html[data-theme="light"] .tps-stat .ss-v.pnl-up{text-shadow:none}
+html[data-theme="light"] .tps-stat .ss-v.pnl-down{text-shadow:none}
+@media (max-width:760px){.tps-stats{grid-template-columns:repeat(2,1fr)}}
+.tps-head + .tps-form{margin-top:9px}
 .tps-form{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .tps-in{flex:1;min-width:110px;background:var(--card-3);border:1px solid var(--line-2);border-radius:9px;
   color:var(--gold-soft);font-size:.8rem;padding:8px 10px;font-family:inherit;font-variant-numeric:tabular-nums}
@@ -758,7 +773,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 5.8l1.55 3.9h4.1l-3.3 2.45 1.25 3.95-3.6-2.6-3.6 2.6 1.25-3.95-3.3-2.45h4.1z" fill="currentColor" opacity=".85"/></svg>
   </button>
   <div class="topbar-t">黄金建仓助手</div>
-  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.21</span></div>
+  <div class="topbar-r"><span class="topbar-ver" id="topbarVer">V4.22</span></div>
 </header>
 
 <!-- ===== 主区 ===== -->
@@ -908,6 +923,12 @@ html[data-theme="light"] .sb-avatar{color:#fff}
     <div class="tp-grid" id="tpGrid"></div>
     <!-- 卖出功能（V4.19）：自定义卖出 + 手动/批量卖出记录 -->
     <div class="tp-sell-sec" id="tpSellSec">
+      <div class="tps-stats" id="sellStats">
+        <div class="tps-stat"><span class="tps-k">卖出总量</span><b class="ss-v" id="ssGrams">--</b></div>
+        <div class="tps-stat"><span class="tps-k">卖出均价</span><b class="ss-v" id="ssAvg">--</b></div>
+        <div class="tps-stat"><span class="tps-k">原始成本</span><b class="ss-v" id="ssCost">--</b></div>
+        <div class="tps-stat"><span class="tps-k">盈亏金额</span><b class="ss-v" id="ssPnl">--</b></div>
+      </div>
       <div class="tps-head">自定义卖出</div>
       <div class="tps-form">
         <input class="tps-in" id="msPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="卖出价 元/克">
@@ -964,7 +985,7 @@ html[data-theme="light"] .sb-avatar{color:#fff}
 
 <!-- ===== 页脚 ===== -->
 <footer class="foot">
-  <span class="foot-t">黄金建仓助手 V4.21 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
+  <span class="foot-t">黄金建仓助手 V4.22 · 布局编辑/恢复请在左侧菜单「设置」中操作</span>
 </footer>
 
 </div>
@@ -1351,7 +1372,7 @@ function sellBatch(P, b){
     /* 自动登记该笔批量卖出记录（V4.19）：卖出价取当前金价，无则取当前档参考价 */
     var priceNow = (P.price!=null && P.price>0) ? P.price
       : (R.valid && R.tierPrice && R.tier>=1 && R.tier<=13 ? (R.tierPrice[R.tier-1]||0) : 0);
-    if(priceNow>0) pushSellLog(P, { mode:'batch', logic:P.logic, batch:b, price:round2(priceNow), grams:soldActual, total:round2(priceNow*soldActual) });
+    if(priceNow>0) pushSellLog(P, { mode:'batch', logic:P.logic, batch:b, price:round2(priceNow), grams:soldActual, total:round2(priceNow*soldActual), cost:(R.avgPrice!=null&&R.avgPrice>0?round2(R.avgPrice):null) });
     save(); render();
     toast('第'+b+'批止盈已执行：卖出 '+soldActual+' g');
   } else {
@@ -1406,7 +1427,7 @@ function manualSell(P, price, grams){
   }
   var soldActual = round2(grams-left);
   if(soldActual>0){
-    pushSellLog(P, { mode:'manual', logic:P.logic, price:round2(price), grams:soldActual, total:round2(price*soldActual) });
+    pushSellLog(P, { mode:'manual', logic:P.logic, price:round2(price), grams:soldActual, total:round2(price*soldActual), cost:(R.avgPrice!=null&&R.avgPrice>0?round2(R.avgPrice):null) });
     save(); render();
     toast('已手动卖出 '+soldActual+' g，总价 '+money(round2(price*soldActual))+' 元');
     return true;
@@ -1437,6 +1458,41 @@ function fmtTime(t){
     return (p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()));
   }catch(e){ return ''; }
 }
+/* 渲染卖出统计：卖出总重量 / 总卖出均价 / 原始资金成本 / 盈亏金额 */
+function renderSellStats(){
+  var P = cur();
+  var logs = P.sellLogs||[];
+  var el = document.getElementById('sellStats');
+  if(!el) return;
+  var gW=0, gTotal=0, gCost=0, costMissing=false;
+  var R = calc();
+  for(var i=0;i<logs.length;i++){
+    var l = logs[i];
+    if(!(l.grams>0)) continue;
+    gW = round2(gW + l.grams);
+    var t = (typeof l.total==='number'&&l.total>0) ? l.total : round2((l.price||0)*l.grams);
+    gTotal = round2(gTotal + t);
+    var cost = (typeof l.cost==='number' && l.cost>0) ? l.cost
+      : (R && R.avgPrice!=null && R.avgPrice>0) ? R.avgPrice : null;
+    if(cost==null){ costMissing=true; }
+    else gCost = round2(gCost + round2(l.grams*cost));
+  }
+  var sG=document.getElementById('ssGrams'), sA=document.getElementById('ssAvg'),
+      sC=document.getElementById('ssCost'), sP=document.getElementById('ssPnl');
+  if(sG) sG.textContent = gW>0 ? (gW+' g') : '--';
+  if(sA) sA.textContent = (gW>0 && gTotal>0) ? (money(round2(gTotal/gW))+' 元/克') : '--';
+  if(sC) sC.textContent = gCost>0 ? (money(gCost)+' 元') : '--';
+  if(sP){
+    if(gTotal>0 && gCost>0){
+      var pnl = round2(gTotal - gCost);
+      sP.textContent = (pnl>=0?'+':'')+money(pnl)+' 元';
+      sP.className = 'ss-v ' + (pnl>=0 ? 'pnl-up' : 'pnl-down');
+    } else {
+      sP.textContent = '--'; sP.className='ss-v';
+    }
+  }
+}
+
 /* 渲染卖出记录列表（最新在前） */
 function renderSellLogs(){
   var P = cur();
@@ -1836,6 +1892,7 @@ function render(){
   }
   tp.innerHTML = tpHtml;
   renderSellLogs();   /* 卖出记录列表（V4.19） */
+  renderSellStats();   /* 卖出统计：总量/均价/成本/盈亏 */
 
   /* ---- 金价条 ---- */
   var gv=document.getElementById('goldVal'), gm=document.getElementById('goldMeta');
@@ -3186,7 +3243,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.21').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.22').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);

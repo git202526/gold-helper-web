@@ -27,10 +27,9 @@ html,body{background:var(--canvas);color:var(--ink);font-family:-apple-system,Bl
 body{min-height:100vh;padding-bottom:40px}
 .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
 /* ===== 顶栏 ===== */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px;background:linear-gradient(180deg,var(--card),rgba(22,17,10,.96));backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);box-shadow:0 4px 24px rgba(0,0,0,.18)}
-body{padding-top:66px}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:linear-gradient(180deg,var(--card),rgba(22,17,10,.96));
+  border-bottom:1px solid var(--line)}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-badge{width:36px;height:36px;border-radius:11px;background:radial-gradient(circle at 32% 30%,var(--gold-soft),var(--gold) 55%,var(--gold-deep));
   display:flex;align-items:center;justify-content:center;box-shadow:var(--glow)}
@@ -186,31 +185,36 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
 .db-del{border:1px solid rgba(242,85,90,.4);background:rgba(242,85,90,.08);color:var(--up);border-radius:8px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer}
 .db-del:hover{background:rgba(242,85,90,.18)}
 .db-empty{text-align:center;color:var(--ink3);font-size:.78rem;padding:26px 0;line-height:1.8}
+
+/* ===== V1.7 侧边选项卡 ===== */
+#menuMask{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:.25s}
+#menuMask.show{opacity:1;visibility:visible}
+#sideMenu{position:fixed;top:0;left:0;bottom:0;z-index:220;width:min(290px,82vw);background:var(--card);
+  border-right:1px solid var(--line);box-shadow:8px 0 40px rgba(0,0,0,.35);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.22,.9,.3,1);display:flex;flex-direction:column;overflow-y:auto}
+#sideMenu.show{transform:translateX(0)}
+.sm-head{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid var(--line)}
+.sm-logo{width:38px;height:38px;border-radius:12px;background:radial-gradient(circle at 32% 30%,var(--gold-soft),var(--gold) 55%,var(--gold-deep));
+  display:flex;align-items:center;justify-content:center;color:#16110A}
+.sm-head b{font-size:.95rem;letter-spacing:1px}
+.sm-head .ver{font-size:.62rem;color:var(--gold-soft);background:var(--gold-bg);border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-weight:700;margin-left:auto}
+.sm-group{padding:14px 12px;display:flex;flex-direction:column;gap:8px}
+.sm-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:12px;background:var(--card2);
+  border:1px solid var(--line);color:var(--ink);font-size:.88rem;font-weight:700;cursor:pointer;transition:.2s}
+.sm-item:hover{background:var(--card3);border-color:var(--gold)}
+.sm-item:active{transform:scale(.97)}
+.sm-item svg{color:var(--gold-soft);flex:none}
 </style>
 </head>
 <body>
 
 <header class="topbar">
-  <div class="logo">
+  <div class="logo" id="logoBtn">
     <div class="logo-badge">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.6</span>
-  </div>
-  <div class="top-actions">
-    <button class="btn" id="btnDb" title="数据库管理">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" stroke-width="1.8"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="currentColor" stroke-width="1.8"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="currentColor" stroke-width="1.8"/></svg>
-      <span>数据管理</span>
-    </button>
-    <button class="btn" id="btnTheme" title="日夜切换">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span id="themeTxt">夜间</span>
-    </button>
-    <button class="btn" id="btnRefresh">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      刷新
-    </button>
+    <span class="ver" id="appVer">V1.7</span>
   </div>
 </header>
 
@@ -307,6 +311,32 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
     </div>
   </section>
 
+  <!-- V1.7 侧边选项卡（logo 点击打开） -->
+  <div id="menuMask"></div>
+  <aside id="sideMenu">
+    <div class="sm-head">
+      <div class="sm-logo">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <b>持仓信息中心</b>
+      <span class="ver">V1.7</span>
+    </div>
+    <div class="sm-group">
+      <div class="sm-item" id="smDb">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" stroke-width="1.8"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="currentColor" stroke-width="1.8"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span>数据库管理</span>
+      </div>
+      <div class="sm-item" id="smTheme">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span id="themeTxt2">夜间模式</span>
+      </div>
+      <div class="sm-item" id="smRefresh">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>刷新数据</span>
+      </div>
+    </div>
+  </aside>
+
   <!-- 空态（数据为空时显示） -->
   <section class="sec" id="emptySec" style="display:none">
     <div class="empty-state">
@@ -356,16 +386,20 @@ function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');c
 /* ============ 主题 ============ */
 function applyTheme(){
   document.documentElement.setAttribute('data-theme', g.theme);
-  $('themeTxt').textContent = g.theme==='dark'?'夜间':'日间';
+  var tt=document.getElementById('themeTxt')||document.getElementById('themeTxt2');
+  if(tt) tt.textContent = g.theme==='dark'?'夜间模式':'日间模式';
   Object.keys(g.charts).forEach(function(k){ if(g.charts[k]) g.charts[k].dispose() });
   g.charts={};
   if(document.querySelector('.pf-card')) render();   /* 主题切换后全量重建（含方案环形图） */
 }
-$('btnTheme').onclick=function(){
+function toggleTheme(){
   g.theme = g.theme==='dark'?'light':'dark';
   try{ localStorage.setItem('jcj_theme_v1', g.theme); localStorage.setItem('jcj_info_theme', g.theme); }catch(e){}
   applyTheme();
-};
+}
+var _bt=document.getElementById('btnTheme');
+if(_bt) _bt.onclick=toggleTheme;
+document.getElementById('smTheme').onclick=function(){ closeMenu(); toggleTheme(); };
 
 /* ============ 数据读取（V1.6：合并基础+账号 key，按 id 去重） ============ */
 var DB_KEYS=['jcj_helper_local_v2','jcj_helper_local_v2_admin','jcj_helper_local_v2_uesr'];
@@ -811,7 +845,19 @@ function delDbRow(el){
     else{ msg.textContent='本机删除失败：数据未找到'; msg.className='db-msg err'; }
   }
 }
-$('btnDb').onclick=function(){ openDb(); };
+var _bd=document.getElementById('btnDb');
+if(_bd) _bd.onclick=function(){ openDb(); };
+document.getElementById('smDb').onclick=function(){ closeMenu(); openDb(); };
+function openMenu(){
+  $('menuMask').classList.add('show');
+  $('sideMenu').classList.add('show');
+}
+function closeMenu(){
+  $('menuMask').classList.remove('show');
+  $('sideMenu').classList.remove('show');
+}
+$('logoBtn').onclick=function(){ openMenu(); };
+$('menuMask').onclick=function(){ closeMenu(); };
 $('dbClose').onclick=function(){ $('dbMask').style.display='none'; };
 $('dbMask').addEventListener('click', function(e){ if(e.target===$('dbMask')) $('dbMask').style.display='none'; });
 $('dbList').addEventListener('click', function(e){
@@ -823,22 +869,24 @@ $('dbList').addEventListener('click', function(e){
 var loading=false;
 function refresh(silent){
   if(loading) return; loading=true;
-  if(!silent){ $('btnRefresh').style.opacity=.6; toast('正在刷新数据…'); }
+  if(!silent){ var _b=$('btnRefresh'); if(_b) _b.style.opacity=.6; toast('正在刷新数据…'); }
   loadPrice().then(function(rs){
     g.px=rs;
     renderPrice();
     render();
     loading=false;
-    $('btnRefresh').style.opacity=1;
+    var _b=$('btnRefresh'); if(_b) _b.style.opacity=1;
     if(!silent) toast('刷新完成');
   }).catch(function(){
     render();
     loading=false;
-    $('btnRefresh').style.opacity=1;
+    var _b=$('btnRefresh'); if(_b) _b.style.opacity=1;
     if(!silent) toast('金价获取失败，已用方案保存价格估算');
   });
 }
-$('btnRefresh').onclick=function(){ refresh(false) };
+var _br=document.getElementById('btnRefresh');
+if(_br) _br.onclick=function(){ refresh(false) };
+document.getElementById('smRefresh').onclick=function(){ closeMenu(); refresh(false); };
 $('btnGoMain').onclick=function(){ try{ window.location.href='./'; }catch(e){} };
 
 /* ============ V1.6 Service Worker 自动更新：SW 换新后自动刷新取最新页面 ============ */

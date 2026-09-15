@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>黄金持仓信息中心 V1.12</title>
+<title>黄金持仓信息中心 V1.13</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 :root{
@@ -219,6 +219,13 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
 
 .h-card.glow-green{animation:glowGreen 1.6s ease-in-out infinite;border-color:rgba(52,211,153,.45)}
 .h-card.glow-red{animation:glowRed 1.6s ease-in-out infinite;border-color:rgba(242,85,90,.45)}
+
+.sync-form{padding:14px 18px 20px;display:flex;flex-direction:column;gap:6px}
+.sync-form label{font-size:.7rem;color:var(--ink3);font-weight:700;margin-top:6px}
+.sync-form input{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  padding:11px 12px;font-size:.85rem;outline:none;width:100%}
+.sync-form input:focus{border-color:var(--gold)}
+.sync-save{margin-top:14px;justify-content:center}
 </style>
 </head>
 <body>
@@ -229,7 +236,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#16110A" stroke-width="2.4"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="#16110A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <b>黄金持仓信息中心</b>
-    <span class="ver" id="appVer">V1.12</span>
+    <span class="ver" id="appVer">V1.13</span>
   </div>
 </header>
 
@@ -335,7 +342,7 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><path d="M12 6v12M8.5 10h4.2a2.3 2.3 0 0 1 0 4.6H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <b>持仓信息中心</b>
-      <span class="ver">V1.12</span>
+      <span class="ver">V1.13</span>
     </div>
     <div class="sm-group">
       <div class="sm-item" id="smDb">
@@ -349,6 +356,10 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
       <div class="sm-item" id="smRefresh">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>刷新数据</span>
+      </div>
+      <div class="sm-item" id="smSync">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>同步设置</span>
       </div>
     </div>
   </aside>
@@ -367,6 +378,22 @@ table.data .gold{color:var(--gold-soft);font-weight:800}
 </div>
 
 <div id="toast"></div>
+
+<!-- V1.13 同步设置弹层 -->
+<div id="syncMask" style="display:none">
+  <div class="db-panel">
+    <div class="db-head">同步设置<button class="db-close" id="syncClose" type="button">×</button></div>
+    <div class="db-tip">配置 GitHub 同步凭据后，本应用自动拉取云端账号方案数据（admin/uesr）。凭据仅保存在本机，用于读取云端数据文件。</div>
+    <div class="db-msg" id="syncMsg"></div>
+    <div class="sync-form">
+      <label>Token</label>
+      <input type="password" id="syncToken" placeholder="GitHub 个人访问令牌" autocomplete="off">
+      <label>仓库（owner/repo）</label>
+      <input type="text" id="syncRepo" placeholder="git202526/gold-sync">
+      <button class="btn sync-save" id="syncSave">保存并拉取</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== V1.6 数据管理弹层 ===== -->
 <div id="dbMask" style="display:none">
@@ -917,6 +944,38 @@ function delDbRow(el){
 var _bd=document.getElementById('btnDb');
 if(_bd) _bd.onclick=function(){ openDb(); };
 document.getElementById('smDb').onclick=function(){ closeMenu(); openDb(); };
+function openSync(){
+  $('syncMask').style.display='flex';
+  var s=getCloudSync();
+  $('syncToken').value = s? s.token : '';
+  $('syncRepo').value = s? (s.owner||'git202526')+'/'+(s.repo||'gold-sync') : 'git202526/gold-sync';
+  $('syncMsg').textContent='';
+}
+$('smSync').onclick=function(){ closeMenu(); openSync(); };
+$('syncClose').onclick=function(){ $('syncMask').style.display='none'; };
+$('syncMask').addEventListener('click', function(e){ if(e.target===$('syncMask')) $('syncMask').style.display='none'; });
+$('syncSave').onclick=function(){
+  var token=$('syncToken').value.trim();
+  var repo=$('syncRepo').value.trim().replace(/^https?:\/\//,'').replace(/\/$/,'');
+  var parts=repo.split('/');
+  if(!token || parts.length<2){ $('syncMsg').textContent='请填写 Token 和 仓库（owner/repo）'; $('syncMsg').className='db-msg err'; return; }
+  var sync={token:token, user:parts[0], owner:parts[0], repo:parts[parts.length-1]};
+  try{ localStorage.setItem('jcj_sync_v1', JSON.stringify(sync)); }catch(e){}
+  $('syncMsg').textContent='正在拉取云端数据…';
+  $('syncMsg').className='db-msg';
+  loadCloudMerge().then(function(){
+    if(g.cloudProfiles && g.cloudProfiles.length){
+      $('syncMsg').textContent='已连接云端：拉取到 '+g.cloudProfiles.length+' 个方案';
+      $('syncMsg').className='db-msg';
+      $('syncMask').style.display='none';
+      toast('云端数据已同步');
+      refresh(true);
+    } else {
+      $('syncMsg').textContent='已保存，但未从云端拉到方案（检查 Token/仓库）';
+      $('syncMsg').className='db-msg err';
+    }
+  });
+};
 function openMenu(){
   $('menuMask').classList.add('show');
   $('sideMenu').classList.add('show');

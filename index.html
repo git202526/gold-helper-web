@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C0905">
-<title>黄金建仓助手 V4.19</title>
+<title>黄金建仓助手 V4.20</title>
 <style>
 /* ============================================================
    V4.19 黄金建仓助手 · 全新黑金视觉（2024-2026 金融工具流行风格）
@@ -1003,6 +1003,7 @@ function defaultProfile(){
     logic: 1,
     high: null, price: null, priceManual: false, cap: 300,
     hitHigh: {1:false, 2:false},   /* 按逻辑隔离：该逻辑是否反弹到过阶段高点 */
+    sellBase: {1:null, 2:null},   /* 按逻辑隔离：止盈周期基准总持仓（初始建仓量，卖出不递减） */
     firstBuyTs: {1:null, 2:null},  /* 按逻辑隔离：该逻辑首次开仓时间戳（开仓天数用） */
     sold: {1:emptySold(), 2:emptySold()},  /* 按逻辑隔离：各批止盈已执行卖出克重（#6） */
     sellLogs: [],  /* 卖出记录流水（手动+批量，V4.19）：{id,t,mode:'manual'|'batch',logic,batch?,price,grams,total} */
@@ -1064,6 +1065,9 @@ function normalizeProfile(p){
   d.sold = (p.sold && typeof p.sold==='object')
     ? {1:normSold(p.sold[1]), 2:normSold(p.sold[2])}
     : {1:emptySold(), 2:emptySold()};
+  d.sellBase = (p.sellBase && typeof p.sellBase==='object')
+    ? {1:toNum(p.sellBase[1]), 2:toNum(p.sellBase[2])}
+    : {1:null, 2:null};
   /* 卖出记录流水（V4.19）：兼容旧数据无此字段；只保留合法条目，限 200 条防体积膨胀 */
   d.sellLogs = Array.isArray(p.sellLogs)
     ? p.sellLogs.filter(function(l){
@@ -1188,12 +1192,23 @@ function calc(){
   R.totalGrams=totalGrams; R.totalInvest=totalInvest; R.avgPrice=avgPrice;
   R.breakeven=breakeven; R.pnl=pnl; R.pnlPct=pnlPct; R.price=price;
   // 分批止盈：10%/20%/20%/20%，保留30%搏更高（高点+20），跌回0档（高点附近）全部清仓
-  var total = totalGrams;
+  /* 卖出基准 = 止盈周期初始总持仓（sellBase）：加仓后刷新基准，卖出期间固定不递减，
+     否则逐批按剩余持仓重算会导致基数越卖越小、永远清不空（修复 #1） */
+  var sb = (P.sellBase && P.sellBase[P.logic]) || 0;
+  if(totalGrams > sb){
+    sb = totalGrams;
+    if(!P.sellBase) P.sellBase = {1:null, 2:null};
+    P.sellBase[P.logic] = totalGrams;
+    try{ save(); }catch(e){}
+  }
+  var total = sb;
+  R.sellBase = sb;
   R.sell1 = round2(total*0.10);
   R.sell2 = round2(total*0.20);
   R.sell3 = round2(total*0.20);
   R.sell4 = round2(total*0.20);
-  R.sell5 = round2(total*0.30);
+  /* 保留仓 = 基准总持仓 - 前4批（余数兜底）：5 批卖出合计精确等于基准持仓，卖出后仓位清空 */
+  R.sell5 = round2(total - R.sell1 - R.sell2 - R.sell3 - R.sell4);
   /* 本轮是否反弹到过 1 档（高点），用于「跌回0档清仓保留仓」；仅更新内存标记，持久化由触发价格/高点变化的调用方 save 完成（#7） */
   if(R.valid && price!=null && price>=high && !hitHighOf(P)){ setHitHigh(P,true); }
   R.hitHigh = hitHighOf(P);
@@ -3171,7 +3186,7 @@ document.getElementById('restoreFile').addEventListener('change', restoreData);
 
 /* ===== PWA：离线缓存注册（HTTPS/localhost 下启用，file:// 打开时静默跳过） ===== */
 if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
-  navigator.serviceWorker.register('./sw.js?v=4.19').catch(function(e){ console.warn('SW 注册失败:', e); });
+  navigator.serviceWorker.register('./sw.js?v=4.20').catch(function(e){ console.warn('SW 注册失败:', e); });
 }
 if((core.cur()?core.cur():state.profiles[0]).price==null || !(core.cur()?core.cur():state.profiles[0]).priceManual){
   fetchGoldPrice(false);
